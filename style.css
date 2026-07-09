@@ -1,98 +1,110 @@
 /* ===========================
-   G2 GARAGEM - STYLE V0.3
+   G2 GARAGEM - STYLE V0.4
+   LAYOUT COMPACTO GAME
 =========================== */
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
 
-    background:#181A1F;
+    background:#101214;
     color:#fff;
-    padding:12px;
+    padding:8px;
 
 }
 
+
 /* =======================
-   TÍTULO
+   TITULO
 ======================= */
 
 h1{
 
     text-align:center;
-    font-size:34px;
-    color:#fff;
-    letter-spacing:2px;
-    text-shadow:0 0 18px #ff3b00;
+    font-size:126px;
+    color:#ff6a00;
+    letter-spacing:8px;
 
-    margin-bottom:6px;
+    text-shadow:
+    0 0 8px #ff6a00;
+
+    margin-bottom:8px;
 
 }
 
 header{
 
     text-align:center;
-    margin-bottom:15px;
+    margin-bottom:18px;
 
 }
 
 header small{
 
-    color:#9b9b9b;
+    color:#8c929b;
+    font-size:12px;
 
 }
 
+
 /* =======================
-   PAINEL
+   PAINEL STATUS
 ======================= */
 
 #painel{
 
     display:grid;
+
     grid-template-columns:1fr 1fr;
-    gap:10px;
 
-    background:#2b3039;
+    gap:6px;
 
-    padding:12px;
+    background:#1b1f24;
 
-    border-radius:18px;
+    padding:8px;
 
-    margin-top:12px;
-    margin-bottom:15px;
+    border-radius:12px;
+
+    margin-bottom:8px;
+
+    border:1px solid #303640;
 
 }
 
+
 .info{
 
-    background:#3b414b;
+    background:#252b33;
 
-    border-radius:14px;
+    border-radius:10px;
 
-    padding:12px;
+    padding:8px;
 
     text-align:center;
 
 }
 
+
 .info strong{
 
     display:block;
 
-    margin-top:5px;
+    margin-top:3px;
 
-    font-size:22px;
+    font-size:17px;
 
-    color:#00d084;
+    color:#00e676;
 
 }
 
+
 /* =======================
-   MENU
+   MENU BOTÕES
 ======================= */
 
 #menu{
@@ -101,107 +113,125 @@ header small{
 
     grid-template-columns:1fr 1fr;
 
-    gap:10px;
+    gap:7px;
 
-    margin-bottom:15px;
+    margin-bottom:10px;
 
 }
 
+
 button{
 
-    background:linear-gradient(#ff5a1f,#ff2d00);
+    background:linear-gradient(
+        180deg,
+        #ff6a00,
+        #d93600
+    );
 
-    color:#fff;
+    color:white;
 
     border:none;
 
-    border-radius:14px;
+    border-radius:10px;
 
-    padding:15px;
+    padding:9px 6px;
 
-    font-size:17px;
+    font-size:14px;
 
     font-weight:bold;
 
     cursor:pointer;
 
+    box-shadow:
+    0 3px 8px rgba(255,80,0,.25);
+
     transition:.15s;
 
-    box-shadow:0 5px 12px rgba(255,70,0,.30);
-
 }
+
 
 button:hover{
 
-    transform:translateY(-2px);
+    transform:translateY(-1px);
 
 }
+
 
 button:active{
 
-    transform:scale(.96);
+    transform:scale(.95);
 
 }
 
+
+
 /* =======================
-   CARD
+   CARDS
 ======================= */
+
 
 .card{
 
-    background:#252932;
+    background:#191d22;
 
-    border-radius:18px;
+    border-radius:14px;
 
-    padding:16px;
+    padding:12px;
 
-    margin-bottom:14px;
+    margin-bottom:10px;
 
-    border:1px solid #353b46;
+    border:1px solid #303640;
 
-    box-shadow:0 8px 18px rgba(0,0,0,.35);
+    box-shadow:
+    0 5px 15px rgba(0,0,0,.4);
 
 }
+
 
 .card h2{
 
     text-align:center;
 
-    color:#00d084;
+    color:#00e676;
 
-    font-size:28px;
+    font-size:22px;
 
-    margin-bottom:4px;
+    margin-bottom:3px;
 
-    text-shadow:0 0 10px #00d084;
+    text-shadow:
+    0 0 8px #00e676;
 
 }
+
 
 .card h3{
 
     text-align:center;
 
-    color:#ffffff;
+    font-size:17px;
 
-    font-size:20px;
+    margin-bottom:6px;
 
-    margin-bottom:8px;
+    color:#fff;
 
 }
+
 
 .card p{
 
-    font-size:16px;
+    font-size:14px;
 
-    margin:5px 0;
+    line-height:18px;
 
-    line-height:20px;
+    margin:3px 0;
 
 }
+
 
 /* =======================
    LINHA
 ======================= */
+
 
 hr{
 
@@ -209,67 +239,72 @@ hr{
 
     height:1px;
 
-    background:#424852;
+    background:#343a44;
 
-    margin:10px 0;
+    margin:8px 0;
 
 }
+
 
 /* =======================
    IMAGENS
 ======================= */
 
+
 img{
 
     width:100%;
 
-    border-radius:12px;
+    border-radius:10px;
 
-    margin-bottom:10px;
+    margin-bottom:8px;
 
 }
 
+
 /* =======================
-   CAIXAS DE VALOR
+   VALORES
 ======================= */
+
 
 .valor{
 
-    background:#2d4d36;
+    background:#123b26;
 
-    color:#66ff99;
+    color:#55ff99;
 
-    padding:10px;
+    padding:8px;
 
-    border-radius:12px;
+    border-radius:10px;
 
     text-align:center;
 
-    font-size:22px;
+    font-size:18px;
 
     font-weight:bold;
 
-    margin:8px 0;
+    margin:6px 0;
 
 }
 
+
 .preco{
 
-    background:#5a3d1c;
+    background:#463014;
 
-    color:#ffb347;
+    color:#ffc266;
 
-    padding:10px;
+    padding:8px;
 
-    border-radius:12px;
+    border-radius:10px;
 
     text-align:center;
 
-    font-size:22px;
+    font-size:18px;
 
     font-weight:bold;
 
-    margin:8px 0;
+    margin:6px 0;
 
 }
 
@@ -279,49 +314,71 @@ img{
 
 .defeito{
 
-    background:#472323;
+    background:#3b2020;
 
-    color:#ff8f8f;
+    color:#ff8d8d;
 
     border-radius:8px;
 
-    padding:8px;
+    padding:7px;
 
-    margin:5px 0;
+    margin:4px 0;
+
+    font-size:14px;
 
 }
 
+
 /* =======================
-   RESPONSIVO
+   RESPONSIVO CELULAR
 ======================= */
 
 @media(max-width:700px){
 
+    body{
+
+        padding:7px;
+
+    }
+
+
     h1{
-
-        font-size:30px;
-
-    }
-
-    button{
-
-        font-size:16px;
-
-        padding:14px;
-
-    }
-
-    .card h2{
 
         font-size:25px;
 
     }
 
+
+    button{
+
+        font-size:13px;
+
+        padding:8px 5px;
+
+    }
+
+
+    .card{
+
+        padding:10px;
+
+    }
+
+
+    .card h2{
+
+        font-size:21px;
+
+    }
+
 }
 
-/* ===========================
-   ALERTA
-=========================== */
+
+
+/* =======================
+   ALERTA MODAL
+======================= */
+
 
 .alerta{
 
@@ -329,7 +386,7 @@ img{
 
     inset:0;
 
-    background:rgba(0,0,0,.65);
+    background:rgba(0,0,0,.75);
 
     display:none;
 
@@ -341,82 +398,127 @@ img{
 
 }
 
+
+
 .alerta-box{
 
-    width:90%;
-    max-width:360px;
+    width:88%;
 
-    background:#252932;
+    max-width:330px;
 
-    border-radius:18px;
+    background:#191d22;
 
-    padding:20px;
+    border-radius:14px;
+
+    padding:16px;
 
     text-align:center;
 
-    border:2px solid #ff3300;
+    border:2px solid #ff6a00;
 
-    box-shadow:0 0 30px rgba(0,0,0,.6);
+    box-shadow:
+
+    0 0 25px rgba(255,100,0,.35);
 
 }
+
+
 
 .alerta-box h2{
 
-    color:#00d084;
+    color:#00e676;
 
-    margin-bottom:15px;
+    font-size:20px;
+
+    margin-bottom:10px;
 
 }
 
+
+
 .alerta-box p{
 
-    margin-bottom:20px;
+    font-size:14px;
+
+    line-height:20px;
+
+    margin-bottom:15px;
 
     white-space:pre-line;
 
 }
 
+
+
+
+/* =======================
+   ALERTA RÁPIDO DO JOGO
+======================= */
+
+
 .alertaJogo{
 
-    position: fixed;
+    position:fixed;
 
-    top: 20px;
+    top:12px;
 
-    left: 50%;
+    left:50%;
 
-    transform: translateX(-50%);
 
-    background:#181A1F;
+    transform:translateX(-50%);
+
+
+    background:#191d22;
 
     color:white;
 
-    padding:18px 25px;
+    padding:10px 16px;
 
-    border-radius:15px;
 
-    font-size:18px;
+    border-radius:12px;
+
+
+    font-size:14px;
 
     font-weight:bold;
 
-    box-shadow:0 0 20px #000;
+
+    border:1px solid #ff6a00;
+
+
+    box-shadow:
+
+    0 0 15px rgba(0,0,0,.8);
+
 
     z-index:9999;
 
-    animation: aparecer .3s;
+
+    animation:aparecer .3s;
 
 }
 
 
+
+
 @keyframes aparecer{
 
+
     from{
+
         opacity:0;
-        transform:translate(-50%,-20px);
+
+        transform:translate(-50%,-15px);
+
     }
 
+
     to{
+
         opacity:1;
+
         transform:translate(-50%,0);
+
     }
 
 }

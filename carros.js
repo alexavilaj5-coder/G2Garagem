@@ -2,7 +2,7 @@ function mostrarPatio(){
 
     let html = `
     <div class="card">
-        <h2>🏢 Meu Pátio</h2>
+        <h2>🏢 Garagem </h2>
         <p><b>Vagas:</b> ${jogo.carros.length}/${jogo.empresa.vagas}</p>
     </div>
     `;
@@ -53,8 +53,6 @@ function mostrarPatio(){
 
                 <hr>
 
-                <button onclick="venderCarro(${index})">
-                    💰 Vender
                 </button>
 
             </div>
@@ -78,8 +76,26 @@ function mostrarPatio(){
 function comprarCarro(){
 
     if(!jogo.ofertaAtual){
-        alert("Nenhum veículo disponível.");
+
+        mostrarAlerta(
+            "🚗 Mercado",
+            "Nenhum veículo disponível."
+        );
+
         return;
+
+    }
+
+    // Verifica vagas da empresa
+    if(jogo.carros.length >= jogo.empresa.vagas){
+
+        mostrarAlerta(
+            "🚫 Garagem Lotada",
+            `Sua empresa possui apenas ${jogo.empresa.vagas} vagas.<br><br>Venda um veículo ou expanda a empresa para comprar mais carros.`
+        );
+
+        return;
+
     }
 
     let carro = {
@@ -101,9 +117,10 @@ function comprarCarro(){
     if(jogo.dinheiro < carro.compra){
 
         mostrarAlerta(
-    "💸 Atenção",
-    "Dinheiro insuficiente."
-);
+            "💸 Atenção",
+            "Dinheiro insuficiente."
+        );
+
         return;
 
     }
@@ -119,9 +136,9 @@ function comprarCarro(){
     salvarJogo();
 
     mostrarAlerta(
-    "🚗 Compra realizada",
-    "Veículo comprado com sucesso!"
-);
+        "🚗 Compra realizada",
+        "Veículo comprado com sucesso!"
+    );
 
     mostrarPatio();
 
