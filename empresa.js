@@ -60,7 +60,7 @@ function expandirEmpresa(){
 
     if(jogo.dinheiro < custo){
 
-      
+        mostrarAlerta(
             "💸 Dinheiro insuficiente",
             `Você precisa de R$ ${custo.toLocaleString("pt-BR")} para expandir sua empresa.`
         );
@@ -199,9 +199,9 @@ function mostrarSobre(){
 
         <hr>
 
-        <p><b>Versão:</b> 0.13 Alpha Dev..</p>
+        <p><b>Versão:</b> 0.13 Alpha</p>
 
-        <p><b>Desenvolvedor:</b> Alex Ávila</p>
+        <p><b>Desenvolvedor:</b> Alex Avila</p>
 
         <hr>
 
@@ -251,7 +251,7 @@ function mostrarCreditos(){
 
         <p><b>Jogo</b></p>
 
-        <h3>G2 Garage</h3>
+        <h3>G2 Garagem</h3>
 
         <hr>
 
@@ -259,15 +259,15 @@ function mostrarCreditos(){
         👨‍💻 Desenvolvedor
         </p>
 
-        <h3>Alex Ávila</h3>
+        <h3>Alex avila</h3>
 
         <hr>
 
         <p>
-        🤖 Assistência de Programação
+        🤖 Assistência de idéias 
         </p>
 
-        <h3> </h3>
+        <h3>Carlos Edom</h3>
 
         <hr>
 
@@ -313,7 +313,7 @@ Achou algum erro?
 
 Tem alguma ideia para melhorar o jogo?
 
-Toda sugestão é muito bem-vinda e ajuda o desenvolvimento do G2 Garagem.
+Toda sugestão é muito bem-vinda e ajuda o desenvolvimento do G2 Garage.
 
 Obrigado por participar deste projeto!
 
