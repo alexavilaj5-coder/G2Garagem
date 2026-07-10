@@ -92,7 +92,7 @@ function carregarJogo(){
 
         jogo.empresa={
 
-            nome:"RAFFA REPASSES",
+            nome:"GARAGEM G2",
             nivel:1,
             vagas:2,
             funcionarios:0

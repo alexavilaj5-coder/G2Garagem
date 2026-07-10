@@ -61,17 +61,32 @@ function mostrarTelaInicial(){
 
     <div class="card">
 
-        <h2>🚗 VERSÃO DO DESENVOLVEDOR 0.2</h2>
+        <h2>🚗 O INICIO DE TUDO!</h2>
 
         <p>
-        📖 O Início de Tudo
+        📖 Você vendeu o seu carro para realizar um sonho: abrir sua própria garagem de veículos. Começando do zero, será preciso negociar bem, consertar carros, conquistar clientes e administrar as despesas. Faça escolhas inteligentes, expanda sua empresa e construa uma das maiores revendas do Brasil."
         
         </p>
-
+        
         <br>
 
         <p>
-        Você vendeu o seu carro para realizar um sonho: abrir sua própria garagem de veículos. Começando do zero, será preciso negociar bem, consertar carros, conquistar clientes e administrar as despesas. Faça escolhas inteligentes, expanda sua empresa e construa uma das maiores revendas do Brasil."
+        ✅ G2 GARAGEM, SEU NOVO GAME!
+</p> 
+</p> 
+Bem-vindo ao seu novo negócio automotivo!
+
+Aqui você começa pequeno, comprando carros usados, fazendo negociações, consertando defeitos e aumentando seu patrimônio.
+
+💰 Compre barato
+🔧 Resolva problemas mecânicos
+📈 Venda com lucro
+🏆 Construa sua própria garagem de sucesso
+
+Cada carro tem uma história... e cada negociação pode mudar o futuro da sua empresa.
+
+Boa sorte, chefe! 🔥
+
         
         </p>
 

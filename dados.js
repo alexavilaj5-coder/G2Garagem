@@ -189,7 +189,34 @@ const carros = [
 {marca:"Volkswagen",modelo:"Fusca",versao:"1600 conversível original",fipe:85000},
 {marca:"Chevrolet",modelo:"Opala",versao:"4.1 Comodoro Diplomata",fipe:55000},
 {marca:"Ford",modelo:"Escort",versao:"1.8 XR3 Conversível",fipe:38000},
-{marca:"Volkswagen",modelo:"Gol",versao:"2.0 GTI 16V Bola",fipe:75000}
+{marca:"Volkswagen",modelo:"Gol",versao:"2.0 GTI 16V Bola",fipe:75000},
+{
+marca:"Porsche",
+modelo:"911",
+versao:"Turbo S",
+fipe:1250000
+},
+
+{
+marca:"Toyota",
+modelo:"Supra",
+versao:"GR 3.0 Turbo",
+fipe:500000
+},
+
+{
+marca:"Mercedes-Benz",
+modelo:"AMG GT",
+versao:"63 S V8 Biturbo",
+fipe:1400000
+},
+
+{
+marca:"BMW",
+modelo:"M4",
+versao:"Competition Coupé",
+fipe:650000
+}
 
 
 

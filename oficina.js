@@ -4,7 +4,7 @@
 
 function mostrarOficina(){
 
-    let html = "<h2>🔧 Oficina sadiM</h2>";
+    let html = "<h2>🔧 OFICINA</h2>";
 
     if(jogo.carros.length==0){
 

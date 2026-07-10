@@ -1,20 +1,25 @@
 /* ===========================
-   G2 GARAGEM - STYLE V0.4
-   LAYOUT COMPACTO GAME
+   G2 GARAGEM - STYLE V0.6
+   NOVA PALETA DE CORES
 =========================== */
+
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+    font-family:"Segoe UI",Arial,sans-serif;
 }
+
 
 body{
 
-    background:#101214;
+    background:
+    radial-gradient(circle at top,#25252b,#090a0d 60%);
+
     color:#fff;
-    padding:8px;
+
+    padding:10px;
 
 }
 
@@ -23,38 +28,57 @@ body{
    TITULO
 ======================= */
 
+
 h1{
 
     text-align:center;
-    font-size:126px;
-    color:#ff6a00;
-    letter-spacing:8px;
+
+    font-size:42px;
+
+    font-weight:900;
+
+    letter-spacing:4px;
+
+    color:#ff3030;
+
+    text-transform:uppercase;
+
 
     text-shadow:
-    0 0 8px #ff6a00;
+    0 0 5px #ff3030,
+    0 0 15px rgba(255,48,48,.7);
 
-    margin-bottom:8px;
+
+    margin:5px 0 10px;
 
 }
+
+
 
 header{
 
     text-align:center;
-    margin-bottom:18px;
+
+    margin-bottom:15px;
 
 }
 
+
+
 header small{
 
-    color:#8c929b;
+    color:#9298a3;
+
     font-size:12px;
 
 }
 
 
+
 /* =======================
-   PAINEL STATUS
+   PAINEL STATUS HUD
 ======================= */
+
 
 #painel{
 
@@ -62,104 +86,172 @@ header small{
 
     grid-template-columns:1fr 1fr;
 
-    gap:6px;
+    gap:8px;
 
-    background:#1b1f24;
 
-    padding:8px;
+    background:#17181d;
 
-    border-radius:12px;
+    padding:10px;
 
-    margin-bottom:8px;
 
-    border:1px solid #303640;
+    border-radius:16px;
+
+
+    border:
+
+    1px solid #353943;
+
+
+    box-shadow:
+
+    inset 0 0 20px rgba(0,0,0,.7),
+    0 5px 20px rgba(0,0,0,.5);
+
+
+    margin-bottom:12px;
 
 }
+
 
 
 .info{
 
-    background:#252b33;
 
-    border-radius:10px;
+    background:
 
-    padding:8px;
+    linear-gradient(
+    145deg,
+    #292b33,
+    #191b20
+    );
+
+
+    border-radius:12px;
+
+
+    padding:10px;
+
 
     text-align:center;
 
+
+    border:1px solid #3b3f4a;
+
+
 }
+
 
 
 .info strong{
 
     display:block;
 
-    margin-top:3px;
 
-    font-size:17px;
+    margin-top:5px;
+
+
+    font-size:18px;
+
 
     color:#00e676;
 
+
+    text-shadow:
+
+    0 0 8px rgba(0,230,118,.5);
+
 }
+
 
 
 /* =======================
-   MENU BOTÕES
+   MENU
 ======================= */
+
 
 #menu{
 
+
     display:grid;
+
 
     grid-template-columns:1fr 1fr;
 
-    gap:7px;
 
-    margin-bottom:10px;
+    gap:8px;
+
+
+    margin-bottom:12px;
 
 }
+
 
 
 button{
 
-    background:linear-gradient(
-        180deg,
-        #ff6a00,
-        #d93600
+
+    background:
+
+    linear-gradient(
+    180deg,
+    #ff3b30,
+    #b71c1c
     );
+
 
     color:white;
 
+
     border:none;
 
-    border-radius:10px;
 
-    padding:9px 6px;
+    border-radius:12px;
 
-    font-size:14px;
 
-    font-weight:bold;
+    padding:10px 5px;
+
+
+    font-size:13px;
+
+
+    font-weight:800;
+
+
+    letter-spacing:.5px;
+
 
     cursor:pointer;
 
+
     box-shadow:
-    0 3px 8px rgba(255,80,0,.25);
+
+    0 4px 0 #7f0000,
+    0 8px 15px rgba(255,48,48,.25);
+
 
     transition:.15s;
 
+
 }
+
 
 
 button:hover{
 
-    transform:translateY(-1px);
+    filter:brightness(1.15);
 
 }
 
 
+
 button:active{
 
-    transform:scale(.95);
+    transform:translateY(3px);
+
+
+    box-shadow:
+
+    0 1px 0 #7f0000;
 
 }
 
@@ -172,64 +264,96 @@ button:active{
 
 .card{
 
-    background:#191d22;
 
-    border-radius:14px;
+    background:
 
-    padding:12px;
+    linear-gradient(
+    145deg,
+    #202127,
+    #111216
+    );
 
-    margin-bottom:10px;
 
-    border:1px solid #303640;
+    border-radius:16px;
+
+
+    padding:14px;
+
+
+    margin-bottom:12px;
+
+
+    border:
+
+    1px solid #383c47;
+
 
     box-shadow:
-    0 5px 15px rgba(0,0,0,.4);
+
+    0 8px 25px rgba(0,0,0,.45);
+
 
 }
+
 
 
 .card h2{
 
+
     text-align:center;
 
-    color:#00e676;
 
-    font-size:22px;
+    color:#00c853;
 
-    margin-bottom:3px;
+
+    font-size:21px;
+
+
+    margin-bottom:8px;
+
 
     text-shadow:
-    0 0 8px #00e676;
+
+    0 0 10px rgba(0,200,83,.6);
+
 
 }
+
 
 
 .card h3{
 
+
     text-align:center;
 
-    font-size:17px;
-
-    margin-bottom:6px;
 
     color:#fff;
 
+
+    font-size:17px;
+
+
+    margin-bottom:8px;
+
 }
+
 
 
 .card p{
 
+
     font-size:14px;
 
-    line-height:18px;
 
-    margin:3px 0;
+    color:#ddd;
+
+
+    line-height:20px;
 
 }
 
-
 /* =======================
-   LINHA
+   LINHA DIVISÓRIA
 ======================= */
 
 
@@ -239,137 +363,185 @@ hr{
 
     height:1px;
 
-    background:#343a44;
+
+    background:
+
+    linear-gradient(
+    90deg,
+    transparent,
+    #454954,
+    transparent
+    );
+
+
+    margin:10px 0;
+
+}
+
+
+
+/* =======================
+   IMAGENS DOS CARROS
+======================= */
+
+
+img{
+
+
+    width:100%;
+
+
+    border-radius:14px;
+
+
+    margin-bottom:10px;
+
+
+    border:1px solid #3b3f4a;
+
+
+    box-shadow:
+
+    0 5px 15px rgba(0,0,0,.5);
+
+}
+
+
+
+/* =======================
+   DINHEIRO / VALORES
+======================= */
+
+
+.valor{
+
+
+    background:
+
+    linear-gradient(
+    135deg,
+    #075e32,
+    #061c14
+    );
+
+
+    color:#69f0ae;
+
+
+    padding:10px;
+
+
+    border-radius:12px;
+
+
+    text-align:center;
+
+
+    font-size:19px;
+
+
+    font-weight:900;
+
+
+    border:
+
+    1px solid #00c853;
+
+
+    box-shadow:
+
+    0 0 12px rgba(0,200,83,.25);
+
 
     margin:8px 0;
 
 }
 
 
-/* =======================
-   IMAGENS
-======================= */
-
-
-img{
-
-    width:100%;
-
-    border-radius:10px;
-
-    margin-bottom:8px;
-
-}
-
-
-/* =======================
-   VALORES
-======================= */
-
-
-.valor{
-
-    background:#123b26;
-
-    color:#55ff99;
-
-    padding:8px;
-
-    border-radius:10px;
-
-    text-align:center;
-
-    font-size:18px;
-
-    font-weight:bold;
-
-    margin:6px 0;
-
-}
 
 
 .preco{
 
-    background:#463014;
 
-    color:#ffc266;
+    background:
 
-    padding:8px;
+    linear-gradient(
+    135deg,
+    #594000,
+    #211600
+    );
 
-    border-radius:10px;
+
+    color:#ffd54f;
+
+
+    padding:10px;
+
+
+    border-radius:12px;
+
 
     text-align:center;
 
-    font-size:18px;
 
-    font-weight:bold;
+    font-size:19px;
 
-    margin:6px 0;
+
+    font-weight:900;
+
+
+    border:
+
+    1px solid #ffc107;
+
+
+    box-shadow:
+
+    0 0 12px rgba(255,193,7,.25);
+
+
+    margin:8px 0;
 
 }
 
+
+
 /* =======================
-   DEFEITOS
+   DEFEITOS DO VEÍCULO
 ======================= */
+
 
 .defeito{
 
-    background:#3b2020;
 
-    color:#ff8d8d;
+    background:
 
-    border-radius:8px;
+    linear-gradient(
+    135deg,
+    #4a1616,
+    #210909
+    );
 
-    padding:7px;
 
-    margin:4px 0;
+    color:#ff8a80;
+
+
+    border-radius:10px;
+
+
+    padding:9px;
+
+
+    margin:5px 0;
+
 
     font-size:14px;
 
-}
 
+    border:
 
-/* =======================
-   RESPONSIVO CELULAR
-======================= */
+    1px solid #ff1744;
 
-@media(max-width:700px){
-
-    body{
-
-        padding:7px;
-
-    }
-
-
-    h1{
-
-        font-size:25px;
-
-    }
-
-
-    button{
-
-        font-size:13px;
-
-        padding:8px 5px;
-
-    }
-
-
-    .card{
-
-        padding:10px;
-
-    }
-
-
-    .card h2{
-
-        font-size:21px;
-
-    }
 
 }
 
@@ -382,17 +554,26 @@ img{
 
 .alerta{
 
+
     position:fixed;
+
 
     inset:0;
 
-    background:rgba(0,0,0,.75);
+
+    background:
+
+    rgba(0,0,0,.80);
+
 
     display:none;
 
+
     justify-content:center;
 
+
     align-items:center;
+
 
     z-index:9999;
 
@@ -402,35 +583,63 @@ img{
 
 .alerta-box{
 
-    width:88%;
 
-    max-width:330px;
+    width:90%;
 
-    background:#191d22;
 
-    border-radius:14px;
+    max-width:340px;
 
-    padding:16px;
+
+    background:
+
+
+    linear-gradient(
+    145deg,
+    #20252d,
+    #0d0f13
+    );
+
+
+    border-radius:18px;
+
+
+    padding:18px;
+
 
     text-align:center;
 
-    border:2px solid #ff6a00;
+
+    border:
+
+    2px solid #ff3030;
+
 
     box-shadow:
 
-    0 0 25px rgba(255,100,0,.35);
+
+    0 0 30px rgba(255,48,48,.35);
+
+
+    animation:
+
+    subir .25s;
 
 }
 
 
 
+
 .alerta-box h2{
 
-    color:#00e676;
 
-    font-size:20px;
+    color:#00c853;
+
+
+    font-size:21px;
+
 
     margin-bottom:10px;
+
 
 }
 
@@ -438,11 +647,18 @@ img{
 
 .alerta-box p{
 
+
+    color:#ddd;
+
+
     font-size:14px;
 
-    line-height:20px;
+
+    line-height:21px;
+
 
     margin-bottom:15px;
+
 
     white-space:pre-line;
 
@@ -450,17 +666,19 @@ img{
 
 
 
-
 /* =======================
-   ALERTA RÁPIDO DO JOGO
+   ALERTA RÁPIDO
 ======================= */
 
 
 .alertaJogo{
 
+
     position:fixed;
 
-    top:12px;
+
+    top:15px;
+
 
     left:50%;
 
@@ -468,37 +686,60 @@ img{
     transform:translateX(-50%);
 
 
-    background:#191d22;
+
+    background:
+
+
+    linear-gradient(
+    145deg,
+    #20252d,
+    #101318
+    );
+
+
 
     color:white;
 
-    padding:10px 16px;
+
+    padding:12px 18px;
 
 
-    border-radius:12px;
+    border-radius:14px;
 
 
     font-size:14px;
 
+
     font-weight:bold;
 
 
-    border:1px solid #ff6a00;
+
+    border:
+
+    1px solid #ff3030;
+
 
 
     box-shadow:
 
-    0 0 15px rgba(0,0,0,.8);
+    0 0 20px rgba(0,0,0,.8);
+
 
 
     z-index:9999;
 
 
-    animation:aparecer .3s;
+    animation:
+
+    aparecer .3s;
 
 }
 
 
+
+/* =======================
+   ANIMAÇÕES
+======================= */
 
 
 @keyframes aparecer{
@@ -508,7 +749,8 @@ img{
 
         opacity:0;
 
-        transform:translate(-50%,-15px);
+        transform:
+        translate(-50%,-20px);
 
     }
 
@@ -517,8 +759,97 @@ img{
 
         opacity:1;
 
-        transform:translate(-50%,0);
+        transform:
+        translate(-50%,0);
 
     }
+
+}
+
+
+
+@keyframes subir{
+
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+/* =======================
+   CELULAR
+======================= */
+
+
+@media(max-width:700px){
+
+
+    body{
+
+        padding:7px;
+
+    }
+
+
+
+    h1{
+
+        font-size:28px;
+
+        letter-spacing:2px;
+
+    }
+
+
+
+    button{
+
+        font-size:12px;
+
+        padding:9px 4px;
+
+    }
+
+
+
+    .card{
+
+        padding:11px;
+
+    }
+
+
+
+    .card h2{
+
+        font-size:19px;
+
+    }
+
+
+
+    .valor,
+    .preco{
+
+        font-size:17px;
+
+    }
+
 
 }

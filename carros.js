@@ -128,6 +128,8 @@ function comprarCarro(){
     jogo.dinheiro -= carro.compra;
 
     jogo.carros.push(carro);
+    
+    jogo.ofertaAtual = null;
 
     jogo.estatisticas.comprados++;
 
@@ -140,6 +142,6 @@ function comprarCarro(){
         "Veículo comprado com sucesso!"
     );
 
-    mostrarPatio();
+    gerarOferta();
 
 }
