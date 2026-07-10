@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>G2 Garagem</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🚗 G2 GARAGEM</h1>
+
+<p style="color:#aaa;text-align:center;">
+🚧 Jogo em fase de desenvolvimento 🚧
+</p>
+
+<div id="painel">
+
+<div class="info">
+💰 Caixa
+<br>
+<strong id="caixa">R$ 25.000</strong>
+</div>
+
+<div class="info">
+📅 Dia
+<br>
+<strong id="dia">1</strong>
+</div>
+
+<div class="info">
+⭐ Reputação
+<br>
+<strong id="reputacao">0</strong>
+</div>
+
+<div class="info">
+📈 Lucro
+<br>
+<strong id="lucro">R$ 0</strong>
+</div>
+
+</div>
+
+</header>
+
+<nav id="menu">
+
+
+
+<button id="btnPatio">🏢 GARAGEM</button>
+
+
+<button id="btnOficina">🔧 OFICINA</button>
+
+<button id="btnBanco">🏦 BANCO</button>
+
+<button id="btnClientes">👤 PROPOSTAS</button>
+
+<button id="btnEmpresa">🏢 EMPRESA</button>
+
+<button id="btnEstatisticas">📊 ESTATISTICAS</button>
+
+<button id="btnMercado">🚗 MERCADO</button>
+
+<button id="btnProximoDia">📅 PRÓXIMO DIA</button>
+
+<button onclick="mostrarConfiguracoes()">⚙️ CONFIGURACÔES
+
+<button id=" ">🎲 EM BREVE</button>
+
+<button id=" ">⛽ EM BREVE</button>
+
+<button id=" ">EM BREVE</button>
+
+<button id=" ">EM BREVE</button>
+
+<button id=" ">EM BREVE</button>
+
+</nav>
+
+<main id="conteudo">
+
+<h2>Bem-vindo!</h2>
+
+<p>
+Compre carros abaixo da FIPE, conserte os defeitos,
+negocie com clientes e transforme sua pequena garagem
+na maior revenda de carros do Brasil.
+</p>
+
+</main>
+
+<!-- Scripts -->
+
+<script src="dados.js"></script>
+<div id="alerta" class="alerta">
+    <div class="alerta-box">
+
+        <h2 id="alertaTitulo">Mensagem</h2>
+
+        <p id="alertaTexto"></p>
+
+        <button onclick="fecharAlerta()">
+            OK
+        </button>
+
+    </div>
+</div>
+<script src="mercado.js"></script>
+<script src="carros.js"></script>
+<script src="oficina.js"></script>
+<script src="banco.js"></script>
+<script src="clientes.js"></script>
+<script src="empresa.js"></script>
+<script src="estatisticas.js"></script>
+<script src="tempo.js"></script>
+<script src="save.js"></script>
+<script src="alerta.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
