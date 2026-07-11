@@ -15,19 +15,19 @@
 body{
 
     background:
-    radial-gradient(circle at top,#25252b,#090a0d 60%);
+    radial-gradient(circle at top,#353d4a 0%,#1b1f27 35%,#0d0f14 100%);
 
     color:#fff;
 
-    padding:10px;
+    padding:15px;
+
+    min-height:100vh;
 
 }
-
 
 /* =======================
    TITULO
 ======================= */
-
 
 h1{
 
@@ -53,16 +53,22 @@ h1{
 
 }
 
-
-
 header{
 
-    text-align:center;
+    background:linear-gradient(180deg,#1f232b,#15181d);
 
-    margin-bottom:15px;
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:22px;
+
+    padding:18px;
+
+    margin-bottom:18px;
+
+    box-shadow:
+    0 12px 35px rgba(0,0,0,.45);
 
 }
-
 
 
 header small{
@@ -79,89 +85,120 @@ header small{
    PAINEL STATUS HUD
 ======================= */
 
+/* =======================
+   PAINEL STATUS
+======================= */
+
+/*==========================
+        HUD NOVO
+==========================*/
 
 #painel{
 
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:8px;
-
-
-    background:#17181d;
-
-    padding:10px;
-
-
-    border-radius:16px;
-
-
-    border:
-
-    1px solid #353943;
-
-
-    box-shadow:
-
-    inset 0 0 20px rgba(0,0,0,.7),
-    0 5px 20px rgba(0,0,0,.5);
-
-
-    margin-bottom:12px;
+    margin:10px 0;
 
 }
 
+.hud{
 
+    background:linear-gradient(180deg,#242935,#191d26);
 
-.info{
+    border-radius:29px;
 
+    padding:18px;
 
-    background:
+    border:1px solid rgba(255,255,255,.08);
 
-    linear-gradient(
-    145deg,
-    #292b33,
-    #191b20
-    );
+    box-shadow:
+    0 12px 30px rgba(0,0,0,.35);
 
+}
 
-    border-radius:12px;
-
-
-    padding:10px;
-
+.hud-caixa{
 
     text-align:center;
 
-
-    border:1px solid #3b3f4a;
-
+    margin-bottom:15px;
 
 }
 
+.hud-caixa span{
 
+    color:#bbb;
 
-.info strong{
+    font-size:15px;
+
+}
+
+.hud-caixa strong{
 
     display:block;
 
+    margin-top:8px;
 
-    margin-top:5px;
+    font-size:34px;
 
+    color:#31f27d;
 
-    font-size:18px;
-
-
-    color:#00e676;
-
-
-    text-shadow:
-
-    0 0 8px rgba(0,230,118,.5);
+    font-weight:900;
 
 }
 
+.hud-info{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:12px;
+
+}
+
+.hud-info div{
+
+    background:#2b303d;
+
+    border-radius:16px;
+
+    padding:12px;
+
+    text-align:center;
+
+}
+
+.hud-info span{
+
+    display:block;
+
+    color:#bbb;
+
+    font-size:13px;
+
+}
+
+.hud-info strong{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:18px;
+
+    color:#ffffff;
+
+}
+
+.hud hr{
+
+    border:none;
+
+    height:1px;
+
+    background:rgba(255,255,255,.08);
+
+    margin:15px 0;
+
+}
 
 
 /* =======================
@@ -171,74 +208,54 @@ header small{
 
 #menu{
 
-
     display:grid;
 
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
 
-    grid-template-columns:1fr 1fr;
+    gap:12px;
 
-
-    gap:8px;
-
-
-    margin-bottom:12px;
+    margin-bottom:18px;
 
 }
-
 
 
 button{
 
+    background:linear-gradient(180deg,#3b4252,#232833);
 
-    background:
-
-    linear-gradient(
-    180deg,
-    #ff3b30,
-    #b71c1c
-    );
-
-
-    color:white;
-
+    color:#fff;
 
     border:none;
 
+    border-radius:16px;
 
-    border-radius:12px;
+    padding:14px;
 
-
-    padding:10px 5px;
-
-
-    font-size:13px;
-
+    font-size:14px;
 
     font-weight:800;
 
-
     letter-spacing:.5px;
-
 
     cursor:pointer;
 
+    transition:.20s;
 
     box-shadow:
 
-    0 4px 0 #7f0000,
-    0 8px 15px rgba(255,48,48,.25);
-
-
-    transition:.15s;
-
+    0 8px 20px rgba(0,0,0,.35);
 
 }
 
-
-
 button:hover{
 
-    filter:brightness(1.15);
+    transform:translateY(-3px);
+
+    filter:brightness(1.08);
+
+    box-shadow:
+
+    0 15px 30px rgba(255,80,70,.35);
 
 }
 
@@ -246,12 +263,7 @@ button:hover{
 
 button:active{
 
-    transform:translateY(3px);
-
-
-    box-shadow:
-
-    0 1px 0 #7f0000;
+    transform:scale(.97);
 
 }
 
@@ -264,93 +276,76 @@ button:active{
 
 .card{
 
+    background:linear-gradient(180deg,#242933,#1a1e26);
 
-    background:
+    border-radius:22px;
 
-    linear-gradient(
-    145deg,
-    #202127,
-    #111216
-    );
+    padding:18px;
 
+    margin-bottom:18px;
 
-    border-radius:16px;
-
-
-    padding:14px;
-
-
-    margin-bottom:12px;
-
-
-    border:
-
-    1px solid #383c47;
-
+    border:1px solid rgba(255,255,255,.08);
 
     box-shadow:
+    0 15px 35px rgba(0,0,0,.45);
 
-    0 8px 25px rgba(0,0,0,.45);
+    transition:.25s;
 
+    overflow:hidden;
+
+    position:relative;
 
 }
 
+.card:hover{
 
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 20px 45px rgba(0,0,0,.60);
+
+}
 
 .card h2{
 
+    color:#ffffff;
+
+    font-size:25px;
+
+    font-weight:900;
 
     text-align:center;
 
-
-    color:#00c853;
-
-
-    font-size:21px;
-
-
-    margin-bottom:8px;
-
-
-    text-shadow:
-
-    0 0 10px rgba(0,200,83,.6);
-
+    margin-bottom:4px;
 
 }
-
 
 
 .card h3{
 
+    color:#bfc6d4;
+
+    font-size:16px;
 
     text-align:center;
 
+    margin-bottom:15px;
 
-    color:#fff;
-
-
-    font-size:17px;
-
-
-    margin-bottom:8px;
+    font-weight:500;
 
 }
-
 
 
 .card p{
 
+    color:#d7dce4;
 
-    font-size:14px;
+    font-size:15px;
 
-
-    color:#ddd;
-
-
-    line-height:20px;
+    line-height:24px;
 
 }
+
 
 /* =======================
    LINHA DIVISÓRIA
@@ -363,21 +358,11 @@ hr{
 
     height:1px;
 
+    background:rgba(255,255,255,.08);
 
-    background:
-
-    linear-gradient(
-    90deg,
-    transparent,
-    #454954,
-    transparent
-    );
-
-
-    margin:10px 0;
+    margin:15px 0;
 
 }
-
 
 
 /* =======================
@@ -412,48 +397,23 @@ img{
    DINHEIRO / VALORES
 ======================= */
 
-
 .valor{
 
+    background:linear-gradient(135deg,#0d8d50,#045a31);
 
-    background:
+    border-radius:15px;
 
-    linear-gradient(
-    135deg,
-    #075e32,
-    #061c14
-    );
-
-
-    color:#69f0ae;
-
-
-    padding:10px;
-
-
-    border-radius:12px;
-
+    padding:15px;
 
     text-align:center;
 
-
-    font-size:19px;
-
+    font-size:22px;
 
     font-weight:900;
 
+    color:#fff;
 
-    border:
-
-    1px solid #00c853;
-
-
-    box-shadow:
-
-    0 0 12px rgba(0,200,83,.25);
-
-
-    margin:8px 0;
+    margin:10px 0;
 
 }
 
@@ -462,48 +422,23 @@ img{
 
 .preco{
 
+    background:linear-gradient(135deg,#ff9800,#ef6c00);
 
-    background:
+    border-radius:15px;
 
-    linear-gradient(
-    135deg,
-    #594000,
-    #211600
-    );
-
-
-    color:#ffd54f;
-
-
-    padding:10px;
-
-
-    border-radius:12px;
-
+    padding:15px;
 
     text-align:center;
 
-
-    font-size:19px;
-
+    font-size:22px;
 
     font-weight:900;
 
+    color:#fff;
 
-    border:
-
-    1px solid #ffc107;
-
-
-    box-shadow:
-
-    0 0 12px rgba(255,193,7,.25);
-
-
-    margin:8px 0;
+    margin:10px 0;
 
 }
-
 
 
 /* =======================
@@ -513,38 +448,19 @@ img{
 
 .defeito{
 
+    background:#2b2022;
 
-    background:
-
-    linear-gradient(
-    135deg,
-    #4a1616,
-    #210909
-    );
-
-
-    color:#ff8a80;
-
+    border-left:5px solid #ff5252;
 
     border-radius:10px;
 
+    padding:12px;
 
-    padding:9px;
+    margin:8px 0;
 
-
-    margin:5px 0;
-
-
-    font-size:14px;
-
-
-    border:
-
-    1px solid #ff1744;
-
+    color:#ffd3d3;
 
 }
-
 
 
 /* =======================
@@ -818,15 +734,35 @@ img{
 
 
 
-    button{
+.alerta-box button{
 
-        font-size:12px;
+    min-width:140px;
+    height:52px;
 
-        padding:9px 4px;
+    font-size:22px;
+    font-weight:800;
 
-    }
+    border-radius:14px;
 
+    margin-top:15px;
 
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.alerta-box button:hover{
+
+    transform:scale(1.05);
+
+}
+
+.alerta-box button:active{
+
+    transform:scale(.98);
+
+}
 
     .card{
 
@@ -851,5 +787,69 @@ img{
 
     }
 
+
+}
+
+button{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+button::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-120%;
+
+    width:80%;
+
+    height:100%;
+
+    background:
+
+    linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    rgba(255,255,255,.35),
+
+    transparent
+
+    );
+
+    transition:.5s;
+
+}
+
+button:hover::before{
+
+    left:140%;
+
+}
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:4px;
+
+    background:linear-gradient(90deg,#00e676,#ff9800,#ff3d00);
 
 }

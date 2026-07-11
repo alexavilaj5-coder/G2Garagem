@@ -87,6 +87,8 @@ const jogo = {
 
 
 const carros = [
+  
+  {marca:"RARO",modelo:"IMPALA SUPERNATURAL",versao:"CARRO ESPECIAL",fipe:9999999},
 
 {marca:"Honda",modelo:"Titan Esd (teste) ",versao:"150",fipe:8500},
 

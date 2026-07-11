@@ -1,14 +1,44 @@
 // ===========================
 // MERCADO.JS
 // ===========================
+function gerarAno(modelo){
+
+    if(typeof anosModelos !== "undefined" && anosModelos[modelo.modelo]){
+
+        return aleatorio(
+            anosModelos[modelo.modelo].inicio,
+            anosModelos[modelo.modelo].fim
+        );
+
+    }
+
+    return aleatorio(2008, jogo.ano);
+
+}
+
+function gerarKm(ano){
+
+    let idade = jogo.ano - ano;
+
+    let kmMin = idade * 8000;
+    let kmMax = idade * 18000;
+
+    if(kmMin < 5000) kmMin = 5000;
+    if(kmMax < 30000) kmMax = 30000;
+
+    return aleatorio(kmMin, kmMax);
+
+}
+
+
 
 function gerarOferta(){
 
     let modelo = carros[aleatorio(0, carros.length - 1)];
 
-    let ano = aleatorio(2008, 2024);
+let ano = gerarAno(modelo);
 
-    let km = aleatorio(35000, 280000);
+let km = gerarKm(ano);
 
     let cor = cores[aleatorio(0, cores.length - 1)];
 
