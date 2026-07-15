@@ -15,7 +15,7 @@
 body{
 
     background:
-    radial-gradient(circle at top,#353d4a 0%,#1b1f27 35%,#0d0f14 100%);
+    radial-gradient(circle at top,#4B0082 0%,#1b1f27 35%,#122134 100%);
 
     color:#fff;
 
@@ -33,23 +33,35 @@ h1{
 
     text-align:center;
 
-    font-size:42px;
+    font-size:90px;
 
     font-weight:900;
 
-    letter-spacing:4px;
-
-    color:#ff3030;
+    letter-spacing:12px;
 
     text-transform:uppercase;
 
+    margin:0 0 8px;
 
-    text-shadow:
-    0 0 5px #ff3030,
-    0 0 15px rgba(255,48,48,.7);
+    background:linear-gradient(
+    90deg,
+    #00e5ff,
+    #4d7cff,
+    #9c4dff,
+    #ff4db8,
+    #00e5ff
+    );
 
+    background-size:400%;
 
-    margin:5px 0 10px;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+
+    animation:
+    tituloGlow 6s linear infinite,
+    tituloPulse 2s ease-in-out infinite;
+
+    filter:drop-shadow(0 0 6px rgba(0,229,255,.6));
 
 }
 
@@ -59,11 +71,11 @@ header{
 
     border:1px solid rgba(255,255,255,.08);
 
-    border-radius:22px;
+    border-radius:12px;
 
-    padding:18px;
+    padding:20px;
 
-    margin-bottom:18px;
+    margin-bottom:8px;
 
     box-shadow:
     0 12px 35px rgba(0,0,0,.45);
@@ -103,14 +115,17 @@ header small{
 
     background:linear-gradient(180deg,#242935,#191d26);
 
-    border-radius:29px;
+    border-radius:20px;
 
-    padding:18px;
+    padding:10px;
 
     border:1px solid rgba(255,255,255,.08);
 
     box-shadow:
     0 12px 30px rgba(0,0,0,.35);
+    filter:saturate(1.08) contrast(1.05);
+
+transition:.35s;
 
 }
 
@@ -118,7 +133,7 @@ header small{
 
     text-align:center;
 
-    margin-bottom:15px;
+    margin-bottom:1px;
 
 }
 
@@ -126,7 +141,7 @@ header small{
 
     color:#bbb;
 
-    font-size:15px;
+    font-size:24px;
 
 }
 
@@ -134,9 +149,9 @@ header small{
 
     display:block;
 
-    margin-top:8px;
+    margin-top:4px;
 
-    font-size:34px;
+    font-size:40px;
 
     color:#31f27d;
 
@@ -150,7 +165,7 @@ header small{
 
     grid-template-columns:repeat(3,1fr);
 
-    gap:12px;
+    gap:11px;
 
 }
 
@@ -158,9 +173,9 @@ header small{
 
     background:#2b303d;
 
-    border-radius:16px;
+    border-radius:12px;
 
-    padding:12px;
+    padding:6px;
 
     text-align:center;
 
@@ -172,7 +187,7 @@ header small{
 
     color:#bbb;
 
-    font-size:13px;
+    font-size:11px;
 
 }
 
@@ -182,7 +197,7 @@ header small{
 
     margin-top:6px;
 
-    font-size:18px;
+    font-size:16px;
 
     color:#ffffff;
 
@@ -196,7 +211,7 @@ header small{
 
     background:rgba(255,255,255,.08);
 
-    margin:15px 0;
+    margin:14px 0;
 
 }
 
@@ -205,67 +220,6 @@ header small{
    MENU
 ======================= */
 
-
-#menu{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-
-    gap:12px;
-
-    margin-bottom:18px;
-
-}
-
-
-button{
-
-    background:linear-gradient(180deg,#3b4252,#232833);
-
-    color:#fff;
-
-    border:none;
-
-    border-radius:16px;
-
-    padding:14px;
-
-    font-size:14px;
-
-    font-weight:800;
-
-    letter-spacing:.5px;
-
-    cursor:pointer;
-
-    transition:.20s;
-
-    box-shadow:
-
-    0 8px 20px rgba(0,0,0,.35);
-
-}
-
-button:hover{
-
-    transform:translateY(-3px);
-
-    filter:brightness(1.08);
-
-    box-shadow:
-
-    0 15px 30px rgba(255,80,70,.35);
-
-}
-
-
-
-button:active{
-
-    transform:scale(.97);
-
-}
 
 
 
@@ -294,6 +248,10 @@ button:active{
     overflow:hidden;
 
     position:relative;
+    
+    backdrop-filter:blur(8px);
+
+-webkit-backdrop-filter:blur(8px);
 
 }
 
@@ -372,22 +330,27 @@ hr{
 
 img{
 
-
     width:100%;
 
+    border-radius:16px;
 
-    border-radius:14px;
+    margin-bottom:12px;
 
-
-    margin-bottom:10px;
-
-
-    border:1px solid #3b3f4a;
-
+    border:2px solid rgba(77,200,255,.35);
 
     box-shadow:
+    0 10px 25px rgba(0,120,255,.22);
 
-    0 5px 15px rgba(0,0,0,.5);
+    transition:.30s;
+
+}
+
+img:hover{
+
+    transform:scale(1.02);
+
+    box-shadow:
+    0 15px 35px rgba(0,170,255,.35);
 
 }
 
@@ -396,12 +359,18 @@ img{
 /* =======================
    DINHEIRO / VALORES
 ======================= */
-
 .valor{
 
-    background:linear-gradient(135deg,#0d8d50,#045a31);
+    background:
+    linear-gradient(
+    135deg,
+    #00d46a,
+    #00a651
+    );
 
-    border-radius:15px;
+    border:1px solid rgba(0,255,140,.35);
+
+    border-radius:16px;
 
     padding:15px;
 
@@ -411,9 +380,17 @@ img{
 
     font-weight:900;
 
-    color:#fff;
+    color:#ffffff;
+
+    text-shadow:
+    0 0 10px rgba(0,255,136,.45);
+
+    box-shadow:
+    0 10px 25px rgba(0,180,90,.30);
 
     margin:10px 0;
+    
+    animation:dinheiroGlow 2.5s infinite alternate;
 
 }
 
@@ -422,9 +399,16 @@ img{
 
 .preco{
 
-    background:linear-gradient(135deg,#ff9800,#ef6c00);
+    background:
+    linear-gradient(
+    135deg,
+    #ffb300,
+    #ff6f00
+    );
 
-    border-radius:15px;
+    border:1px solid rgba(255,190,60,.35);
+
+    border-radius:16px;
 
     padding:15px;
 
@@ -434,12 +418,17 @@ img{
 
     font-weight:900;
 
-    color:#fff;
+    color:#ffffff;
+
+    text-shadow:
+    0 0 10px rgba(255,170,0,.35);
+
+    box-shadow:
+    0 10px 25px rgba(255,140,0,.30);
 
     margin:10px 0;
 
 }
-
 
 /* =======================
    DEFEITOS DO VEÍCULO
@@ -448,17 +437,96 @@ img{
 
 .defeito{
 
-    background:#2b2022;
+    background:
+    linear-gradient(
+    135deg,
+    #412026,
+    #261217
+    );
 
-    border-left:5px solid #ff5252;
+    border-left:6px solid #ff3d5f;
 
-    border-radius:10px;
+    border-radius:14px;
 
     padding:12px;
 
-    margin:8px 0;
+    margin:10px 0;
 
-    color:#ffd3d3;
+    color:#ffe5e8;
+
+    box-shadow:
+    0 6px 18px rgba(255,61,95,.18);
+
+}
+
+
+#menu{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+
+    gap:12px;
+
+    margin-bottom:18px;
+
+}
+
+
+button{
+
+    background:
+    linear-gradient(
+    180deg,
+    #808080,
+    #1C1C1C
+    );
+
+    color:#ffffff;
+
+    border:1px solid rgba(255,255,255,.12);
+
+    border-radius:18px;
+
+    padding:15px;
+
+    font-size:15px;
+
+    font-weight:900;
+
+    letter-spacing:1px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:
+    0 8px 22px rgba(0,80,255,.35),
+    inset 0 1px 0 rgba(255,255,255,.15);
+
+}
+
+button:hover{
+
+    transform:translateY(-4px);
+
+    background:
+    linear-gradient(
+    180deg,
+    #353535,
+    #00BFFF
+    );
+
+    box-shadow:
+    0 15px 35px rgba(0,120,255,.45);
+    
+    letter-spacing:1.5px;
+
+}
+
+button:active{
+
+    transform:scale(.96);
 
 }
 
@@ -499,46 +567,29 @@ img{
 
 .alerta-box{
 
-
     width:90%;
-
 
     max-width:340px;
 
-
     background:
-
-
     linear-gradient(
     145deg,
-    #20252d,
-    #0d0f13
+    #1d2840,
+    #0b1018
     );
-
 
     border-radius:18px;
 
-
     padding:18px;
-
 
     text-align:center;
 
-
-    border:
-
-    2px solid #ff3030;
-
+    border:2px solid #42b8ff;
 
     box-shadow:
+    0 0 35px rgba(66,184,255,.35);
 
-
-    0 0 30px rgba(255,48,48,.35);
-
-
-    animation:
-
-    subir .25s;
+    animation:subir .2s;
 
 }
 
@@ -547,36 +598,50 @@ img{
 
 .alerta-box h2{
 
+    color:#46ff8b;
 
-    color:#00c853;
-
-
-    font-size:21px;
-
-
-    margin-bottom:10px;
-
+    text-shadow:
+    0 0 12px rgba(70,255,139,.40);
 
 }
 
 
 
-.alerta-box p{
+.alertaJogo{
 
+    position:fixed;
 
-    color:#ddd;
+    top:15px;
 
+    left:50%;
+
+    transform:translateX(-50%);
+
+    background:
+    linear-gradient(
+    145deg,
+    #1c2840,
+    #101722
+    );
+
+    color:white;
+
+    padding:12px 18px;
+
+    border-radius:15px;
 
     font-size:14px;
 
+    font-weight:900;
 
-    line-height:21px;
+    border:1px solid #42b8ff;
 
+    box-shadow:
+    0 0 30px rgba(66,184,255,.35);
 
-    margin-bottom:15px;
+    z-index:9999;
 
-
-    white-space:pre-line;
+    animation:aparecer .3s;
 
 }
 
@@ -726,9 +791,9 @@ img{
 
     h1{
 
-        font-size:28px;
+        font-size:40px;
 
-        letter-spacing:2px;
+        letter-spacing:4px;
 
     }
 
@@ -806,27 +871,22 @@ button::before{
 
     top:0;
 
-    left:-120%;
+    left:-130%;
 
-    width:80%;
+    width:70%;
 
     height:100%;
 
     background:
 
     linear-gradient(
-
     90deg,
-
     transparent,
-
-    rgba(255,255,255,.35),
-
+    rgba(255,255,255,.65),
     transparent
-
     );
 
-    transition:.5s;
+    transition:.55s;
 
 }
 
@@ -848,8 +908,111 @@ button:hover::before{
 
     width:100%;
 
-    height:4px;
+    height:5px;
 
-    background:linear-gradient(90deg,#00e676,#ff9800,#ff3d00);
+    background:
+    linear-gradient(
+    90deg,
+    #00d4ff,
+    #3b82ff,
+    #ff4500,
+    #7c4dff,
+    #ff3cac
+    );
+
+    background-size:300%;
+
+    animation:brilhoCard 8s linear infinite;
 
 }
+
+@keyframes brilhoCard{
+
+    0%{
+
+        background-position:0%;
+
+    }
+
+    100%{
+
+        background-position:300%;
+
+    }
+
+}
+
+@keyframes dinheiroGlow{
+
+    from{
+
+        box-shadow:
+
+        0 0 15px rgba(0,255,120,.20);
+
+    }
+
+    to{
+
+        box-shadow:
+
+        0 0 28px rgba(0,255,120,.45);
+
+    }
+
+}
+
+@keyframes tituloGlow{
+
+    0%{
+        background-position:0%;
+    }
+
+    100%{
+        background-position:300%;
+    }
+
+}
+
+@keyframes tituloGlow{
+
+    0%{
+        background-position:0%;
+    }
+
+    100%{
+        background-position:400%;
+    }
+
+}
+
+@keyframes tituloPARARPulse{
+
+    0%{
+
+        transform:scale(1);
+
+        filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
+
+    }
+
+    50%{
+
+        transform:scale(1.23);
+
+        filter:
+        drop-shadow(0 0 12px rgba(124,77,255,.8))
+        drop-shadow(0 0 20px rgba(255,77,184,.5));
+
+    }
+
+    100%{
+
+        transform:scale(1);
+
+        filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
+
+    }
+
+}
+
