@@ -4,7 +4,7 @@
 
 function mostrarEmpresa(){
 
-    let custoExpansao = jogo.empresa.nivel * 75000;
+    let custoExpansao = jogo.empresa.nivel * 15000;
 
     conteudo.innerHTML = `
 
@@ -34,6 +34,7 @@ function mostrarEmpresa(){
 
         <p>
         🏗️ Próxima expansão
+        Dobre suas vagas...
         <br>
         <strong>R$ ${custoExpansao.toLocaleString("pt-BR")}</strong>
         </p>
@@ -56,7 +57,7 @@ function mostrarEmpresa(){
 
 function expandirEmpresa(){
 
-    let custo = jogo.empresa.nivel * 75000;
+    let custo = jogo.empresa.nivel * 15000;
 
     if(jogo.dinheiro < custo){
 
@@ -73,7 +74,7 @@ function expandirEmpresa(){
 
     jogo.empresa.nivel++;
 
-    jogo.empresa.vagas += 2;
+    jogo.empresa.vagas += 4;
 
     atualizarPainel();
 

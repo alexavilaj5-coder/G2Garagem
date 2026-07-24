@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>G2 Garagem</title>
+<title>🚗 G2 Garage</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -14,106 +13,256 @@
 
 <body>
 
-<header>
+<div id="app">
 
-<h1>🚗 G2 GARAGEM</h1>
 
-<p style="color:#aaa;text-align:center;">
-🚧 Jogo em fase de desenvolvimento 🚧
-</p>
+<header id="topo">
+  
+  <div id="avisoTopo"></div>
 
-<div id="painel">
+<div class="topbar">
 
-    <div class="hud">
 
-        <div class="hud-caixa">
-            <span>💰 Caixa</span>
-            <strong id="caixa">R$ 25.000</strong>
-        </div>
+<div class="empresa">
 
-        <hr>
+<div class="logo">🚗</div>
 
-        <div class="hud-info">
+<div class="empresa-info">
 
-            <div>
-                <span>📅 Dia</span>
-                <strong id="dia">1</strong>
-            </div>
+<h1>G2 GARAGE</h1>
 
-            <div>
-                <span>⭐ Reputação</span>
-                <strong id="reputacao">0</strong>
-            </div>
-
-            <div>
-                <span>📈 Lucro</span>
-                <strong id="lucro">R$ 0</strong>
-            </div>
-
-        </div>
-
-    </div>
+<small id="nivelEmpresa">
+⭐ Nível 1 - Garagem de Bairro
+</small>
 
 </div>
 
+</div>
+
+
+
+<div class="hud-mini">
+
+
+<div class="box">
+
+<span>💵</span>
+
+<small>Caixa</small>
+
+<strong id="caixa">
+R$ 400.000
+</strong>
+
+</div>
+
+
+
+<div class="box">
+
+<span>📅</span>
+
+<small>Data</small>
+
+<strong id="dia">
+1/01
+</strong>
+
+</div>
+
+
+
+<div class="box">
+
+<span>⭐</span>
+
+<small>Reputação</small>
+
+<strong id="reputacao">
+0
+</strong>
+
+</div>
+
+
+
+<div class="box">
+
+<span>🚗</span>
+
+<small>Vagas</small>
+
+<strong id="vagas">
+0/2
+</strong>
+
+</div>
+
+
+
+<div class="box">
+
+<span>📈</span>
+
+<small>Lucro</small>
+
+<strong id="lucro">
+R$ 0
+</strong>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
 </header>
+
+_______🧰🪛JOGO EM FASE DE DESENVOLVIMENTO....VERSÃO PRÉ ALPHA______
+
+<!-- APENAS TELA INICIAL -->
+
+<section id="showroom" style="display:none;">
+
+<img id="fotoPrincipal"
+src="imagens/logo.png"
+alt="Carro">
+
+<h2 id="tituloShowroom">
+Bem-vindo ao G2 Garage
+</h2>
+
+<p id="descricaoShowroom">
+Compre, conserte e venda carros para construir a maior garagem do Brasil.
+</p>
+
+</section>
+
+
+
+
+<main id="conteudo">
+
+
+<div class="card">
+
+
+<h2>
+🚗 O INÍCIO DE TUDO!
+</h2>
+
+
+<p>
+Você começou sua própria garagem de veículos.
+Compre carros abaixo da FIPE, faça reparos,
+negocie com clientes e aumente seu patrimônio.
+</p>
+
+
+</div>
+
+
+</main>
+
+
+
+
 
 <nav id="menu">
 
 
+<button id="btnPatio">
+🏠
+<span>Garagem</span>
+</button>
 
-<button id="btnPatio">🏢 GARAGEM</button>
 
 
-<button id="btnOficina">🔧 OFICINA</button>
+<button id="btnMercado">
+🛒
+<span>Mercado</span>
+</button>
 
-<button id="btnBanco">🏦 BANCO</button>
 
-<button id="btnClientes">👤 PROPOSTAS</button>
 
-<button id="btnEmpresa">🏢 EMPRESA</button>
+<button id="btnClientes">
+👥
+<span>Clientes</span>
+</button>
 
-<button id="btnEstatisticas">📊 ESTATISTICAS</button>
 
-<button id="btnMercado">🚗 MERCADO</button>
 
-<button id="btnProximoDia">📅 PRÓXIMO DIA</button>
+<button id="btnOficina">
+🔧
+<span>Oficina</span>
+</button>
 
-<button onclick="mostrarConfiguracoes()">⚙️ CONFIGURACÔES
 
-<button id=" ">🎲 EM BREVE</button>
+
+<button id="btnBanco">
+🏦
+<span>Banco</span>
+</button>
+
+
+
+<button id="btnEmpresa">
+🏢
+<span>Empresa</span>
+</button>
+
+
+
+<button id="btnEstatisticas">
+📊
+<span>Stats</span>
+</button>
+
+
+
+<button id="btnProximoDia">
+⏩
+<span>Dia</span>
+</button>
 
 
 </nav>
 
-<main id="conteudo">
 
-<h2>Bem-vindo!</h2>
 
-<p>
-Compre carros abaixo da FIPE, conserte os defeitos,
-negocie com clientes e transforme sua pequena garagem
-na maior revenda de carros do Brasil.
-</p>
 
-</main>
+<div id="alerta" class="alerta">
 
-<!-- Scripts -->
+
+<div class="alerta-box">
+
+
+<h2 id="alertaTitulo">
+Mensagem
+</h2>
+
+
+<p id="alertaTexto"></p>
+
+
+
+<button onclick="fecharAlerta()">
+OK
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
 
 <script src="dados.js"></script>
-<div id="alerta" class="alerta">
-    <div class="alerta-box">
-
-        <h2 id="alertaTitulo">Mensagem</h2>
-
-        <p id="alertaTexto"></p>
-
-        <button onclick="fecharAlerta()">
-            OK
-        </button>
-
-    </div>
-</div>
 <script src="anos.js"></script>
 <script src="mercado.js"></script>
 <script src="carros.js"></script>
@@ -126,6 +275,8 @@ na maior revenda de carros do Brasil.
 <script src="save.js"></script>
 <script src="alerta.js"></script>
 <script src="script.js"></script>
+<script src="conquistas.js"></script>
+
 
 </body>
 </html>

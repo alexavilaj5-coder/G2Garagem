@@ -328,15 +328,46 @@ function aceitarOferta(){
 
     let carro = jogo.carros[cliente.carro];
 
-    if(!carro){
+if(!carro){
 
-        jogo.clienteAtual = null;
+    jogo.clienteAtual = null;
 
-        mostrarClientes();
+    mostrarClientes();
 
-        return;
+    return;
 
-    }
+}
+
+
+// ===========================
+// BLOQUEIO CARRO NA OFICINA
+// ===========================
+
+if(carro.reparos && carro.reparos.length > 0){
+
+    mostrarAlerta(
+        "🔧 Veículo em reparo",
+        `
+
+${carro.marca} ${carro.nome}
+
+Ainda está na oficina.
+
+Aguarde o término dos reparos
+antes de vender.
+
+`
+    );
+
+    jogo.clienteAtual = null;
+
+    salvarJogo();
+
+    mostrarClientes();
+
+    return;
+
+}
 
     let valor = cliente.oferta;
 

@@ -1,36 +1,54 @@
 // ===========================
-// TEMPO.JS
+// TEMPO.JS V2
 // G2 GARAGEM
 // ===========================
 
+
 // ===========================
-// CALENDÁRIO
+// DIAS DA SEMANA
 // ===========================
 
 const diasSemana = [
-    "Domingo",
-    "Segunda-feira",
-    "Terça-feira",
-    "Quarta-feira",
-    "Quinta-feira",
-    "Sexta-feira",
-    "Sábado"
+
+"Domingo",
+"Segunda-feira",
+"Terça-feira",
+"Quarta-feira",
+"Quinta-feira",
+"Sexta-feira",
+"Sábado"
+
 ];
+
+
+
 
 // ===========================
 // DESPESAS MENSAIS
 // ===========================
 
 const despesasMensais = [
-    {nome:"🏢 Aluguel da Garagem",valor:5500},
-    {nome:"💡 Energia",valor:1280},
-    {nome:"💧 Água",valor:180},
-    {nome:"🌐 Internet",valor:150},
-    {nome:"📄 Alvará",valor:350},
-    {nome:"🧹 Limpeza",valor:250},
-    {nome:"🛡 Seguro",valor:450},
-    {nome:"☕ Café e Materiais",valor:120}
+
+{nome:"🏢 Aluguel da Garagem",valor:5500},
+
+{nome:"💡 Energia",valor:1280},
+
+{nome:"💧 Água",valor:180},
+
+{nome:"🌐 Internet",valor:150},
+
+{nome:"📄 Alvará",valor:350},
+
+{nome:"🧹 Limpeza",valor:250},
+
+{nome:"🛡 Seguro",valor:450},
+
+{nome:"☕ Café e Materiais",valor:120}
+
 ];
+
+
+
 
 // ===========================
 // DESPESAS DIÁRIAS
@@ -38,23 +56,24 @@ const despesasMensais = [
 
 const despesasDiarias = [
 
-    {nome:"☕ Café da Equipe",valor:17},
+{nome:"☕ Café da Equipe",valor:17},
 
-    {nome:"🧹 Produtos de Limpeza",valor:15},
+{nome:"🧹 Produtos de Limpeza",valor:15},
 
-    {nome:"🍽️ Almoço Funcionários",valor:80},
+{nome:"🍽️ Almoço Funcionários",valor:80},
 
-    {nome:"🥤 Bebidas da Equipe",valor:25},
+{nome:"🥤 Bebidas da Equipe",valor:25},
 
-    {nome:"🧽 Lavagem dos Veículos",valor:50},
+{nome:"🧽 Lavagem dos Veículos",valor:50},
 
-    {nome:"🔧 Ferramentas e Manutenção",valor:50},
+{nome:"🔧 Ferramentas e Manutenção",valor:50},
 
-    {nome:"🧹 Diária Faxineira",valor:120},
-
-    {nome:"📢 Divulgação da Garagem",valor:100}
+{nome:"📢 Divulgação da Garagem",valor:100}
 
 ];
+
+
+
 
 // ===========================
 // INICIAR CALENDÁRIO
@@ -62,116 +81,180 @@ const despesasDiarias = [
 
 function iniciarCalendario(){
 
-    if(jogo.mes===undefined) jogo.mes=1;
-    if(jogo.ano===undefined) jogo.ano=2026;
-    if(jogo.diaSemana===undefined) jogo.diaSemana=4;
+
+if(jogo.mes===undefined)
+jogo.mes=1;
+
+
+if(jogo.ano===undefined)
+jogo.ano=2026;
+
+
+if(jogo.diaSemana===undefined)
+jogo.diaSemana=4;
+
 
 }
 
+
+
+
+
 // ===========================
-// DATA DO PAINEL
+// DATA NO PAINEL
 // ===========================
 
 function atualizarDataPainel(){
 
-    iniciarCalendario();
 
-    dia.innerHTML =
-    diasSemana[jogo.diaSemana] +
-    "<br>" +
-    String(jogo.dia).padStart(2,"0") +
-    "/" +
-    String(jogo.mes).padStart(2,"0") +
-    "/" +
-    jogo.ano;
+iniciarCalendario();
+
+
+
+dia.innerHTML =
+
+diasSemana[jogo.diaSemana]
+
++
+
+"<br>"
+
++
+
+String(jogo.dia).padStart(2,"0")
+
++
+
+"/"
+
++
+
+String(jogo.mes).padStart(2,"0")
+
++
+
+"/"
+
++
+
+jogo.ano;
+
 
 }
 
+
+
+
+
+
 // ===========================
-// DESPESAS DO DIA
+// COBRAR DESPESAS DIÁRIAS
 // ===========================
 
 function cobrarDespesasDiarias(){
 
-    let total = 0;
 
-    let texto = "☕ DESPESAS DO DIA\n\n";
+let total=0;
 
-    despesasDiarias.forEach(function(despesa){
 
-        total += despesa.valor;
 
-        texto +=
-        despesa.nome +
-        " - R$ " +
-        despesa.valor.toLocaleString("pt-BR") +
-        "\n";
+despesasDiarias.forEach(function(d){
 
-    });
 
-    jogo.dinheiro -= total;
+total += d.valor;
 
-    jogo.financeiro.gastosHoje += total;
-    jogo.financeiro.gastosMes += total;
-    jogo.financeiro.gastosTotal += total;
 
-    texto += "\n━━━━━━━━━━━━━━";
+});
 
-    texto += "\nTOTAL: R$ " +
-    total.toLocaleString("pt-BR");
 
-    texto += "\n\n💰 Caixa Atual\nR$ " +
-    jogo.dinheiro.toLocaleString("pt-BR");
 
-    mostrarAlerta(
-        "💸 Despesas do Dia",
-        texto
-    );
+jogo.dinheiro -= total;
+
+
+jogo.financeiro.gastosHoje += total;
+
+jogo.financeiro.gastosMes += total;
+
+jogo.financeiro.gastosTotal += total;
+
+
 
 }
 
+
+
+
+
+
+
 // ===========================
-// CONTAS DO MÊS
+// COBRAR CONTAS DO MÊS
 // ===========================
 
 function cobrarDespesasMensais(){
 
-    let total = 0;
 
-    let texto = "🏢 CONTAS DO MÊS\n\n";
+let total=0;
 
-    despesasMensais.forEach(function(despesa){
 
-        total += despesa.valor;
+let texto="🏢 CONTAS DO MÊS\n\n";
 
-        texto +=
-        despesa.nome +
-        " - R$ " +
-        despesa.valor.toLocaleString("pt-BR") +
-        "\n";
 
-    });
 
-    jogo.dinheiro -= total;
+despesasMensais.forEach(function(d){
 
-    jogo.financeiro.gastosMes += total;
-    jogo.financeiro.gastosTotal += total;
-    jogo.financeiro.gastosContas += total;
 
-    texto += "\n━━━━━━━━━━━━━━";
+total += d.valor;
 
-    texto += "\nTOTAL: R$ " +
-    total.toLocaleString("pt-BR");
 
-    texto += "\n\n💰 Caixa Atual\nR$ " +
-    jogo.dinheiro.toLocaleString("pt-BR");
+texto +=
 
-    mostrarAlerta(
-        "🏢 Contas do Mês",
-        texto
-    );
+d.nome+
+
+" - R$ "+
+
+d.valor.toLocaleString("pt-BR")
+
++
+
+"\n";
+
+
+});
+
+
+
+jogo.dinheiro -= total;
+
+
+
+jogo.financeiro.gastosMes += total;
+
+jogo.financeiro.gastosTotal += total;
+
+jogo.financeiro.gastosContas += total;
+
+
+
+mostrarAlerta(
+
+"🏢 Contas Pagas",
+
+texto+
+
+"\n\nTOTAL: R$ "+
+
+total.toLocaleString("pt-BR")
+
+);
 
 }
+
+
+
+
+
+
 
 // ===========================
 // AVANÇAR DIA
@@ -181,68 +264,65 @@ function avancarDia(){
 
     iniciarCalendario();
 
-    // Zera gastos do dia
     jogo.financeiro.gastosHoje = 0;
 
-    // Avança um dia
-    jogo.dia++;
-    jogo.diaSemana++;
+    function passarDia(){
 
-    // Reinicia a semana
-    if(jogo.diaSemana > 6){
-        jogo.diaSemana = 0;
-    }
+        jogo.dia++;
+        jogo.diaSemana++;
 
-    // Cobra despesas do dia
-    cobrarDespesasDiarias();
+        if(jogo.diaSemana > 6){
+            jogo.diaSemana = 0;
+        }
 
-    // Virou o mês
-    if(jogo.dia > 30){
+        cobrarDespesasDiarias();
 
-        jogo.dia = 1;
-        jogo.mes++;
+        if(typeof atualizarOficinaDia === "function"){
+            atualizarOficinaDia();
+        }
 
-        // Zera gastos do mês
-        jogo.financeiro.gastosMes = 0;
+        if(typeof atualizarClientesNovoDia === "function"){
+            atualizarClientesNovoDia();
+        }
 
-        // Cobra contas mensais
-        cobrarDespesasMensais();
+        if(jogo.dia > 30){
 
-        mostrarAlerta(
-            "📅 Novo Mês",
-`🏢 Um novo mês começou!
+            jogo.dia = 1;
+            jogo.mes++;
 
-As contas mensais foram pagas.
+            cobrarDespesasMensais();
 
-Boa sorte nas próximas negociações!`
-        );
+            mostrarAlerta(
+                "📅 Novo Mês",
+                "Um novo mês começou na G2 Garagem!"
+            );
 
-    }
+        }
 
-    // Virou o ano
-    if(jogo.mes > 12){
+        if(jogo.mes > 12){
 
-        jogo.mes = 1;
-        jogo.ano++;
+            jogo.mes = 1;
+            jogo.ano++;
 
-        mostrarAlerta(
-            "🎉 Feliz Ano Novo!",
-`Parabéns!
+            mostrarAlerta(
+                "🎉 Feliz Ano Novo",
+                "Bem-vindo a " + jogo.ano + "!"
+            );
 
-A G2 GARAGEM entrou em ${jogo.ano}.
-
-Que seja um ano de muito lucro! 🚗`
-        );
+        }
 
     }
 
-    // Atualiza clientes do dia
-    if(typeof atualizarClientesNovoDia === "function"){
-        atualizarClientesNovoDia();
+    passarDia();
+
+    // pula sábado e domingo automaticamente
+    while(jogo.diaSemana == 6 || jogo.diaSemana == 0){
+        passarDia();
     }
 
-    // Gera nova oferta do mercado
-    gerarOferta();
+    if(typeof gerarOferta === "function"){
+        gerarOferta();
+    }
 
     salvarJogo();
 
@@ -250,24 +330,44 @@ Que seja um ano de muito lucro! 🚗`
 
     atualizarDataPainel();
 
-    // Resumo do dia
-    mostrarAlerta(
-        "📅 Novo Dia",
-`${diasSemana[jogo.diaSemana]}
+    const avisos = [
 
-📅 ${String(jogo.dia).padStart(2,"0")}/${String(jogo.mes).padStart(2,"0")}/${jogo.ano}
+        "🚗 Novos carros chegaram ao mercado!",
 
-━━━━━━━━━━━━━━
+        "💰 Hora de fechar bons negócios!",
 
-💸 Gastos Hoje
-R$ ${jogo.financeiro.gastosHoje.toLocaleString("pt-BR")}
+        "👀 Clientes estão pesquisando veículos.",
 
-💰 Caixa
-R$ ${jogo.dinheiro.toLocaleString("pt-BR")}
+        "🔧 A oficina iniciou novos serviços.",
 
-🚗 Novos veículos chegaram ao mercado!
+        "🏆 Mais um dia para aumentar sua reputação!",
 
-👥 Novos clientes podem aparecer hoje.`
+        "📈 O mercado foi atualizado.",
+
+        "🚘 Pode aparecer um carro raro hoje!",
+
+        "💸 Negocie bem e aumente seus lucros!",
+
+        "🔥 Bom trabalho, chefe!",
+
+        "📢 Novas oportunidades apareceram!",
+
+        "⭐ Sua garagem continua crescendo!",
+
+        "🚙 SUVs e esportivos podem aparecer hoje!"
+
+    ];
+
+    const texto = avisos[Math.floor(Math.random()*avisos.length)];
+
+    mostrarAvisoTopo(
+        "📅 " + diasSemana[jogo.diaSemana] +
+        "<br>" +
+        String(jogo.dia).padStart(2,"0") + "/" +
+        String(jogo.mes).padStart(2,"0") + "/" +
+        jogo.ano +
+        "<br><br>" +
+        texto
     );
 
 }

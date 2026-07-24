@@ -1,12 +1,15 @@
 // ===========================
-// OFICINA.JS
+// OFICINA.JS V3
+// G2 GARAGEM
 // ===========================
+
 
 function mostrarOficina(){
 
     let html = "<h2>🔧 OFICINA</h2>";
 
-    if(jogo.carros.length==0){
+
+    if(jogo.carros.length == 0){
 
         html += "<p>Você não possui carros.</p>";
 
@@ -16,65 +19,183 @@ function mostrarOficina(){
 
     }
 
+
+
     jogo.carros.forEach(function(carro,index){
+
 
         html += `
 
         <div class="card">
 
-        <h2>${carro.marca} ${carro.nome}</h2>
 
-        <p><b>Ano:</b> ${carro.ano}</p>
+        <h2>
+        ${carro.marca} ${carro.modelo}
+        </h2>
 
-        <p><b>KM:</b> ${carro.km.toLocaleString("pt-BR")}</p>
 
-        <p><b>Cor:</b> ${carro.cor}</p>
+        <p>
+        📅 Ano: ${carro.ano}
+        </p>
+
+
+        <p>
+        🛣️ KM: ${carro.km ? carro.km.toLocaleString("pt-BR") : "N/A"}
+        </p>
+
+
+        <p>
+        🎨 Cor: ${carro.cor || "Não informado"}
+        </p>
+
 
         <hr>
 
         `;
 
-        if(carro.defeitos.length==0){
+
+
+        // ===========================
+        // REPAROS EM ANDAMENTO
+        // ===========================
+
+
+        if(carro.reparos && carro.reparos.length > 0){
+
+
+            html += `
+
+            <h3>
+            ⏳ Reparos em andamento
+            </h3>
+
+            `;
+
+
+            carro.reparos.forEach(function(reparo){
+
+
+                html += `
+
+                <div class="defeito">
+
+
+                🔧 ${reparo.nome}
+
+                <br>
+
+                💰 R$ ${reparo.valor.toLocaleString("pt-BR")}
+
+
+                <br>
+
+                ⏰ Faltam:
+                ${reparo.dias} dias
+
+
+                </div>
+
+
+                `;
+
+
+            });
+
+
+
+        }
+
+
+
+        // ===========================
+        // CARRO PRONTO
+        // ===========================
+
+
+        if(
+        (!carro.defeitos || carro.defeitos.length == 0)
+        &&
+        (!carro.reparos || carro.reparos.length == 0)
+        ){
+
 
             html += `
 
             <p style="color:#4CAF50">
 
-            ✅ Carro revisado
+            ✅ Veículo revisado e pronto
 
             </p>
 
             `;
 
-        }else{
 
-            html += "<h3>Defeitos</h3>";
+        }
+
+
+
+        // ===========================
+        // DEFEITOS
+        // ===========================
+
+
+        if(carro.defeitos && carro.defeitos.length > 0){
+
+
+            html += `
+
+            <h3>
+            🔧 Defeitos encontrados
+            </h3>
+
+            `;
+
+
 
             carro.defeitos.forEach(function(defeito,posicao){
 
+
+
                 html += `
 
-                <p>
+
+                <div class="defeito">
+
 
                 🔧 ${defeito.nome}
 
-                - R$ ${defeito.valor.toLocaleString("pt-BR")}
 
-                </p>
+                <br>
 
-                <button onclick="consertarDefeito(${index},${posicao})">
 
-                Consertar
+                💰 R$ ${defeito.valor.toLocaleString("pt-BR")}
+
+
+                </div>
+
+
+
+                <button onclick="iniciarReparo(${index},${posicao})">
+
+                🔧 Enviar para oficina
 
                 </button>
 
+
                 <br><br>
+
 
                 `;
 
+
+
             });
 
+
+
         }
+
+
 
         html += `
 
@@ -84,50 +205,209 @@ function mostrarOficina(){
 
         `;
 
+
+
     });
+
+
 
     conteudo.innerHTML = html;
 
+
 }
 
-function consertarDefeito(indiceCarro,indiceDefeito){
+
+
+
+
+// ===========================
+// INICIAR REPARO
+// ===========================
+
+
+function iniciarReparo(indiceCarro,indiceDefeito){
+
 
     let carro = jogo.carros[indiceCarro];
 
+
     let defeito = carro.defeitos[indiceDefeito];
+
+
+
+    if(!carro.reparos){
+
+        carro.reparos=[];
+
+    }
+
+
 
     if(jogo.dinheiro < defeito.valor){
 
-        alert("Dinheiro insuficiente.");
+
+        mostrarAlerta(
+
+        "💸 Dinheiro insuficiente",
+
+        "Você não possui dinheiro para realizar esse reparo."
+
+        );
+
 
         return;
 
     }
 
+
+
+    let prazo = aleatorio(3,7);
+
+
+
     jogo.dinheiro -= defeito.valor;
 
-    jogo.lucro -= defeito.valor;
 
-    carro.custo -= defeito.valor;
+
+    carro.reparos.push({
+
+        nome:defeito.nome,
+
+        valor:defeito.valor,
+
+        dias:prazo,
+
+        totalDias:prazo
+
+    });
+
+
 
     carro.defeitos.splice(indiceDefeito,1);
 
-    if(carro.defeitos.length==0){
 
-        carro.arrumado = true;
 
-        jogo.reputacao++;
+    jogo.financeiro.gastosConsertos += defeito.valor;
 
-    }
 
-    jogo.estatisticas.consertados++;
 
     atualizarPainel();
 
     salvarJogo();
 
-    alert("🔧 Reparo concluído!");
+
+
+    mostrarAlerta(
+
+    "🔧 Reparo iniciado",
+
+`${defeito.nome}
+
+
+⏳ Prazo:
+${prazo} dias
+
+
+O veículo ficará parado na oficina.`
+
+    );
+
+
 
     mostrarOficina();
+
+
+
+}
+
+
+
+
+
+// ===========================
+// AVANÇO DE DIAS DA OFICINA
+// ===========================
+
+
+function atualizarOficinaDia(){
+
+
+
+    jogo.carros.forEach(function(carro){
+
+
+
+        if(carro.reparos && carro.reparos.length > 0){
+
+
+
+            carro.reparos.forEach(function(reparo){
+
+
+                reparo.dias--;
+
+
+            });
+
+
+
+
+
+            carro.reparos =
+            carro.reparos.filter(function(reparo){
+
+
+
+                if(reparo.dias <= 0){
+
+
+
+                    jogo.estatisticas.consertados++;
+
+
+                    jogo.reputacao++;
+
+
+
+                    mostrarAlerta(
+
+                    "✅ Reparo concluído",
+
+`${carro.marca} ${carro.modelo}
+
+
+🔧 ${reparo.nome}
+
+
+Veículo pronto para venda!`
+
+                    );
+
+
+
+                    return false;
+
+
+                }
+
+
+
+                return true;
+
+
+            });
+
+
+
+        }
+
+
+
+    });
+
+
+
+    salvarJogo();
+
 
 }

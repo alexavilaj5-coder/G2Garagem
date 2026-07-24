@@ -6,7 +6,7 @@ const anosModelos = {
 
     "IMPALA SUPERNATURAL":{inicio:1967,fim:1967},
 
-    "Gol":{inicio:2000,fim:2008},
+    "Gol G3":{inicio:2000,fim:2003},
     "Gol G5":{inicio:2009,fim:2012},
     "Gol G6":{inicio:2013,fim:2016},
 
@@ -43,6 +43,7 @@ const anosModelos = {
     "911":{inicio:2020,fim:2026},
     "Supra":{inicio:1993,fim:2002},
     "AMG GT":{inicio:2015,fim:2026},
-    "M4":{inicio:2014,fim:2026}
+    "M4":{inicio:2014,fim:2026},
+    "Focus":{inicio:2001,fim:2003},
 
 };

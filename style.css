@@ -1,1018 +1,560 @@
-/* ===========================
-   G2 GARAGEM - STYLE V0.6
-   NOVA PALETA DE CORES
-=========================== */
+/* ==========================================
+   G2 GARAGE PREMIUM STYLE V3.0 (SUPER EDITION)
+========================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&display=swap');
+
+:root{
+  --fundo: #080808;
+  --card: #121212;
+  --card2: #181818;
+
+  --amarelo: #ffc400;
+  --amarelo-glow: rgba(255, 196, 0, 0.4);
+  --verde: #00d26a;
+  --vermelho: #ff3030;
+  --azul: #00aaff;
+
+  --texto: #ffffff;
+  --cinza: #999;
+}
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:"Segoe UI",Arial,sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Rajdhani', Arial, sans-serif;
 }
-
 
 body{
-
-    background:
-    radial-gradient(circle at top,#4B0082 0%,#1b1f27 35%,#122134 100%);
-
-    color:#fff;
-
-    padding:15px;
-
-    min-height:100vh;
-
+  background: radial-gradient(circle at top, #1a1a24, #080808 70%);
+  color: white;
+  min-height: 100vh;
+  padding-bottom: 80px;
 }
 
-/* =======================
-   TITULO
-======================= */
+/* =========================
+   APP CONTAINER
+========================= */
 
-h1{
-
-    text-align:center;
-
-    font-size:90px;
-
-    font-weight:900;
-
-    letter-spacing:12px;
-
-    text-transform:uppercase;
-
-    margin:0 0 8px;
-
-    background:linear-gradient(
-    90deg,
-    #00e5ff,
-    #4d7cff,
-    #9c4dff,
-    #ff4db8,
-    #00e5ff
-    );
-
-    background-size:400%;
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-
-    animation:
-    tituloGlow 6s linear infinite,
-    tituloPulse 2s ease-in-out infinite;
-
-    filter:drop-shadow(0 0 6px rgba(0,229,255,.6));
-
+#app{
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
 }
 
-header{
+/* ==========================================
+   TOPO / LOGO PREMIUM G2 GARAGE
+========================================== */
 
-    background:linear-gradient(180deg,#1f232b,#15181d);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:12px;
-
-    padding:20px;
-
-    margin-bottom:8px;
-
-    box-shadow:
-    0 12px 35px rgba(0,0,0,.45);
-
+#topo{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(8, 8, 10, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 2px solid var(--amarelo);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 196, 0, 0.15);
 }
 
-
-header small{
-
-    color:#9298a3;
-
-    font-size:12px;
-
+.topbar{
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-
-
-/* =======================
-   PAINEL STATUS HUD
-======================= */
-
-/* =======================
-   PAINEL STATUS
-======================= */
-
-/*==========================
-        HUD NOVO
-==========================*/
-
-#painel{
-
-    margin:10px 0;
-
+/* LOGO DESTACADA E GRANDE */
+.empresa{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 4px 0;
 }
 
-.hud{
-
-    background:linear-gradient(180deg,#242935,#191d26);
-
-    border-radius:20px;
-
-    padding:10px;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    box-shadow:
-    0 12px 30px rgba(0,0,0,.35);
-    filter:saturate(1.08) contrast(1.05);
-
-transition:.35s;
-
+.logo{
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1f1f1f 0%, #0a0a0a 100%);
+  border: 2px solid var(--amarelo);
+  border-radius: 12px;
+  padding: 6px 14px;
+  box-shadow: 0 0 15px var(--amarelo-glow), inset 0 0 8px rgba(255, 196, 0, 0.2);
+  text-shadow: 0 0 8px var(--amarelo);
 }
 
-.hud-caixa{
-
-    text-align:center;
-
-    margin-bottom:1px;
-
+.empresa-info h1{
+  font-size: 26px; /* Nome bem maior e imponente */
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--amarelo);
+  text-transform: uppercase;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(255, 196, 0, 0.4);
+  line-height: 1;
 }
 
-.hud-caixa span{
-
-    color:#bbb;
-
-    font-size:24px;
-
+.empresa-info small{
+  font-size: 11px;
+  color: #bbb;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.hud-caixa strong{
+/* ==========================================
+   HUD ESPORTIVO (ESTILO PAINEL DIGITAL)
+========================================== */
 
-    display:block;
-
-    margin-top:4px;
-
-    font-size:40px;
-
-    color:#31f27d;
-
-    font-weight:900;
-
+.hud-mini{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
 }
 
-.hud-info{
-
-    display:grid;
-
-    grid-template-columns:repeat(3,1fr);
-
-    gap:11px;
-
+.box{
+  background: linear-gradient(180deg, #1f1f24 0%, #0d0d10 100%);
+  border: 1px solid #333;
+  border-top: 2px solid #555;
+  border-radius: 8px;
+  padding: 6px 4px;
+  text-align: center;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.hud-info div{
-
-    background:#2b303d;
-
-    border-radius:12px;
-
-    padding:6px;
-
-    text-align:center;
-
+/* Linha Neon na parte inferior de cada card do HUD */
+.box::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #333;
 }
 
-.hud-info span{
-
-    display:block;
-
-    color:#bbb;
-
-    font-size:11px;
-
+.box span{
+  display: block;
+  font-size: 10px;
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.hud-info strong{
-
-    display:block;
-
-    margin-top:6px;
-
-    font-size:16px;
-
-    color:#ffffff;
-
+.box strong{
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  margin-top: 2px;
 }
 
-.hud hr{
-
-    border:none;
-
-    height:1px;
-
-    background:rgba(255,255,255,.08);
-
-    margin:14px 0;
-
+/* Destaque para Dinheiro no HUD */
+.dinheiro{
+  border-top-color: var(--verde);
+}
+.dinheiro::after{
+  background: var(--verde);
+  box-shadow: 0 0 6px var(--verde);
+}
+.dinheiro strong{
+  color: var(--verde);
+  text-shadow: 0 0 6px rgba(0, 210, 106, 0.4);
 }
 
+/* =========================
+ SHOWROOM INICIAL
+========================= */
 
-/* =======================
-   MENU
-======================= */
+#showroom{
+  margin: 10px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid #333;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
+#fotoPrincipal{
+  width: 85px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--amarelo);
+  box-shadow: 0 0 8px rgba(255, 196, 0, 0.2);
+}
 
+#tituloShowroom{
+  font-size: 18px;
+  color: var(--amarelo);
+  font-weight: 700;
+}
 
+#descricaoShowroom{
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.3;
+}
 
-/* =======================
-   CARDS
-======================= */
+/* =========================
+ CONTEÚDO & CARDS
+========================= */
 
+#conteudo{
+  padding: 10px;
+}
 
 .card{
-
-    background:linear-gradient(180deg,#242933,#1a1e26);
-
-    border-radius:22px;
-
-    padding:18px;
-
-    margin-bottom:18px;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    box-shadow:
-    0 15px 35px rgba(0,0,0,.45);
-
-    transition:.25s;
-
-    overflow:hidden;
-
-    position:relative;
-    
-    backdrop-filter:blur(8px);
-
--webkit-backdrop-filter:blur(8px);
-
-}
-
-.card:hover{
-
-    transform:translateY(-4px);
-
-    box-shadow:
-    0 20px 45px rgba(0,0,0,.60);
-
+  background: linear-gradient(145deg, #161616, #0c0c0c);
+  border: 1px solid #292929;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: center;
 }
 
 .card h2{
-
-    color:#ffffff;
-
-    font-size:25px;
-
-    font-weight:900;
-
-    text-align:center;
-
-    margin-bottom:4px;
-
+  font-size: 20px;
+  color: var(--amarelo);
+  margin-bottom: 8px;
+  font-weight: 700;
 }
-
-
-.card h3{
-
-    color:#bfc6d4;
-
-    font-size:16px;
-
-    text-align:center;
-
-    margin-bottom:15px;
-
-    font-weight:500;
-
-}
-
 
 .card p{
-
-    color:#d7dce4;
-
-    font-size:15px;
-
-    line-height:24px;
-
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.4;
+  margin-bottom: 10px;
 }
 
-
-/* =======================
-   LINHA DIVISÓRIA
-======================= */
-
-
-hr{
-
-    border:none;
-
-    height:1px;
-
-    background:rgba(255,255,255,.08);
-
-    margin:15px 0;
-
-}
-
-
-/* =======================
-   IMAGENS DOS CARROS
-======================= */
-
-
-img{
-
-    width:100%;
-
-    border-radius:16px;
-
-    margin-bottom:12px;
-
-    border:2px solid rgba(77,200,255,.35);
-
-    box-shadow:
-    0 10px 25px rgba(0,120,255,.22);
-
-    transition:.30s;
-
-}
-
-img:hover{
-
-    transform:scale(1.02);
-
-    box-shadow:
-    0 15px 35px rgba(0,170,255,.35);
-
-}
-
-
-
-/* =======================
-   DINHEIRO / VALORES
-======================= */
-.valor{
-
-    background:
-    linear-gradient(
-    135deg,
-    #00d46a,
-    #00a651
-    );
-
-    border:1px solid rgba(0,255,140,.35);
-
-    border-radius:16px;
-
-    padding:15px;
-
-    text-align:center;
-
-    font-size:22px;
-
-    font-weight:900;
-
-    color:#ffffff;
-
-    text-shadow:
-    0 0 10px rgba(0,255,136,.45);
-
-    box-shadow:
-    0 10px 25px rgba(0,180,90,.30);
-
-    margin:10px 0;
-    
-    animation:dinheiroGlow 2.5s infinite alternate;
-
-}
-
-
-
-
-.preco{
-
-    background:
-    linear-gradient(
-    135deg,
-    #ffb300,
-    #ff6f00
-    );
-
-    border:1px solid rgba(255,190,60,.35);
-
-    border-radius:16px;
-
-    padding:15px;
-
-    text-align:center;
-
-    font-size:22px;
-
-    font-weight:900;
-
-    color:#ffffff;
-
-    text-shadow:
-    0 0 10px rgba(255,170,0,.35);
-
-    box-shadow:
-    0 10px 25px rgba(255,140,0,.30);
-
-    margin:10px 0;
-
-}
-
-/* =======================
-   DEFEITOS DO VEÍCULO
-======================= */
-
-
-.defeito{
-
-    background:
-    linear-gradient(
-    135deg,
-    #412026,
-    #261217
-    );
-
-    border-left:6px solid #ff3d5f;
-
-    border-radius:14px;
-
-    padding:12px;
-
-    margin:10px 0;
-
-    color:#ffe5e8;
-
-    box-shadow:
-    0 6px 18px rgba(255,61,95,.18);
-
-}
-
-
-#menu{
-
-    display:grid;
-
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-
-    gap:12px;
-
-    margin-bottom:18px;
-
-}
-
+/* ==========================================
+   PADRONIZAÇÃO DOS BOTÕES (AÇÕES / SALVAR)
+========================================== */
 
 button{
-
-    background:
-    linear-gradient(
-    180deg,
-    #808080,
-    #1C1C1C
-    );
-
-    color:#ffffff;
-
-    border:1px solid rgba(255,255,255,.12);
-
-    border-radius:18px;
-
-    padding:15px;
-
-    font-size:15px;
-
-    font-weight:900;
-
-    letter-spacing:1px;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-    box-shadow:
-    0 8px 22px rgba(0,80,255,.35),
-    inset 0 1px 0 rgba(255,255,255,.15);
-
-}
-
-button:hover{
-
-    transform:translateY(-4px);
-
-    background:
-    linear-gradient(
-    180deg,
-    #353535,
-    #00BFFF
-    );
-
-    box-shadow:
-    0 15px 35px rgba(0,120,255,.45);
-    
-    letter-spacing:1.5px;
-
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #222;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  border: 1px solid #444;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 button:active{
-
-    transform:scale(.96);
-
+  transform: scale(0.96);
 }
 
+/* Força os botões das configurações e expansão a ficarem bonitões e centralizados */
+#conteudo .card button,
+#conteudo button{
+  display: block;
+  width: 100%;
+  max-width: 350px;
+  height: 50px;
+  margin: 10px auto;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
 
-/* =======================
-   ALERTA MODAL
-======================= */
+/* Botão principal/salvar ganha o Amarelo em Destaque */
+#conteudo .card button:first-of-type{
+  background: linear-gradient(90deg, #ffc400, #ffaa00);
+  color: #000;
+  border: none;
+  box-shadow: 0 0 12px rgba(255, 196, 0, 0.3);
+}
 
+/* ==========================================
+   MERCADO / CARRO (RETAQUALIBRADO)
+========================================== */
+
+.carro-card{
+    background:#111;
+    border:1px solid #303030;
+    border-radius:18px;
+    padding:14px;
+    overflow:hidden;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.5),
+        0 0 12px rgba(255,196,0,.08);
+}
+
+.carro-card img{
+    width:100%;
+    height:240px;
+    object-fit:contain;
+    background:linear-gradient(180deg,#111,#1a1a1a);
+    border-radius:16px;
+    padding:8px;
+    margin-bottom:12px;
+    border:2px solid #353535;
+    box-shadow:
+        0 0 18px rgba(255,196,0,.15),
+        inset 0 0 20px rgba(255,255,255,.04);
+    transition:.35s;
+}
+
+.carro-card img:hover{
+    transform:scale(1.02);
+}
+
+.carro-card h2{
+  color: var(--amarelo);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.carro-card h3{
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 2px;
+  margin-bottom: 8px;
+}
+
+/* INFORMAÇÕES DO CARRO */
+.info-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.info-grid div{
+  background: #181818;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  font-size: 11px;
+  color: #aaa;
+}
+
+.info-grid strong{
+  display: block;
+  font-size: 14px;
+  color: white;
+  margin-top: 2px;
+}
+
+/* FIPE E PEDIDO (VOLTARAM A FICAR COM DESTAQUE!) */
+.precos{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.fipe-box,
+.pedido-box{
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.fipe-box{
+  background: rgba(0, 40, 61, 0.7);
+  border: 1px solid var(--azul);
+}
+
+.pedido-box{
+  background: rgba(0, 53, 29, 0.7);
+  border: 1px solid var(--verde);
+}
+
+.precos small{
+  display: block;
+  font-size: 11px;
+  color: #ccc;
+  font-weight: 600;
+}
+
+.precos strong{
+  display: block;
+  font-size: 16px; /* FIPE e Pedido bem legíveis */
+  margin-top: 2px;
+}
+
+.fipe-box strong{ color: #00aaff; }
+.pedido-box strong{ color: #00e676; }
+
+/* DEFEITOS */
+.defeito{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #240707;
+  border-left: 4px solid var(--vermelho);
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 4px 0;
+  font-size: 12px;
+}
+
+.defeito strong{ color: #ff6060; }
+
+.defeito.ok{
+  background: #062515;
+  border-left-color: var(--verde);
+  color: var(--verde);
+}
+
+/* RESUMO COMPRA */
+.resumo-compra{
+  background: #181818;
+  border: 1px dashed #555;
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.resumo-compra small{
+  font-size: 11px;
+  color: #aaa;
+}
+
+.resumo-compra strong{
+  display: block;
+  color: var(--amarelo);
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+/* BOTÃO COMPRAR */
+.btnComprar,
+.carro-card button.btnComprar{
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 48px !important;
+  background: linear-gradient(90deg, #00b85c, #00e676) !important;
+  color: #000 !important;
+  font-size: 17px !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+  margin-top: 10px !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3) !important;
+}
+
+/* ==========================================
+   MENU INFERIOR (NAVEGAÇÃO)
+========================================== */
+
+#menu{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: rgba(8, 8, 8, 0.96);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 2000;
+}
+
+#menu button{
+  background: none !important;
+  border: none !important;
+  padding: 3px !important;
+  width: auto !important;
+  height: auto !important;
+  font-size: 18px !important;
+  color: #aaa !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+#menu button span{
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+#menu button:hover{
+  color: var(--amarelo) !important;
+}
+
+/* ==========================================
+ ALERTAS E AVISOS
+========================================== */
 
 .alerta{
-
-
-    position:fixed;
-
-
-    inset:0;
-
-
-    background:
-
-    rgba(0,0,0,.80);
-
-
-    display:none;
-
-
-    justify-content:center;
-
-
-    align-items:center;
-
-
-    z-index:9999;
-
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
 }
-
-
 
 .alerta-box{
-
-    width:90%;
-
-    max-width:340px;
-
-    background:
-    linear-gradient(
-    145deg,
-    #1d2840,
-    #0b1018
-    );
-
-    border-radius:18px;
-
-    padding:18px;
-
-    text-align:center;
-
-    border:2px solid #42b8ff;
-
-    box-shadow:
-    0 0 35px rgba(66,184,255,.35);
-
-    animation:subir .2s;
-
+  width: 85%;
+  max-width: 320px;
+  background: #151515;
+  border: 2px solid var(--amarelo);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
 }
-
-
-
 
 .alerta-box h2{
-
-    color:#46ff8b;
-
-    text-shadow:
-    0 0 12px rgba(70,255,139,.40);
-
+  color: var(--amarelo);
 }
-
-
-
-.alertaJogo{
-
-    position:fixed;
-
-    top:15px;
-
-    left:50%;
-
-    transform:translateX(-50%);
-
-    background:
-    linear-gradient(
-    145deg,
-    #1c2840,
-    #101722
-    );
-
-    color:white;
-
-    padding:12px 18px;
-
-    border-radius:15px;
-
-    font-size:14px;
-
-    font-weight:900;
-
-    border:1px solid #42b8ff;
-
-    box-shadow:
-    0 0 30px rgba(66,184,255,.35);
-
-    z-index:9999;
-
-    animation:aparecer .3s;
-
-}
-
-
-
-/* =======================
-   ALERTA RÁPIDO
-======================= */
-
-
-.alertaJogo{
-
-
-    position:fixed;
-
-
-    top:15px;
-
-
-    left:50%;
-
-
-    transform:translateX(-50%);
-
-
-
-    background:
-
-
-    linear-gradient(
-    145deg,
-    #20252d,
-    #101318
-    );
-
-
-
-    color:white;
-
-
-    padding:12px 18px;
-
-
-    border-radius:14px;
-
-
-    font-size:14px;
-
-
-    font-weight:bold;
-
-
-
-    border:
-
-    1px solid #ff3030;
-
-
-
-    box-shadow:
-
-    0 0 20px rgba(0,0,0,.8);
-
-
-
-    z-index:9999;
-
-
-    animation:
-
-    aparecer .3s;
-
-}
-
-
-
-/* =======================
-   ANIMAÇÕES
-======================= */
-
-
-@keyframes aparecer{
-
-
-    from{
-
-        opacity:0;
-
-        transform:
-        translate(-50%,-20px);
-
-    }
-
-
-    to{
-
-        opacity:1;
-
-        transform:
-        translate(-50%,0);
-
-    }
-
-}
-
-
-
-@keyframes subir{
-
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(30px);
-
-    }
-
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
-}
-
-
-
-/* =======================
-   CELULAR
-======================= */
-
-
-@media(max-width:700px){
-
-
-    body{
-
-        padding:7px;
-
-    }
-
-
-
-    h1{
-
-        font-size:40px;
-
-        letter-spacing:4px;
-
-    }
-
-
 
 .alerta-box button{
-
-    min-width:140px;
-    height:52px;
-
-    font-size:22px;
-    font-weight:800;
-
-    border-radius:14px;
-
-    margin-top:15px;
-
-    cursor:pointer;
-
-    transition:.2s;
-
+  margin-top: 15px;
+  width: 100%;
+  background: var(--amarelo);
+  color: #000;
 }
 
-.alerta-box button:hover{
-
-    transform:scale(1.05);
-
+#avisoTopo{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0.8);
+  background: rgba(10,15,25,0.95);
+  color: white;
+  border: 2px solid #00ffff;
+  padding: 20px 30px;
+  border-radius: 15px;
+  z-index: 9999;
+  opacity: 0;
+  transition: .3s;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  min-width: 280px;
+  box-shadow: 0 0 25px #00ffff;
+  backdrop-filter: blur(8px);
 }
 
-.alerta-box button:active{
-
-    transform:scale(.98);
-
+#avisoTopo.mostrar{
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
 }
-
-    .card{
-
-        padding:11px;
-
-    }
-
-
-
-    .card h2{
-
-        font-size:19px;
-
-    }
-
-
-
-    .valor,
-    .preco{
-
-        font-size:17px;
-
-    }
-
-
-}
-
-button{
-
-    position:relative;
-
-    overflow:hidden;
-
-}
-
-button::before{
-
-    content:"";
-
-    position:absolute;
-
-    top:0;
-
-    left:-130%;
-
-    width:70%;
-
-    height:100%;
-
-    background:
-
-    linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.65),
-    transparent
-    );
-
-    transition:.55s;
-
-}
-
-button:hover::before{
-
-    left:140%;
-
-}
-
-.card::before{
-
-    content:"";
-
-    position:absolute;
-
-    top:0;
-
-    left:0;
-
-    width:100%;
-
-    height:5px;
-
-    background:
-    linear-gradient(
-    90deg,
-    #00d4ff,
-    #3b82ff,
-    #ff4500,
-    #7c4dff,
-    #ff3cac
-    );
-
-    background-size:300%;
-
-    animation:brilhoCard 8s linear infinite;
-
-}
-
-@keyframes brilhoCard{
-
-    0%{
-
-        background-position:0%;
-
-    }
-
-    100%{
-
-        background-position:300%;
-
-    }
-
-}
-
-@keyframes dinheiroGlow{
-
-    from{
-
-        box-shadow:
-
-        0 0 15px rgba(0,255,120,.20);
-
-    }
-
-    to{
-
-        box-shadow:
-
-        0 0 28px rgba(0,255,120,.45);
-
-    }
-
-}
-
-@keyframes tituloGlow{
-
-    0%{
-        background-position:0%;
-    }
-
-    100%{
-        background-position:300%;
-    }
-
-}
-
-@keyframes tituloGlow{
-
-    0%{
-        background-position:0%;
-    }
-
-    100%{
-        background-position:400%;
-    }
-
-}
-
-@keyframes tituloPARARPulse{
-
-    0%{
-
-        transform:scale(1);
-
-        filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
-
-    }
-
-    50%{
-
-        transform:scale(1.23);
-
-        filter:
-        drop-shadow(0 0 12px rgba(124,77,255,.8))
-        drop-shadow(0 0 20px rgba(255,77,184,.5));
-
-    }
-
-    100%{
-
-        transform:scale(1);
-
-        filter:drop-shadow(0 0 6px rgba(0,229,255,.5));
-
-    }
-
-}
-

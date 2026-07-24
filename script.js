@@ -16,6 +16,8 @@ window.onload = function(){
     carregarJogo();
 
     atualizarPainel();
+    
+    iniciarIntroducao();
 
     document.getElementById("btnMercado").onclick = abrirMercado;
     document.getElementById("btnPatio").onclick = abrirPatio;
@@ -164,3 +166,131 @@ function abrirEmpresa(){
     mostrarEmpresa();
 
 }
+
+
+// ===========================
+// AVISO PEQUENO NO TOPO
+// ===========================
+
+function mostrarAvisoTopo(texto){
+
+    let aviso = document.getElementById("avisoTopo");
+
+    if(!aviso){
+        console.log("Div avisoTopo não encontrada");
+        return;
+    }
+
+
+    aviso.innerHTML = texto;
+
+    aviso.classList.add("mostrar");
+
+
+    setTimeout(function(){
+
+        aviso.classList.remove("mostrar");
+
+    },3000);
+
+}
+
+function iniciarTutorial(){
+
+if(jogo.tutorialVisto) return;
+
+
+conteudo.innerHTML=`
+
+<div class="card">
+
+<h2>🚗 Bem-vindo à G2 Garagem</h2>
+
+<hr>
+
+<p>
+Você começou uma pequena revenda de veículos.
+</p>
+
+<p>
+🎯 Compre, conserte, venda e expanda sua empresa.
+</p>
+
+<p>
+📋 Mercado:
+Analise carros, FIPE, defeitos e histórico.
+</p>
+
+<p>
+🔧 Oficina:
+Reparos levam alguns dias para ficarem prontos.
+</p>
+
+<p>
+👥 Clientes:
+Negocie ofertas e aumente sua reputação.
+</p>
+
+<p>
+🏢 Empresa:
+Expanda vagas e contrate funcionários.
+</p>
+
+<button onclick="fecharTutorial()">
+🚗 Começar jogo
+</button>
+
+</div>
+
+`;
+
+}
+
+
+function iniciarIntroducao(){
+
+    if(jogo.introducao){
+
+        mostrarAlerta(
+        "🚗 Bem-vindo à G2 Garage",
+
+`
+Você abriu sua própria garagem!
+
+🎯 Seu objetivo:
+
+Comprar carros usados,
+consertar problemas,
+negociar com clientes
+e crescer sua empresa.
+
+🔧 Oficina:
+Alguns veículos chegam com defeitos.
+Os reparos levam tempo e custam dinheiro.
+
+💰 Mercado:
+Procure boas oportunidades,
+compre barato e venda com lucro.
+
+🏢 Empresa:
+Expanda sua garagem,
+aumente suas vagas
+e contrate funcionários.
+
+📅 Administração:
+Controle seus gastos,
+contas e seu caixa.
+
+Boa sorte, chefe! 🚗
+`
+        );
+
+
+        jogo.introducao = false;
+
+        salvarJogo();
+
+    }
+
+}
+
