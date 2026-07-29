@@ -1,273 +1,257 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>🚗 G2 Garage</title>
-
 <link rel="stylesheet" href="style.css">
-
+<style>
+    /* Estilos Exclusivos da Nova Tela de Load G2 Garagem */
+    @keyframes rgbGlowLoad {
+        0% { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5), 0 0 20px rgba(56, 189, 248, 0.3); }
+        50% { text-shadow: 0 0 20px rgba(34, 197, 94, 0.8), 0 0 30px rgba(34, 197, 94, 0.5); }
+        100% { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5), 0 0 20px rgba(56, 189, 248, 0.3); }
+    }
+    @keyframes pulseCard {
+        0% { transform: scale(0.98); opacity: 0.9; }
+        50% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0.98); opacity: 0.9; }
+    }
+    .load-container {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: radial-gradient(circle at center, #18181b 0%, #09090b 100%);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 99999; color: #fff; font-family: sans-serif;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    .load-box {
+        background: rgba(24, 24, 27, 0.75);
+        border: 1px solid #27272a;
+        padding: 35px 30px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        backdrop-filter: blur(10px);
+        max-width: 380px;
+        width: 90%;
+        animation: pulseCard 3s infinite ease-in-out;
+    }
+    .load-titulo {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        color: #38bdf8;
+        margin: 0 0 5px 0;
+        animation: rgbGlowLoad 3s infinite;
+        text-transform: uppercase;
+    }
+    .load-sub {
+        font-size: 11px;
+        color: #71717a;
+        letter-spacing: 2px;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+    }
+    .load-barra-bg {
+        width: 100%;
+        height: 8px;
+        background: #09090b;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid #27272a;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    .load-barra-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #0284c7, #22c55e);
+        border-radius: 4px;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+    }
+    .load-status {
+        font-size: 12px;
+        color: #a1a1aa;
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+</style>
 </head>
 
 <body>
 
+<!-- TELA DE LOAD TOP (G2 GARAGEM) -->
+<div id="tela-load" class="load-container">
+    <div class="load-box">
+        <div style="font-size: 40px; margin-bottom: 10px;">🏎️🔊</div>
+        <h1 class="load-titulo">G2 GARAGEM</h1>
+        <div class="load-sub">Elite Automotiva & New Stereo</div>
+        
+        <div class="load-barra-bg">
+            <div id="barra-progresso" class="load-barra-fill"></div>
+        </div>
+        
+        <div id="texto-load" class="load-status">Carregando módulos e oficina...</div>
+    </div>
+</div>
+
 <div id="app">
 
-
 <header id="topo">
-  
   <div id="avisoTopo"></div>
+  <div class="topbar">
+    <div class="empresa">
+      <div class="logo">🚗</div>
+      <div class="empresa-info">
+        <h1>G2 GARAGE</h1>
+        <small id="nivelEmpresa">⭐ Nível 1 - Garagem de Bairro</small>
+      </div>
+    </div>
 
-<div class="topbar">
-
-
-<div class="empresa">
-
-<div class="logo">🚗</div>
-
-<div class="empresa-info">
-
-<h1>G2 GARAGE</h1>
-
-<small id="nivelEmpresa">
-⭐ Nível 1 - Garagem de Bairro
-</small>
-
-</div>
-
-</div>
-
-
-
-<div class="hud-mini">
-
-
-<div class="box">
-
-<span>💵</span>
-
-<small>Caixa</small>
-
-<strong id="caixa">
-R$ 400.000
-</strong>
-
-</div>
-
-
-
-<div class="box">
-
-<span>📅</span>
-
-<small>Data</small>
-
-<strong id="dia">
-1/01
-</strong>
-
-</div>
-
-
-
-<div class="box">
-
-<span>⭐</span>
-
-<small>Reputação</small>
-
-<strong id="reputacao">
-0
-</strong>
-
-</div>
-
-
-
-<div class="box">
-
-<span>🚗</span>
-
-<small>Vagas</small>
-
-<strong id="vagas">
-0/2
-</strong>
-
-</div>
-
-
-
-<div class="box">
-
-<span>📈</span>
-
-<small>Lucro</small>
-
-<strong id="lucro">
-R$ 0
-</strong>
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
+    <div class="hud-mini">
+      <div class="box">
+        <span>💵</span>
+        <small>Caixa</small>
+        <strong id="caixa">R$ 400.000</strong>
+      </div>
+      <div class="box">
+        <span>📅</span>
+        <small>Data</small>
+        <strong id="dia">1/01</strong>
+      </div>
+      <div class="box">
+        <span>⭐</span>
+        <small>Reputação</small>
+        <strong id="reputacao">0</strong>
+      </div>
+      <div class="box">
+        <span>🚗</span>
+        <small>Vagas</small>
+        <strong id="vagas">0/2</strong>
+      </div>
+      <div class="box">
+        <span>📈</span>
+        <small>Lucro</small>
+        <strong id="lucro">R$ 0</strong>
+      </div>
+    </div>
+  </div>
 </header>
 
-_______🧰🪛JOGO EM FASE DE DESENVOLVIMENTO....VERSÃO PRÉ ALPHA______
-
 <!-- APENAS TELA INICIAL -->
-
 <section id="showroom" style="display:none;">
-
-<img id="fotoPrincipal"
-src="imagens/logo.png"
-alt="Carro">
-
-<h2 id="tituloShowroom">
-Bem-vindo ao G2 Garage
-</h2>
-
-<p id="descricaoShowroom">
-Compre, conserte e venda carros para construir a maior garagem do Brasil.
-</p>
-
+  <img id="fotoPrincipal" src="imagens/logo.png" alt="Carro">
+  <h2 id="tituloShowroom">Bem-vindo ao G2 Garage</h2>
+  <p id="descricaoShowroom">Compre, conserte e venda carros para construir a maior garagem do Brasil.</p>
 </section>
 
-
-
-
 <main id="conteudo">
-
-
-<div class="card">
-
-
-<h2>
-🚗 O INÍCIO DE TUDO!
-</h2>
-
-
-<p>
-Você começou sua própria garagem de veículos.
-Compre carros abaixo da FIPE, faça reparos,
-negocie com clientes e aumente seu patrimônio.
-</p>
-
-
-</div>
-
-
+  <div class="card">
+    <h2>🚗 O INÍCIO DE TUDO!</h2>
+    <p>Você começou sua própria garagem de veículos. Compre carros abaixo da FIPE, faça reparos, negocie com clientes e aumente seu patrimônio.</p>
+  </div>
 </main>
 
-
-
-
-
 <nav id="menu">
-
-
-<button id="btnPatio">
-🏠
-<span>Garagem</span>
-</button>
-
-
-
-<button id="btnMercado">
-🛒
-<span>Mercado</span>
-</button>
-
-
-
-<button id="btnClientes">
-👥
-<span>Clientes</span>
-</button>
-
-
-
-<button id="btnOficina">
-🔧
-<span>Oficina</span>
-</button>
-
-
-
-<button id="btnBanco">
-🏦
-<span>Banco</span>
-</button>
-
-
-
-<button id="btnEmpresa">
-🏢
-<span>Empresa</span>
-</button>
-
-
-
-<button id="btnEstatisticas">
-📊
-<span>Stats</span>
-</button>
-
-
-
-<button id="btnProximoDia">
-⏩
-<span>Dia</span>
-</button>
-
-
+  <button id="btnPatio">🏠<span>Garagem</span></button>
+  <button id="btnMercado">🛒<span>Mercado</span></button>
+  <button id="btnClientes">👥<span>Clientes</span></button>
+  <button id="btnOficina">🔧<span>Oficina</span></button>
+  <button id="btnSom" onclick="abrirLojaSom(0)">🎵<span>Som</span></button>
+  <button id="btnLeilao">🔨<span>Leilão</span></button>
+  <button id="btnBanco">🏦<span>Banco</span></button>
+  <button id="btnEmpresa">🏢<span>Empresa</span></button>
+  <button id="btnEstatisticas">📊<span>Stats</span></button>
+  <button id="btnProximoDia">⏩<span>Dia</span></button>
 </nav>
 
-
-
-
 <div id="alerta" class="alerta">
-
-
-<div class="alerta-box">
-
-
-<h2 id="alertaTitulo">
-Mensagem
-</h2>
-
-
-<p id="alertaTexto"></p>
-
-
-
-<button onclick="fecharAlerta()">
-OK
-</button>
-
-
+  <div class="alerta-box">
+    <h2 id="alertaTitulo">Mensagem</h2>
+    <p id="alertaTexto"></p>
+    <button onclick="fecharAlerta()">OK</button>
+  </div>
 </div>
 
+<!-- ==========================================
+     MODAL MINI-GAME 1: TESTE DE PISTA (SHIFT LIGHT)
+========================================== -->
+<div id="modalTesteDrive" class="alerta" style="display: none;">
+  <div class="alerta-box teste-drive-box" style="text-align: center;">
+    <h2 style="color: var(--accent, #38bdf8); margin-bottom: 5px;">🏎️ TESTE DE PISTA & DINÂMICO</h2>
+    <p id="infoCarroTeste" style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Ajustando motor...</p>
+    
+    <!-- Painel RPM Moderno / Shift Light -->
+    <div class="painel-rpm-arcade">
+      <div class="luzes-shift">
+        <span id="luz1" class="luz-led"></span>
+        <span id="luz2" class="luz-led"></span>
+        <span id="luz3" class="luz-led"></span>
+        <span id="luz4" class="luz-led"></span>
+        <span id="luz5" class="luz-led red"></span>
+      </div>
+      <div class="barra-tacometro">
+        <div id="ponteiroDinamico" class="ponteiro-fluid"></div>
+        <div class="zona-perfeita"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 8px; font-family: monospace; font-size: 11px; color: #cbd5e1;">
+        <span id="txtRpmDigital">0 RPM</span>
+        <span>MARCHA: <strong id="txtMarchaArcade" style="color: #38bdf8;">1ª</strong></span>
+        <span>ACERTOS: <strong id="txtProgressoArcade" style="color: #10b981;">0 / 3</strong></span>
+      </div>
+    </div>
 
+    <p id="statusTesteMsg" style="font-size: 13px; margin: 15px 0; font-weight: bold; color: #fff;">Acelere no tempo certo para trocar de marcha!</p>
+
+    <!-- Botões de Ação -->
+    <button id="btnAcelerarTeste" onclick="executarTrocaMarcha()" class="btn-arcade-acao">🔥 SUBIR MARCHA NO CORTE!</button>
+    <button id="btnFecharTeste" onclick="fecharTesteDrive()" style="display:none; background: #334155; width: 100%; padding: 12px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px;">Voltar para Oficina</button>
+  </div>
 </div>
 
+<!-- ==========================================
+     MODAL MINI-GAME 2: SHOW DE GRAVES (SPL)
+========================================== -->
+<div id="modalShowSom" class="alerta" style="display: none;">
+  <div class="alerta-box teste-drive-box" style="text-align: center;">
+    <h2 style="color: var(--accent, #38bdf8); margin-bottom: 5px;">🔊 SHOW DE GRAVES: COMPETIÇÃO SPL</h2>
+    <p id="infoCarroSom" style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Preparando o paredão...</p>
+    
+    <!-- Painel Medidor de Decibéis (SPL Meter) -->
+    <div class="painel-spl-arcade">
+      <div id="ondaSonora" class="onda-animada">🎵 🔊 🎵</div>
+      <div class="barra-spl-container">
+        <div id="ponteiroSpl" class="ponteiro-spl-fluid"></div>
+        <div class="zona-spl-ideal"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 8px; font-family: monospace; font-size: 11px; color: #cbd5e1;">
+        <span id="PRESSÃO:">PRESSÃO: <strong id="txtDecibeis" style="color: #38bdf8;">110 dB</strong></span>
+        <span>BATERIAS: <strong id="txtBateria" style="color: #facc15;">100%</strong></span>
+        <span>TOQUES: <strong id="txtAcertosSpl" style="color: #10b981;">0 / 5</strong></span>
+      </div>
+    </div>
 
+    <p id="statusSomMsg" style="font-size: 13px; margin: 15px 0; font-weight: bold; color: #fff;">Clique repetidamente no ritmo do grave para manter o sistema no talo sem desarmar os módulos!</p>
 
+    <!-- Botão de Batida do Som -->
+    <button id="btnBaterSom" onclick="bombearGrave()" class="btn-spl-acao">💥 MANDAR PRESSÃO NO GRAVE!</button>
+    <button id="btnFecharSom" onclick="fecharShowSom()" style="display:none; background: #334155; width: 100%; padding: 12px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px;">Resgatar Prêmio & Voltar</button>
+  </div>
+</div>
 
+</div> <!-- Fim do div app -->
+
+<!-- SCRIPTS -->
 <script src="dados.js"></script>
 <script src="anos.js"></script>
+<script src="som.js"></script>
+<script src="arena.js"></script>
+<script src="banco.js"></script>
 <script src="mercado.js"></script>
 <script src="carros.js"></script>
 <script src="oficina.js"></script>
-<script src="banco.js"></script>
+<script src="leilao.js"></script>
 <script src="clientes.js"></script>
 <script src="empresa.js"></script>
 <script src="estatisticas.js"></script>
@@ -277,6 +261,41 @@ OK
 <script src="script.js"></script>
 <script src="conquistas.js"></script>
 
+<!-- SCRIPT DE CONTROLE DO LOAD COM MENSAGENS DINÂMICAS -->
+<script>
+window.addEventListener('load', () => {
+    let progresso = 0;
+    let barra = document.getElementById('barra-progresso');
+    let telaLoad = document.getElementById('tela-load');
+    let textoLoad = document.getElementById('texto-load');
+
+    const mensagens = [
+        "Carregando banco de dados...",
+        "Sintonizando woofers e módulos...",
+        "Organizando carros no pátio...",
+        "Iniciando central New Stereo...",
+        "Tudo pronto! Bem-vindo à G2 Garagem!"
+    ];
+    
+    let intervalo = setInterval(() => {
+        progresso += 20;
+        if (barra) barra.style.width = progresso + '%';
+        
+        let indiceMsg = Math.floor((progresso / 100) * (mensagens.length - 1));
+        if (textoLoad) textoLoad.innerText = mensagens[indiceMsg];
+        
+        if (progresso >= 100) {
+            clearInterval(intervalo);
+            if (telaLoad) {
+                telaLoad.style.opacity = '0';
+                setTimeout(() => {
+                    telaLoad.style.display = 'none';
+                }, 600);
+            }
+        }
+    }, 120);
+});
+</script>
 
 </body>
 </html>

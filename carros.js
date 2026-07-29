@@ -17,11 +17,21 @@ function mostrarPatio(){
 
     }else{
 
-        jogo.carros.forEach(function(carro,index){
+        jogo.carros.forEach(function(carro, index){
+
+            // Verifica se o carro tem foto salva, senão exibe o placeholder padrão
+            let imagemHtml = carro.foto 
+                ? `<img src="imagens/carros/${carro.foto}" onerror="this.src='imagens/carros/gol.jpg'" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:10px;">`
+                : `<div style="width: 100%; height: 160px; background: #18181b; border: 2px dashed #3f3f46; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #71717a; font-family: monospace; gap: 8px; margin-bottom:10px;">
+                    <div style="font-size: 40px; opacity: 0.6;">🚘</div>
+                    <span style="font-size: 12px; font-weight: bold; letter-spacing: 1px;">SEM FOTO DISPONÍVEL</span>
+                   </div>`;
 
             html += `
 
             <div class="card">
+
+                ${imagemHtml}
 
                 <h2>${carro.marca} ${carro.nome}</h2>
 
@@ -52,8 +62,6 @@ function mostrarPatio(){
                 <p>🔧 Defeitos: ${carro.defeitos.length}</p>
 
                 <hr>
-
-                </button>
 
             </div>
 
@@ -110,7 +118,8 @@ function comprarCarro(){
         defeitos: JSON.parse(JSON.stringify(jogo.ofertaAtual.defeitos)),
         custo: jogo.ofertaAtual.custo,
         fipe: jogo.ofertaAtual.fipe,
-        compra: jogo.ofertaAtual.preco
+        compra: jogo.ofertaAtual.preco,
+        foto: jogo.ofertaAtual.imagem // <--- Salva a foto do mercado para aparecer na garagem!
 
     };
 

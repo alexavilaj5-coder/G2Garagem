@@ -1,25 +1,19 @@
 // ===========================
-// MERCADO.JS V2.0
-// PARTE 1
+// MERCADO.JS V2.3 (COMPLETO E CORRIGIDO)
+// G2 GARAGEM
 // ===========================
 
 function gerarAno(modelo){
-
     if(typeof anosModelos !== "undefined" && anosModelos[modelo.modelo]){
-
         return aleatorio(
             anosModelos[modelo.modelo].inicio,
             anosModelos[modelo.modelo].fim
         );
-
     }
-
-    return aleatorio(2008,jogo.ano);
-
+    return aleatorio(2008, jogo.ano);
 }
 
 function gerarKm(ano){
-
     let idade = jogo.ano - ano;
 
     let minimo = idade * 8000;
@@ -28,106 +22,79 @@ function gerarKm(ano){
     if(minimo < 5000) minimo = 5000;
     if(maximo < 30000) maximo = 30000;
 
-    return aleatorio(minimo,maximo);
-
+    return aleatorio(minimo, maximo);
 }
 
 function gerarOferta(){
-
     let modelo = carros[
-        aleatorio(0,carros.length-1)
+        aleatorio(0, carros.length - 1)
     ];
 
     let ano = gerarAno(modelo);
-
     let km = gerarKm(ano);
-
     let cor = cores[
-        aleatorio(0,cores.length-1)
+        aleatorio(0, cores.length - 1)
     ];
-
     let historico = historicos[
-        aleatorio(0,historicos.length-1)
+        aleatorio(0, historicos.length - 1)
     ];
 
-    let defeitosCarro=[];
+    let defeitosCarro = [];
+    let custoTotal = 0;
+    let quantidade = aleatorio(0, 3);
 
-    let custoTotal=0;
-
-    let quantidade=aleatorio(0,3);
-
-    for(let i=0;i<quantidade;i++){
-
-        let defeito=
-        defeitos[
-            aleatorio(0,defeitos.length-1)
+    for(let i = 0; i < quantidade; i++){
+        let defeito = defeitos[
+            aleatorio(0, defeitos.length - 1)
         ];
 
-        if(!defeitosCarro.some(d=>d.nome==defeito.nome)){
-
+        if(!defeitosCarro.some(d => d.nome == defeito.nome)){
             defeitosCarro.push(defeito);
-
-            custoTotal+=defeito.valor;
-
+            custoTotal += defeito.valor;
         }
-
     }
 
-    let desconto=aleatorio(5000,15000);
+    let desconto = aleatorio(5000, 15000);
+    let preco = modelo.fipe - desconto - custoTotal;
 
-    let preco=modelo.fipe-desconto-custoTotal;
-
-    if(preco < modelo.fipe*0.45){
-
-        preco=Math.floor(modelo.fipe*0.45);
-
+    if(preco < modelo.fipe * 0.45){
+        preco = Math.floor(modelo.fipe * 0.45);
     }
 
-    jogo.ofertaAtual={
+    let imagemEscolhida = Array.isArray(modelo.imagem)
+        ? modelo.imagem[aleatorio(0, modelo.imagem.length - 1)]
+        : modelo.imagem;
 
-    marca:modelo.marca,
-
-    nome:modelo.modelo,
-
-    versao:modelo.versao,
-
-    imagem: Array.isArray(modelo.imagem)
-    ? modelo.imagem[
-        aleatorio(0, modelo.imagem.length - 1)
-      ]
-    : modelo.imagem,
-
-    ano:ano,
-
-    km:km,
-
-    cor:cor,
-
-    historico:historico,
-
-    defeitos:defeitosCarro,
-
-    custo:custoTotal,
-
-    fipe:modelo.fipe,
-
-    preco:preco
-
-};
+    jogo.ofertaAtual = {
+        marca: modelo.marca,
+        nome: modelo.modelo,
+        versao: modelo.versao,
+        imagem: imagemEscolhida,
+        ano: ano,
+        km: km,
+        cor: cor,
+        historico: historico,
+        defeitos: defeitosCarro,
+        custo: custoTotal,
+        fipe: modelo.fipe,
+        preco: preco
+    };
 
     mostrarOferta();
-
 }
 
 function mostrarOferta(){
+    let carro = jogo.ofertaAtual;
 
-    let carro=jogo.ofertaAtual;
+    if(!carro){
+        gerarOferta();
+        return;
+    }
 
-    let html=`
-
+    let html = `
 <div class="card carro-card">
 
-<img src="imagens/carros/${carro.imagem}">
+<img src="imagens/carros/${carro.imagem}" onerror="this.src='imagens/carros/gol.jpg'">
 
 <h2>${carro.marca} ${carro.nome}</h2>
 
@@ -136,35 +103,23 @@ function mostrarOferta(){
 <div class="info-grid">
 
 <div>
-
 📅
-
 <strong>${carro.ano}</strong>
-
 </div>
 
 <div>
-
 🛣️
-
 <strong>${carro.km.toLocaleString("pt-BR")} km</strong>
-
 </div>
 
 <div>
-
 🎨
-
 <strong>${carro.cor}</strong>
-
 </div>
 
 <div>
-
 📖
-
 <strong>${carro.historico}</strong>
-
 </div>
 
 </div>
@@ -172,108 +127,133 @@ function mostrarOferta(){
 <div class="precos">
 
 <div class="fipe-box">
-
 <small>FIPE</small>
-
 <strong>
-
 R$ ${carro.fipe.toLocaleString("pt-BR")}
-
 </strong>
-
 </div>
 
 <div class="pedido-box">
-
 <small>PEDIDO</small>
-
 <strong>
-
 R$ ${carro.preco.toLocaleString("pt-BR")}
-
 </strong>
-
 </div>
 
 </div>
 
 <h3>
-
 🔧 Defeitos encontrados
-
 </h3>
-
 `;
 
-
-if(carro.defeitos.length==0){
-
-    html+=`
-
+if(carro.defeitos.length == 0){
+    html += `
     <div class="defeito ok">
-
         ✅ Veículo sem defeitos
-
     </div>
-
     `;
-
-}else{
-
+} else {
     carro.defeitos.forEach(function(d){
-
-        html+=`
-
+        html += `
         <div class="defeito">
-
             <span>
-
                 🔧 ${d.nome}
-
             </span>
-
             <strong>
-
                 R$ ${d.valor.toLocaleString("pt-BR")}
-
             </strong>
-
         </div>
-
         `;
-
     });
-
 }
 
-html+=`
-
+html += `
 <div class="resumo-compra">
-
     <div>
-
         <small>Custo dos reparos</small>
-
         <strong>
-
             R$ ${carro.custo.toLocaleString("pt-BR")}
-
         </strong>
-
     </div>
-
 </div>
 
 <button class="btnComprar" onclick="comprarCarro()">
-
     🚗 Comprar Veículo
-
 </button>
 
 </div>
-
 `;
 
-conteudo.innerHTML = html;
+    conteudo.innerHTML = html;
+}
 
+// ===========================
+// FUNÇÃO DE PONTE (CHAMADA PELO MENU HTML)
+// ===========================
+function mostrarMercado(){
+    if(!jogo.ofertaAtual){
+        gerarOferta();
+    } else {
+        mostrarOferta();
+    }
+}
+
+// ===========================
+// COMPRAR CARRO (COM ENVIO CORRETO DA FOTO)
+// ===========================
+function comprarCarro(){
+    let carro = jogo.ofertaAtual;
+
+    if(!carro){
+        mostrarAlerta("❌ Erro", "Nenhuma oferta disponível no momento.");
+        return;
+    }
+
+    if(jogo.dinheiro < carro.preco){
+        mostrarAlerta(
+            "💸 Dinheiro insuficiente",
+            `Você não possui saldo suficiente para comprar este veículo.\n\nCaixa: R$ ${jogo.dinheiro.toLocaleString("pt-BR")}\nPreço: R$ ${carro.preco.toLocaleString("pt-BR")}`
+        );
+        return;
+    }
+
+    jogo.dinheiro -= carro.preco;
+
+    if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0, lucroTotal: 0 };
+    jogo.estatisticas.comprados++;
+
+    if(!jogo.carros) jogo.carros = [];
+
+    // Adiciona o carro na garagem levando a foto junto!
+    jogo.carros.push({
+        marca: carro.marca,
+        modelo: carro.nome + " " + carro.versao,
+        ano: carro.ano,
+        km: carro.km,
+        cor: carro.cor,
+        fipe: carro.fipe,
+        precoCompra: carro.preco,
+        foto: carro.imagem, // <--- Aqui garante que a foto vai para a oficina
+        defeitos: [...carro.defeitos],
+        reparos: []
+    });
+
+    jogo.ofertaAtual = null;
+
+    atualizarPainel();
+    salvarJogo();
+
+    mostrarAlerta(
+        "🎉 Compra Realizada",
+        `Você comprou o ${carro.marca} ${carro.nome}!\n\nO carro foi enviado para a oficina.`
+    );
+
+    if(typeof mostrarOficina === "function"){
+        mostrarOficina();
+    }
+}
+
+function aleatorio(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

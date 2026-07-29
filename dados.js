@@ -1,127 +1,77 @@
 // ===========================
-
-// DADOS.JS
-
+// DADOS.JS (CORRIGIDO PARA DIA 1)
 // ===========================
 
-
-
 const jogo = {
-
-    dinheiro: 25000,
-
-    dia: 9,
-
-    mes: 3,
-
+    dinheiro: 45000,
+    dia: 1,
+    mes: 1,
     ano: 2026,
-
     diaSemana: 4,
-
     reputacao: 0,
-
     lucro: 0,
-    
     introducao: true,
-
-    emprestimo: 0,
-
+    emprestimos: [], // Garante que a lista de empréstimos nasce limpa aqui também
     carros: [],
-
     ofertaAtual: null,
 
     // Empresa
-    empresa:{
-
-        nome:"G2 Garagem",
-
-        nivel:1,
-
-        vagas:2,
-
-        funcionarios:0
-
+    empresa: {
+        nome: "G2 Garagem",
+        nivel: 1,
+        vagas: 2,
+        funcionarios: 0
     },
 
     // Financeiro
-    financeiro:{
-
-        gastosHoje:0,
-
-        gastosMes:0,
-
-        gastosTotal:0,
-
-        gastosConsertos:0,
-
-        gastosContas:0,
-
-        receitaTotal:0,
-
-        melhorVenda:0,
-
-        maiorPrejuizo:0
-
+    financeiro: {
+        gastosHoje: 0,
+        gastosMes: 0,
+        gastosTotal: 0,
+        gastosConsertos: 0,
+        gastosContas: 0,
+        receitaTotal: 0,
+        melhorVenda: 0,
+        maiorPrejuizo: 0
     },
 
-    estatisticas:{
-
-        comprados:0,
-
-        vendidos:0,
-
-        consertados:0,
-
-        lucroTotal:0
-
+    estatisticas: {
+        comprados: 0,
+        vendidos: 0,
+        consertados: 0,
+        lucroTotal: 0
     }
-
 };
 
-
-
 // ===========================
-
 // LISTA DE CARROS
-
 // ===========================
-
-
 
 const carros = [
-  
 {marca:"RARO",modelo:"IMPALA SUPERNATURAL",versao:"CARRO ESPECIAL",fipe:600000,imagem:"impala_supernatural.jpg"},
-
 {marca:"Honda",modelo:"Titan Esd (teste)",versao:"150",fipe:8500,imagem:"titan_esd.jpg"},
-
-{marca:"Volkswagen",modelo:"Gol G3",versao:"1.6 Ap",fipe:25000,imagem:"gol.jpg",imagem:"gol2.jpg",imagem:"gol2.jpg"},
+{marca:"Volkswagen",modelo:"Gol G3",versao:"1.6 Ap",fipe:25000,imagem:"gol.jpg"},
 {marca:"Volkswagen",modelo:"Gol G5",versao:"1.6",fipe:36000,imagem:"gol_g5.jpg"},
 {marca:"Volkswagen",modelo:"Gol G6",versao:"1.6",fipe:47000,imagem:"gol_g6.jpg"},
 {marca:"Volkswagen",modelo:"Fox",versao:"1.6",fipe:42000,imagem:"fox.jpg"},
 {marca:"Volkswagen",modelo:"Voyage",versao:"1.6",fipe:43000,imagem:"voyage.jpg"},
 {marca:"Volkswagen",modelo:"Saveiro",versao:"1.6",fipe:58000,imagem:"saveiro.jpg"},
-
-{marca:"Chevrolet",modelo:"Celta",versao:"1.0",fipe:22000,imagem:"celta.jpg",imagem:"celta2.jpg"},
+{marca:"Chevrolet",modelo:"Celta",versao:"1.0",fipe:22000,imagem:"celta.jpg"},
 {marca:"Chevrolet",modelo:"Corsa",versao:"1.4",fipe:27000,imagem:"corsa.jpg"},
 {marca:"Chevrolet",modelo:"Onix",versao:"1.0",fipe:65000,imagem:"onix.jpg"},
 {marca:"Chevrolet",modelo:"Cruze",versao:"1.8",fipe:82000,imagem:"cruze.jpg"},
-
 {marca:"Fiat",modelo:"Uno",versao:"1.0",fipe:18000,imagem:"uno.jpg"},
 {marca:"Fiat",modelo:"Palio",versao:"1.4",fipe:26000,imagem:"palio.jpg"},
 {marca:"Fiat",modelo:"Argo",versao:"1.3",fipe:76000,imagem:"argo.jpg"},
-
 {marca:"Ford",modelo:"Ka",versao:"1.0",fipe:36000,imagem:"ka.jpg"},
 {marca:"Ford",modelo:"Focus",versao:"2.0",fipe:22000,imagem:"focus.jpg"},
 {marca:"Ford",modelo:"Fiesta",versao:"1.6",fipe:39000,imagem:"fiesta.jpg"},
-
 {marca:"Honda",modelo:"Fit",versao:"1.5",fipe:58000,imagem:"fit.jpg"},
 {marca:"Honda",modelo:"City",versao:"1.5",fipe:69000,imagem:"city.jpg"},
 {marca:"Honda",modelo:"Civic",versao:"2.0",fipe:98000,imagem:"civic.jpg"},
-
 {marca:"Toyota",modelo:"Etios",versao:"1.5",fipe:54000,imagem:"etios.jpg"},
 {marca:"Toyota",modelo:"Corolla",versao:"2.0",fipe:145000,imagem:"corolla.jpg"},
 {marca:"Toyota",modelo:"Hilux",versao:"2.8",fipe:220000,imagem:"hilux.jpg"},
-
 {marca:"Volkswagen",modelo:"Amarok",versao:"3.0 V6 Diesel Extreme",fipe:245000,imagem:"amarok.jpg"},
 {marca:"Toyota",modelo:"Hilux",versao:"2.8 D-4D SRX",fipe:275000,imagem:"hilux.jpg"},
 {marca:"Chevrolet",modelo:"S10",versao:"2.8 CTDI High Country",fipe:210000,imagem:"s10.jpg"},
@@ -169,235 +119,59 @@ const carros = [
 {marca:"Ford",modelo:"Escort",versao:"1.8 XR3 Conversível",fipe:38000,imagem:"escort_xr3.jpg"},
 {marca:"Volkswagen",modelo:"Gol",versao:"2.0 GTI 16V Bola",fipe:75000,imagem:"golGTI.jpg"},
 {marca:"Porsche",modelo:"911",versao:"Turbo S",fipe:1250000,imagem:"911.jpg"},
-{marca:"Toyota",modelo:"Supra",versao:"GR 3.0 Turbo",fipe:500000,imagem:"supra.jpg",imagem:"supra2.jpg"},
+{marca:"Toyota",modelo:"Supra",versao:"GR 3.0 Turbo",fipe:500000,imagem:"supra.jpg"},
 {marca:"Mercedes-Benz",modelo:"AMG GT",versao:"63 S V8 Biturbo",fipe:1400000,imagem:"amg_gt.jpg"},
 {marca:"BMW",modelo:"M4",versao:"Competition Coupé",fipe:340000,imagem:"bmw.jpg"}
-
-
-
 ];
-
-
 
 const cores = [
-
-
-
-"Branco",
-
-"Preto",
-
-"Prata",
-
-"Cinza",
-
-"Vermelho",
-
-"Azul",
-
-"Verde",
-
-"Amarelo"
-
-
-
+    "Branco", "Preto", "Prata", "Cinza", "Vermelho", "Azul", "Verde", "Amarelo"
 ];
-
-
 
 const historicos = [
-
-
-
-"Único dono",
-"Uber",
-"Locadora",
-"Leilão",
-"Pequena colisão",
-"Revisões em dia",
-"Sem histórico",
-"Segundo dono",
-"Terceiro dono",
-"Quarto dono ou mais",
-"De colecionador",
-"Placa preta",
-"Restaurado",
-"Recuperado de financiamento",
-"Média monta",
-"Grande monta",
-"Sinistrado com laudo",
-"Laudo cautelar aprovado",
-"Laudo cautelar reprovado",
-"Laudo cautelar aprovado com apontamento",
-"Chassi remarcado",
-"Pintura original",
-"Retocado",
-"Carro de repasse",
-"Garantia de fábrica",
-"Baixa quilometragem",
-"Nota fiscal de fábrica",
-"Manual e chave reserva",
-"Toda a documentação paga",
-"IPVA 2026 quitado",
-"Com multas pendentes",
-"Alienado",
-"Bloqueio judicial",
-"Dupla transferência pendente",
-"Placa Mercosul",
-"Placa antiga",
-"Sem retoques na lataria",
-"Motor feito recentemente",
-"Histórico de modificação suspensão",
-"Legalizado no documento",
-"Sem sinistro no documento",
-"Ex-táxi",
-"Carro de frota de empresa",
-"Uso em estrada",
-"Uso predominantemente urbano",
-"Carro de mulher",
-"Carro de idoso",
-"Guardado apenas em garagem coberta",
-"Adquirido em concessionária local",
-"Leilão de banco",
-"Leilão de seguradora",
-"Leilão de frota",
-"Leilão de renovação de frota",
-"Recuperado de roubo/furto",
-"Furtado e achado sem danos",
-"Histórico de enchente",
-"Passagem por seguradora",
-"Sinistro recuperado",
-"Transformado",
-"Kit GNV instalado e homologado",
-"Kit GNV retirado",
-"GNV com vistoria vencida",
-"Motor trocado e cadastrado",
-"Motor trocado sem cadastro",
-"Painel substituído (KM desalinhada)",
-"KM adulterada constatada",
-"Estrutura íntegra",
-"Longarina reparada",
-"Painel traseiro trocado",
-"Folha de teto substituída",
-"Coluna central reparada",
-"Caixa de ar refeita",
-"Amortecedores originais",
-"Pneus novos",
-"Pneus carecas",
-"Pneus remold",
-"Rodas modificadas",
-"Suspensão a ar",
-"Suspensão de rosca",
-"Suspensão fixa rebaixada",
-"Remapeado (Stage 1)",
-"Remapeado (Stage 2)",
-"Filtro e escape modificados",
-"Voltou para o mapa original",
-"Som automotivo forte instalado anteriormente",
-"Fiação de som pesada passada",
-"Totalmente original de fábrica",
-"Ficou parado muito tempo",
-"Pertenceu a mecânico",
-"Carro de fã do modelo",
-"Comprado em leilão de sucata",
-"Pintura queimada de sol",
-"Histórico de granizo",
-"Tratamento antiferrugem feito",
-"Podres na lataria corrigidos",
-"Esmagamento de assoalho",
-"Sem garantia mecânica (venda no estado)",
-"Revisado em concessionária até os 100k",
-"Revisado em oficina especializada",
-"Dono anterior perfeccionista",
-"Uso severo em terra/fazenda",
-"Puxava reboque frequentemente",
-"Câmbio automático revisado recente",
-"Luz de injeção acesa no histórico",
-"Airbag já disparado e trocado",
-"Airbag isolado",
-"Vidros originais com logo da marca",
-"Para-brisa trocado por paralelo",
-"Bancos em couro hidratados",
-"Interna reformada",
-"Sem detalhes para fazer",
-"Restauração antiga",
-"Sobras de solda de fábrica intactas",
-"Histórico de envelopamento total",
-"Placa clonada anteriormente",
-"Burocracia de inventário resolvida",
-"Liberado para transferência imediata"
-
-
-
+    "Único dono", "Uber", "Locadora", "Leilão", "Pequena colisão", "Revisões em dia", "Sem histórico", "Segundo dono", "Terceiro dono", "Quarto dono ou mais", "De colecionador", "Placa preta", "Restaurado", "Recuperado de financiamento", "Média monta", "Grande monta", "Sinistrado com laudo", "Laudo cautelar aprovado", "Laudo cautelar reprovado", "Laudo cautelar aprovado com apontamento", "Chassi remarcado", "Pintura original", "Retocado", "Carro de repasse", "Garantia de fábrica", "Baixa quilometragem", "Nota fiscal de fábrica", "Manual e chave reserva", "Toda a documentação paga", "IPVA 2026 quitado", "Com multas pendentes", "Alienado", "Bloqueio judicial", "Dupla transferência pendente", "Placa Mercosul", "Placa antiga", "Sem retoques na lataria", "Motor feito recentemente", "Histórico de modificação suspensão", "Legalizado no documento", "Sem sinistro no documento", "Ex-táxi", "Carro de frota de empresa", "Uso em estrada", "Uso predominantemente urbano", "Carro de mulher", "Carro de idoso", "Guardado apenas em garagem coberta", "Adquirido em concessionária local", "Leilão de banco", "Leilão de seguradora", "Leilão de frota", "Leilão de renovação de frota", "Recuperado de roubo/furto", "Furtado e achado sem danos", "Histórico de enchente", "Passagem por seguradora", "Sinistro recuperado", "Transformado", "Kit GNV instalado e homologado", "Kit GNV retirado", "Kit GNV com vistoria vencida", "Motor trocado e cadastrado", "Motor trocado sem cadastro", "Painel substituído (KM desalinhada)", "KM adulterada constatada", "Estrutura íntegra", "Longarina reparada", "Painel traseiro trocado", "Folha de teto substituída", "Coluna central reparada", "Caixa de ar refeita", "Amortecedores originais", "Pneus novos", "Pneus carecas", "Pneus remold", "Rodas modificadas", "Suspensão a ar", "Suspensão de rosca", "Suspensão fixa rebaixada", "Remapeado (Stage 1)", "Remapeado (Stage 2)", "Filtro e escape modificados", "Voltou para o mapa original", "Som automotivo forte instalado anteriormente", "Fiação de som pesada passada", "Totalmente original de fábrica", "Ficou parado muito tempo", "Pertenceu a mecânico", "Carro de fã do modelo", "Comprado em leilão de sucata", "Pintura queimada de sol", "Histórico de granizo", "Tratamento antiferrugem feito", "Podres na lataria corrigidos", "Esmagamento de assoalho", "Sem garantia mecânica (venda no estado)", "Revisado em concessionária até os 100k", "Revisado em oficina especializada", "Dono anterior perfeccionista", "Uso severo em terra/fazenda", "Puxava reboque frequentemente", "Câmbio automático revisado recente", "Luz de injeção acesa no histórico", "Airbag já disparado e trocado", "Airbag isolado", "Vidros originais com logo da marca", "Para-brisa trocado por paralelo", "Bancos em couro hidratados", "Interna reformada", "Sem detalhes para fazer", "Restauração antiga", "Sobras de solda de fábrica intactas", "Histórico de envelopamento total", "Placa clonada anteriormente", "Burocracia de inventário resolvida", "Liberado para transferência imediata"
 ];
-
-
 
 const defeitos = [
-
-
-
-{nome:"Motor",valor:8500},
-
-{nome:"Câmbio",valor:6500},
-
-{nome:"Suspensão",valor:2800},
-
-{nome:"Pintura",valor:2200},
-
-{nome:"Pneus",valor:1800},
-
-{nome:"Ar-condicionado",valor:1500},
-
-{nome:"Freios",valor:900},
-
-{nome:"Bateria",valor:650},
-
-{nome:"Embreagem",valor:2400},
-
-{nome:"Embreagem",valor:2400},
-{nome:"Correia Dentada Rompida",valor:3500},
-{nome:"Junta do Cabeçote Queimada",valor:2800},
-{nome:"Bomba de Combustível Queimada",valor:650},
-{nome:"Velas e Cabos de Ignição",valor:350},
-{nome:"Pastilhas de Freio Gastas",valor:220},
-{nome:"Discos de Freio Empenados",valor:480},
-{nome:"Amortecedores Dianteiros Estourados",valor:1400},
-{nome:"Bucha da Bandeja Danificada",valor:180},
-{nome:"Ponteira de Homocinética Com Folga",valor:380},
-{nome:"Vazamento no Radiador",value:550},
-{nome:"Alternador Não Carrega",valor:900},
-{nome:"Motor de Arranque Pesado",valor:450},
-{nome:"Bateria Arriada",valor:490},
-{nome:"Vazamento de Óleo do Motor",valor:600},
-{nome:"Retentor do Câmbio Estourado",valor:320},
-{nome:"Rolamento de Roda Roncando",valor:2800},
-{nome:"Caixa de Direção Hidráulica Com Vazamento",valor:1600},
-{nome:"Barra Estabilizadora Com Folga",valor:250},
-{nome:"Sensor MAP Danificado",valor:290},
-{nome:"Sonda Lambda Travada",valor:420},
-{nome:"Bicos Injetores Entupidos",valor:380},
-{nome:"Bobina de Ignição Falhando",valor:400},
-{nome:"Compressor do Ar Condicionado Travado",valor:2100},
-{nome:"Eletroventilador do Radiador Queimado",valor:680},
-{nome:"Folga no Virabrequim",valor:5500},
-{nome:"Catalisador Entupido",valor:1800},
-{nome:"Cabo de Embreagem Partido",valor:150},
-{nome:"Cubo de Roda Empenado",valor:340}
-
-
-
+    {nome:"Motor",valor:8500},
+    {nome:"Câmbio",valor:6500},
+    {nome:"Suspensão",valor:2800},
+    {nome:"Pintura",valor:2200},
+    {nome:"Pneus",valor:1800},
+    {nome:"Ar-condicionado",valor:1500},
+    {nome:"Freios",valor:900},
+    {nome:"Bateria",valor:650},
+    {nome:"Embreagem",valor:2400},
+    {nome:"Correia Dentada Rompida",valor:3500},
+    {nome:"Junta do Cabeçote Queimada",valor:2800},
+    {nome:"Bomba de Combustível Queimada",valor:650},
+    {nome:"Velas e Cabos de Ignição",valor:350},
+    {nome:"Pastilhas de Freio Gastas",valor:220},
+    {nome:"Discos de Freio Empenados",valor:480},
+    {nome:"Amortecedores Dianteiros Estourados",valor:1400},
+    {nome:"Bucha da Bandeja Danificada",valor:180},
+    {nome:"Ponteira de Homocinética Com Folga",valor:380},
+    {nome:"Vazamento no Radiador",valor:550},
+    {nome:"Alternador Não Carrega",valor:900},
+    {nome:"Motor de Arranque Pesado",valor:450},
+    {nome:"Bateria Arriada",valor:490},
+    {nome:"Vazamento de Óleo do Motor",valor:600},
+    {nome:"Retentor do Câmbio Estourado",valor:320},
+    {nome:"Rolamento de Roda Roncando",valor:2800},
+    {nome:"Caixa de Direção Hidráulica Com Vazamento",valor:1600},
+    {nome:"Barra Estabilizadora Com Folga",valor:250},
+    {nome:"Sensor MAP Danificado",valor:290},
+    {nome:"Sonda Lambda Travada",valor:420},
+    {nome:"Bicos Injetores Entupidos",valor:380},
+    {nome:"Bobina de Ignição Falhando",valor:400},
+    {nome:"Compressor do Ar Condicionado Travado",valor:2100},
+    {nome:"Eletroventilador do Radiador Queimado",valor:680},
+    {nome:"Folga no Virabrequim",valor:5500},
+    {nome:"Catalisador Entupido",valor:1800},
+    {nome:"Cabo de Embreagem Partido",valor:150},
+    {nome:"Cubo de Roda Empenado",valor:340}
 ];
 
-
-
-function aleatorio(min,max){
-
-
-
-    return Math.floor(Math.random()*(max-min+1))+min;
-
-
-
+function aleatorio(min, max){
+    return Math.floor(Math.random()*(max-min+1))+min;
 }
-
