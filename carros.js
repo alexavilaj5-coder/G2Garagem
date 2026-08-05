@@ -34,8 +34,8 @@ function mostrarPatio() {
         html += `<div class="patio-grid">`;
 
         jogo.carros.forEach(function (carro, index) {
-            let imagemPadrao = 'imagens/carros/gol.jpg';
-            let imagemUrl = carro.foto ? `imagens/carros/${carro.foto}` : imagemPadrao;
+            let imagemPadrao = 'imagens/gol.jpg';
+            let imagemUrl = carro.foto ? `imagens/${carro.foto}` : imagemPadrao;
 
             let kmSeguro = (carro.km || 0).toLocaleString("pt-BR");
             let compraFormatada = (carro.compra || carro.precoCompra || 0).toLocaleString("pt-BR", { style: 'currency', currency: 'BRL' });
@@ -46,7 +46,6 @@ function mostrarPatio() {
             if (qtdDefeitos > 0 && qtdDefeitos < 3) classeBorda = 'estado-atencao';
             if (qtdDefeitos >= 3) classeBorda = 'estado-critico';
 
-            // Adicionamos a chamada para ver os detalhes do carro ao clicar no card
             html += `
             <div class="card carro-card ${classeBorda}" onclick="verDetalhesCarro(${index})">
                 
@@ -99,12 +98,9 @@ function mostrarPatio() {
     conteudo.innerHTML = html;
 }
 
-// Função provisional para abrir os detalhes quando você clica no carro
 function verDetalhesCarro(index) {
     let carro = jogo.carros[index];
     if (!carro) return;
     
-    // Se você já tiver uma função antiga de inspecionar carro no seu jogo, pode chamá-la aqui.
-    // Exemplo básico temporário:
     mostrarAlerta("🚘 " + carro.marca + " " + carro.modelo, `Ano: ${carro.ano}\nQuilometragem: ${(carro.km || 0).toLocaleString("pt-BR")} km\nDefeitos: ${carro.defeitos ? carro.defeitos.length : 0}`);
 }

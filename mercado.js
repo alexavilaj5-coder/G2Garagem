@@ -94,7 +94,7 @@ function mostrarOferta(){
     let html = `
 <div class="card carro-card">
 
-<img src="imagens/carros/${carro.imagem}" onerror="this.src='imagens/carros/gol.jpg'">
+<img src="imagens/${carro.imagem}" onerror="this.src='imagens/gol.jpg'">
 
 <h2>${carro.marca} ${carro.nome}</h2>
 
