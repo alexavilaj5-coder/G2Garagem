@@ -3,7 +3,7 @@
 // ===========================
 
 const jogo = {
-    dinheiro: 45000,
+    dinheiro: 9000,
     dia: 1,
     mes: 1,
     ano: 2026,

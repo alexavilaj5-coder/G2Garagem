@@ -1,7 +1,7 @@
-// ===========================
-// TEMPO.JS V3.3 (COM RESUMO INTELIGENTE DO DIA)
+// ===========================================
+// TEMPO.JS V4.3 (COM VIRADA DE PARCELAS MENSAL) 🚗💳💥
 // G2 GARAGEM
-// ===========================
+// ===========================================
 
 const diasSemana = [
     "Domingo",
@@ -13,25 +13,31 @@ const diasSemana = [
     "Sábado"
 ];
 
+// Lista expandida de despesas mensais (com variação de preço baseada em porcentagem)
 const despesasMensais = [
-    {nome:"🏢 Aluguel da Garagem",valor:5500},
-    {nome:"💡 Energia",valor:1280},
-    {nome:"💧 Água",valor:180},
-    {nome:"🌐 Internet",valor:150},
-    {nome:"📄 Alvará",valor:350},
-    {nome:"🧹 Limpeza",valor:250},
-    {nome:"🛡 Seguro",valor:450},
-    {nome:"☕ Café e Materiais",valor:120}
+    {nome: "🏢 Aluguel da Garagem", valorBase: 5500, variacao: 0.05},
+    {nome: "💡 Energia Elétrica (Oficina)", valorBase: 1350, variacao: 0.25},
+    {nome: "💧 Água e Saneamento", valorBase: 190, variacao: 0.10},
+    {nome: "🌐 Internet Fibra & Sistema", valorBase: 150, variacao: 0.10},
+    {nome: "📄 Alvará e Licenças", valorBase: 350, variacao: 0.00},
+    {nome: "🧹 Limpeza Geral e Insumos", valorBase: 280, variacao: 0.10},
+    {nome: "🛡 Seguro Frota & Imóvel", valorBase: 480, variacao: 0.05},
+    {nome: "☕ Café, Água e Insumos", valorBase: 140, variacao: 0.20},
+    {nome: "🗑️ Taxa de Resíduos Perigosos", valorBase: 220, variacao: 0.15},
+    {nome: "📢 Marketing e Anúncios Fixos", valorBase: 600, variacao: 0.60}
 ];
 
+// Lista expandida de despesas diárias (com variação e imprevistos)
 const despesasDiarias = [
-    {nome:"☕ Café da Equipe",valor:17},
-    {nome:"🧹 Produtos de Limpeza",valor:15},
-    {nome:"🍽️ Almoço Funcionários",valor:80},
-    {nome:"🥤 Bebidas da Equipe",valor:25},
-    {nome:"🧽 Lavagem dos Veículos",valor:50},
-    {nome:"🔧 Ferramentas e Manutenção",valor:50},
-    {nome:"📢 Divulgação da Garagem",valor:100}
+    {nome: "☕ Café da Equipe", valorBase: 18, variacao: 0.25},
+    {nome: "🧹 Produtos de Limpeza", valorBase: 15, variacao: 0.70},
+    {nome: "🍽️ Almoço dos Funcionários", valorBase: 90, variacao: 0.20},
+    {nome: "🥤 Bebidas e Hidratação", valorBase: 25, variacao: 0.20},
+    {nome: "🧽 Lavagem Rápida de Veículos", valorBase: 50, variacao: 0.40},
+    {nome: "🔧 Ferramentas Manuais e Desgaste", valorBase: 60, variacao: 0.50},
+    {nome: "📢 Divulgação Digital do Dia", valorBase: 100, variacao: 0.50},
+    {nome: "🔩 Parafusos, Lixas e Abrasivos", valorBase: 45, variacao: 0.40},
+    {nome: "🧯 Recarga e Manutenção de Equipamentos", valorBase: 35, variacao: 0.60}
 ];
 
 function iniciarCalendario(){
@@ -39,6 +45,15 @@ function iniciarCalendario(){
     if(jogo.ano === undefined) jogo.ano = 2026;
     if(jogo.dia === undefined) jogo.dia = 1;
     if(jogo.diaSemana === undefined) jogo.diaSemana = 4;
+    if(jogo.financeiro === undefined) jogo.financeiro = { gastosHoje: 0, gastosMes: 0, gastosTotal: 0, gastosContas: 0 };
+
+    // Dispara os fogos se o jogo iniciar exatamente no dia 1 de janeiro (boa vinda ao game)
+    if(jogo.dia === 1 && jogo.mes === 1 && !window.fogosIniciaisDisparados){
+        window.fogosIniciaisDisparados = true;
+        setTimeout(() => {
+            dispararFogosDeArtificio();
+        }, 1000);
+    }
 }
 
 function atualizarDataPainel(){
@@ -55,25 +70,39 @@ function atualizarDataPainel(){
     }
 }
 
+// Função auxiliar para calcular valores aleatórios baseados na variação
+function calcularValorAleatorio(base, variator){
+    let fator = 1 + (Math.random() * (variator * 2) - variator);
+    return Math.round(base * fator);
+}
+
 function cobrarDespesasDiarias(){
     let total = 0;
+    
+    jogo.resumoGastosHoje = [];
+
     despesasDiarias.forEach(function(d){
-        total += d.valor;
+        let valorReal = calcularValorAleatorio(d.valorBase, d.variacao);
+        total += valorReal;
+        jogo.resumoGastosHoje.push({ nome: d.nome, valor: valorReal });
     });
 
     jogo.dinheiro -= total;
-    jogo.financeiro.gastosHoje += total;
+    jogo.financeiro.gastosHoje = total;
     jogo.financeiro.gastosMes += total;
     jogo.financeiro.gastosTotal += total;
+
+    return total;
 }
 
 function cobrarDespesasMensais(){
     let total = 0;
-    let texto = "🏢 CONTAS DO MÊS\n\n";
+    let texto = "🏢 CONTAS DO MÊS (FECHAMENTO)\n\n";
 
     despesasMensais.forEach(function(d){
-        total += d.valor;
-        texto += d.nome + " - R$ " + d.valor.toLocaleString("pt-BR") + "\n";
+        let valorReal = calcularValorAleatorio(d.valorBase, d.variacao);
+        total += valorReal;
+        texto += `${d.nome} - R$ ${valorReal.toLocaleString("pt-BR")}\n`;
     });
 
     jogo.dinheiro -= total;
@@ -82,8 +111,8 @@ function cobrarDespesasMensais(){
     jogo.financeiro.gastosContas += total;
 
     mostrarAlerta(
-        "🏢 Contas Pagas",
-        texto + "\n\nTOTAL: R$ " + total.toLocaleString("pt-BR")
+        "🏢 Fechamento Mensal de Contas",
+        texto + "\n-----------------------------------\nTOTAL GASTO: R$ " + total.toLocaleString("pt-BR")
     );
 }
 
@@ -93,6 +122,7 @@ function avancarDia(){
 
     let totalGastoHojePassar = 0;
     let emprestimosAtualizadosTexto = "";
+    let virouAnoNovo = false;
 
     function passarDia(){
         jogo.dia++;
@@ -133,12 +163,8 @@ function avancarDia(){
             jogo.investimento += rendimentoDiario;
         }
 
-        // 3. Soma despesas diárias para o resumo
-        despesasDiarias.forEach(function(d){
-            totalGastoHojePassar += d.valor;
-        });
-
-        cobrarDespesasDiarias();
+        // 3. Cobra despesas diárias com variação aleatória
+        totalGastoHojePassar = cobrarDespesasDiarias();
 
         if(typeof atualizarOficinaDia === "function"){
             atualizarOficinaDia();
@@ -148,26 +174,28 @@ function avancarDia(){
             atualizarClientesNovoDia();
         }
 
+        // 4. Virada de Mês (Dispara Contas e Parcelas do Crediário Mensal)
         if(jogo.dia > 30){
             jogo.dia = 1;
             jogo.mes++;
 
             cobrarDespesasMensais();
 
+            // CHAMA AQUI O PROCESSAMENTO DAS PARCELAS DO CREDIÁRIO
+            if(typeof processarParcelasFinanciamentos === "function"){
+                processarParcelasFinanciamentos();
+            }
+
             mostrarAlerta(
-                "📅 Novo Mês",
-                "Um novo mês começou na G2 Garagem!"
+                "📅 Virada de Mês",
+                "Um novo mês começou na G2 Garagem! As contas fixas e as parcelas do crediário foram processadas."
             );
         }
 
         if(jogo.mes > 12){
             jogo.mes = 1;
             jogo.ano++;
-
-            mostrarAlerta(
-                "🎉 Feliz Ano Novo",
-                "Bem-vindo a " + jogo.ano + "!"
-            );
+            virouAnoNovo = true;
         }
     }
 
@@ -185,11 +213,24 @@ function avancarDia(){
         mostrarBanco();
     }
 
-    // Monta o resumo profissional com o que aconteceu no dia
-    let resumoDia = `💸 Despesas pagas hoje: <strong>R$ ${totalGastoHojePassar.toLocaleString("pt-BR")}</strong>`;
+    if(virouAnoNovo){
+        mostrarAlerta(
+            "🎉 Feliz Ano Novo!",
+            "Bem-vindo a " + jogo.ano + "! Sua garagem completa mais um ano de história."
+        );
+        setTimeout(() => {
+            dispararFogosDeArtificio();
+        }, 500);
+    }
+
+    let resumoDia = `💸 Custos operacionais hoje: <strong>R$ ${totalGastoHojePassar.toLocaleString("pt-BR")}</strong>`;
     
+    if(jogo.resumoGastosHoje && jogo.resumoGastosHoje.length > 0) {
+        resumoDia += `<br><span style='font-size: 11px; color: #a1a1aa;'>Imprevistos e gastos do dia calculados com sucesso.</span>`;
+    }
+
     if(jogo.investimento > 0) {
-        resumoDia += `<br>📈 Seus investimentos renderam hoje.`;
+        resumoDia += `<br>📈 Seus investimentos renderam juros hoje.`;
     }
 
     if(jogo.emprestimos && jogo.emprestimos.length > 0) {
@@ -208,4 +249,50 @@ function avancarDia(){
         "<br><br>" +
         resumoDia
     );
+}
+
+function dispararFogosDeArtificio() {
+    const overlay = document.createElement("div");
+    overlay.className = "container-fogos";
+    document.body.appendChild(overlay);
+
+    const cores = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#ffffff"];
+
+    let ondas = 0;
+    let intervaloFogos = setInterval(() => {
+        ondas++;
+        
+        let posX = Math.random() * window.innerWidth;
+        let posY = Math.random() * (window.innerHeight / 2);
+
+        for (let i = 0; i < 30; i++) {
+            let particula = document.createElement("div");
+            particula.className = "particula-fogo";
+            particula.style.left = posX + "px";
+            particula.style.top = posY + "px";
+            particula.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+            
+            let angulo = Math.random() * Math.PI * 2;
+            let velocidade = Math.random() * 80 + 20;
+            let destinoX = Math.cos(angulo) * velocidade;
+            let destinoY = Math.sin(angulo) * velocidade;
+            
+            particula.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${destinoX}px, ${destinoY}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 500,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
+            });
+
+            overlay.appendChild(particula);
+        }
+
+        if (ondas >= 5) {
+            clearInterval(intervaloFogos);
+            setTimeout(() => {
+                overlay.remove();
+            }, 1500);
+        }
+    }, 800);
 }

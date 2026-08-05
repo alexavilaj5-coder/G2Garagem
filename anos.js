@@ -42,6 +42,7 @@ const anosModelos = {
 
     "911":{inicio:2020,fim:2026},
     "Supra":{inicio:1993,fim:2002},
+    "Clio RS line":{inicio:2025,fim:2026},
     "AMG GT":{inicio:2015,fim:2026},
     "M4":{inicio:2014,fim:2026},
     "Focus":{inicio:2001,fim:2003},

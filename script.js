@@ -1,6 +1,6 @@
-// ===========================
-// SCRIPT.JS (ATUALIZADO COM LEILÃO)
-// ===========================
+// ===========================================
+// SCRIPT.JS (G2 GARAGEM — VERSÃO NÍVEL 1000 🚀)
+// ===========================================
 
 const conteudo = document.getElementById("conteudo");
 
@@ -12,17 +12,15 @@ const lucro = document.getElementById("lucro");
 const vagas = document.getElementById("vagas");
 
 window.onload = function(){
-
     carregarJogo();
-
     atualizarPainel();
     
-    iniciarIntroducao();
+    iniciarIntroducaoCinematografica();
 
     document.getElementById("btnMercado").onclick = abrirMercado;
     document.getElementById("btnPatio").onclick = abrirPatio;
     document.getElementById("btnOficina").onclick = abrirOficina;
-    document.getElementById("btnLeilao").onclick = abrirLeilao; // ADICIONADO AQUI
+    document.getElementById("btnLeilao").onclick = abrirLeilao;
     document.getElementById("btnBanco").onclick = abrirBanco;
     document.getElementById("btnClientes").onclick = abrirClientes;
     document.getElementById("btnEmpresa").onclick = abrirEmpresa;
@@ -30,14 +28,11 @@ window.onload = function(){
     document.getElementById("btnProximoDia").onclick = proximoDia;
 
     mostrarTelaInicial();
-
 };
 
 function atualizarPainel(){
-
     caixa.innerHTML = "R$ " + jogo.dinheiro.toLocaleString("pt-BR");
 
-    // Quem define a data é o tempo.js
     if(typeof atualizarDataPainel === "function"){
         atualizarDataPainel();
     }else{
@@ -45,37 +40,23 @@ function atualizarPainel(){
     }
 
     reputacao.innerHTML = jogo.reputacao;
-
     lucro.innerHTML = "R$ " + jogo.lucro.toLocaleString("pt-BR");
 
     if(vagas){
-
         let usadas = jogo.carros ? jogo.carros.length : 0;
-
         vagas.innerHTML = usadas + "/" + jogo.empresa.vagas;
-
     }
-
 }
 
 function mostrarTelaInicial(){
-
     conteudo.innerHTML = `
-
     <div class="card">
-
         <h2>🚗 O INICIO DE TUDO!</h2>
-
         <p>
         📖 Você vendeu o seu carro para realizar um sonho: abrir sua própria garagem de veículos. Começando do zero, será preciso negociar bem, consertar carros, conquistar clientes e administrar as despesas. Faça escolhas inteligentes, expanda sua empresa e construa uma das maiores revendas do Brasil.
         </p>
-        
         <br>
-
-        <p>
-        ✅ G2 GARAGEM, SEU NOVO GAME!
-        </p>
-
+        <p>✅ G2 GARAGEM, SEU NOVO GAME!</p>
         <p>
         Bem-vindo ao seu novo negócio automotivo!<br><br>
         Aqui você começa pequeno, comprando carros usados, fazendo negociações, consertando defeitos e aumentando seu patrimônio.<br><br>
@@ -86,210 +67,318 @@ function mostrarTelaInicial(){
         Cada carro tem uma história... e cada negociação pode mudar o futuro da sua empresa.<br><br>
         Boa sorte, chefe! 🔥
         </p>
-
     </div>
-
     `;
-
 }
 
 function proximoDia(){
-
-    // O tempo.js assume o controle
     if(typeof avancarDia === "function"){
-
         avancarDia();
-
     }else{
-
         jogo.dia++;
-
         gerarOferta();
-
         salvarJogo();
-
         atualizarPainel();
-
-        alert(
-`📅 Dia ${jogo.dia}
-
-🚗 Novas ofertas chegaram ao mercado!`
-        );
-
+        alert(`📅 Dia ${jogo.dia}\n\n🚗 Novas ofertas chegaram ao mercado!`);
     }
-
 }
 
-function abrirMercado(){
-
-    gerarOferta();
-
-}
-
-function abrirPatio(){
-
-    mostrarPatio();
-
-}
-
-function abrirOficina(){
-
-    mostrarOficina();
-
-}
-
-function abrirLeilao(){
-
-    mostrarLeilao();
-
-}
-
-function abrirBanco(){
-
-    mostrarBanco();
-
-}
-
-function abrirClientes(){
-
-    mostrarClientes();
-
-}
-
-function abrirEstatisticas(){
-
-    mostrarEstatisticas();
-
-}
-
-function abrirEmpresa(){
-
-    mostrarEmpresa();
-
-}
-
-
-// ===========================
-// AVISO PEQUENO NO TOPO
-// ===========================
+function abrirMercado(){ gerarOferta(); }
+function abrirPatio(){ mostrarPatio(); }
+function abrirOficina(){ mostrarOficina(); }
+function abrirLeilao(){ mostrarLeilao(); }
+function abrirBanco(){ mostrarBanco(); }
+function abrirClientes(){ mostrarClientes(); }
+function abrirEstatisticas(){ mostrarEstatisticas(); }
+function abrirEmpresa(){ mostrarEmpresa(); }
 
 function mostrarAvisoTopo(texto){
-
     let aviso = document.getElementById("avisoTopo");
-
-    if(!aviso){
-        console.log("Div avisoTopo não encontrada");
-        return;
-    }
-
+    if(!aviso) return;
     aviso.innerHTML = texto;
-
     aviso.classList.add("mostrar");
-
     setTimeout(function(){
-
         aviso.classList.remove("mostrar");
-
     },3000);
-
 }
 
 function iniciarTutorial(){
-
-if(jogo.tutorialVisto) return;
-
-conteudo.innerHTML=`
-
-<div class="card">
-
-<h2>🚗 Bem-vindo à G2 Garagem</h2>
-
-<hr>
-
-<p>
-Você começou uma pequena revenda de veículos.
-</p>
-
-<p>
-🎯 Compre, conserte, venda e expanda sua empresa.
-</p>
-
-<p>
-📋 Mercado:
-Analise carros, FIPE, defeitos e histórico.
-</p>
-
-<p>
-🔧 Oficina:
-Reparos levam alguns dias para ficarem prontos.
-</p>
-
-<p>
-👥 Clientes:
-Negocie ofertas e aumente sua reputação.
-</p>
-
-<p>
-🏢 Empresa:
-Expanda vagas e contrate funcionários.
-</p>
-
-<button onclick="fecharTutorial()">
-🚗 Começar jogo
-</button>
-
-</div>
-
-`;
-
+    if(jogo.tutorialVisto) return;
+    conteudo.innerHTML=`
+    <div class="card">
+        <h2>🚗 Bem-vindo à G2 Garagem</h2>
+        <hr>
+        <p>Você começou uma pequena revenda de veículos.</p>
+        <p>🎯 Compre, conserte, venda e expanda sua empresa.</p>
+        <button onclick="fecharTutorial()">🚗 Começar jogo</button>
+    </div>
+    `;
 }
 
+// ===========================================
+// INTRODUÇÃO CINEMATOGRÁFICA NÍVEL 1000 (PAINEL + IGNIÇÃO)
+// ===========================================
 
-function iniciarIntroducao(){
+function iniciarIntroducaoCinematografica() {
+    if(!jogo.introducao) return;
 
-    if(jogo.introducao){
+    let existente = document.getElementById("modal-intro-g2");
+    if(existente) existente.remove();
 
-        mostrarAlerta(
-        "🚗 Bem-vindo à G2 Garage",
+    const overlay = document.createElement("div");
+    overlay.id = "modal-intro-g2";
 
-`
-Você abriu sua própria garagem!
+    overlay.innerHTML = `
+        <style>
+            #modal-intro-g2 {
+                position: fixed;
+                top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(5, 5, 7, 0.96);
+                backdrop-filter: blur(12px);
+                display: flex; justify-content: center; align-items: center;
+                z-index: 999999;
+                animation: fadeInIntro 0.5s ease-out forwards;
+                font-family: inherit;
+            }
+            @keyframes fadeInIntro { from { opacity: 0; } to { opacity: 1; } }
 
-🎯 Seu objetivo:
+            .painel-ignicao-box {
+                background: linear-gradient(145deg, #121216 0%, #09090b 100%);
+                border: 2px solid #27272a;
+                border-top: 4px solid #ef4444;
+                border-radius: 16px;
+                padding: 40px;
+                max-width: 520px;
+                width: 90%;
+                box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(239, 68, 68, 0.15);
+                text-align: center;
+                color: #f4f4f5;
+                position: relative;
+            }
 
-Comprar carros usados,
-consertar problemas,
-negociar com clientes
-e crescer sua empresa.
+            .painel-luzes-topo {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
 
-🔧 Oficina:
-Alguns veículos chegam com defeitos.
-Os reparos levam tempo e custam dinheiro.
+            .luz-painel {
+                width: 14px; height: 14px;
+                background: #27272a;
+                border-radius: 50%;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+                transition: all 0.3s ease;
+            }
+            .luz-painel.ligada {
+                background: #10b981;
+                box-shadow: 0 0 12px #10b981, inset 0 1px 2px rgba(255,255,255,0.4);
+            }
+            .luz-painel.alerta.ligada {
+                background: #f59e0b;
+                box-shadow: 0 0 12px #f59e0b;
+            }
 
-💰 Mercado:
-Procure boas oportunidades,
-compre barato e venda com lucro.
+            .painel-titulo {
+                font-size: 20px;
+                font-weight: 800;
+                color: #fff;
+                margin-bottom: 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+            }
 
-🏢 Empresa:
-Expanda sua garagem,
-aumente suas vagas
-e contrate funcionários.
+            .painel-status-texto {
+                font-size: 13px;
+                color: #a1a1aa;
+                margin-bottom: 30px;
+                min-height: 20px;
+                font-family: monospace;
+            }
 
-📅 Administração:
-Controle seus gastos,
-contas e seu caixa.
+            .painel-controles {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+                background: rgba(0, 0, 0, 0.4);
+                padding: 25px;
+                border-radius: 12px;
+                border: 1px solid #27272a;
+                margin-bottom: 25px;
+            }
 
-Boa sorte, chefe! 🚗
-`
-        );
+            .botao-painel {
+                background: #18181b;
+                border: 2px solid #3f3f46;
+                color: #a1a1aa;
+                padding: 12px 20px;
+                border-radius: 10px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            }
 
-        jogo.introducao = false;
+            .botao-painel span {
+                font-size: 18px;
+            }
 
-        salvarJogo();
+            .botao-painel.ativo {
+                background: #27272a;
+                border-color: #3b82f6;
+                color: #fff;
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            }
 
+            /* Chave de ignição mecânica estilizada */
+            .chave-ignicao-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .cilindro-chave {
+                width: 65px; height: 65px;
+                background: radial-gradient(circle, #3f3f46 0%, #18181b 80%);
+                border: 3px solid #52525b;
+                border-radius: 50%;
+                display: flex; justify-content: center; align-items: center;
+                cursor: not-allowed;
+                position: relative;
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+                box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+            }
+
+            .cilindro-chave.liberado {
+                cursor: pointer;
+                border-color: #ef4444;
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 6px 15px rgba(0,0,0,0.5);
+            }
+
+            .cilindro-chave.liberado:hover {
+                transform: scale(1.05);
+            }
+
+            .miolo-chave {
+                width: 12px; height: 35px;
+                background: #d4d4d8;
+                border-radius: 3px;
+                transition: transform 0.4s ease;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            }
+
+            .cilindro-chave.girada .miolo-chave {
+                transform: rotate(90deg);
+            }
+
+            .painel-historia-bloco {
+                font-size: 13px;
+                line-height: 1.6;
+                color: #d4d4d8;
+                background: rgba(24, 24, 27, 0.7);
+                padding: 15px;
+                border-radius: 8px;
+                border-left: 3px solid #ef4444;
+                text-align: left;
+                margin-bottom: 20px;
+                display: none;
+                animation: fadeInIntro 0.4s ease forwards;
+            }
+        </style>
+
+        <div class="painel-ignicao-box">
+            <div class="painel-luzes-topo">
+                <div class="luz-painel" id="luzBateria" title="Bateria"></div>
+                <div class="luz-painel alerta" id="luzInjecao" title="Injeção"></div>
+                <div class="luz-painel" id="luzOleo" title="Pressão de Óleo"></div>
+            </div>
+
+            <div class="painel-titulo">🔧 G2 Garagem — Sistema de Partida</div>
+            <div class="painel-status-texto" id="txtStatusPainel">PASSO 1: Ligue a ignição e sistemas do painel.</div>
+
+            <div class="painel-controles">
+                <button class="botao-painel" id="btnLigarSistema" onclick="painelLigarSistemas()">
+                    <span>⚡</span> 1. Painel / Bateria
+                </button>
+
+                <div class="chave-ignicao-container">
+                    <div class="cilindro-chave" id="cilindroChave" onclick="painelGirarChave()" title="Gire a chave para dar a partida">
+                        <div class="miolo-chave" id="mioloChave"></div>
+                    </div>
+                    <span style="font-size: 10px; color: #a1a1aa; text-transform: uppercase; font-weight: bold;">2. Ignição</span>
+                </div>
+            </div>
+
+            <div class="painel-historia-bloco" id="blocoHistoriaG2">
+                <strong>Motor roncou forte! A G2 Garagem está aberta.</strong><br>
+                Você vendeu tudo para investir na revenda de veículos. Agora o destino da oficina está no seu volante: compre barato, recupere motores, vença leilões e faça o caixa estourar!
+                <br><br>
+                <button class="botao-partida-g2" onclick="fecharIntroducaoNivel1000()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); cursor:pointer; width:100%; border:none; padding:12px; border-radius:8px; color:#fff; font-weight:bold; font-size:14px; text-transform:uppercase; box-shadow:0 4px 15px rgba(16, 185, 129, 0.4);">Assumir o Comando da Garagem 🚀</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+    window.sistemaEletricoLigado = false;
+    window.motorLigado = false;
+}
+
+function painelLigarSistemas() {
+    if(window.sistemaEletricoLigado) return;
+    window.sistemaEletricoLigado = true;
+
+    document.getElementById("luzBateria").classList.add("ligada");
+    document.getElementById("luzInjecao").classList.add("ligada");
+    document.getElementById("luzOleo").classList.add("ligada");
+
+    let btn = document.getElementById("btnLigarSistema");
+    btn.classList.add("ativo");
+    btn.innerHTML = "<span>🔋</span> Sistemas OK";
+
+    let cilindro = document.getElementById("cilindroChave");
+    cilindro.classList.add("liberado");
+
+    document.getElementById("txtStatusPainel").innerText = "PASSO 2: Bateria ativa. Clique na chave para dar a partida no motor!";
+}
+
+function painelGirarChave() {
+    if(!window.sistemaEletricoLigado || window.motorLigado) return;
+    window.motorLigado = true;
+
+    let cilindro = document.getElementById("cilindroChave");
+    cilindro.classList.add("girada");
+
+    document.getElementById("txtStatusPainel").innerHTML = "<span style='color: #10b981; font-weight: bold;'>VVRUUUM! MOTOR RONCANDO ALTO! 🔥</span>";
+
+    setTimeout(() => {
+        document.getElementById("blocoHistoriaG2").style.display = "block";
+        document.getElementById("txtStatusPainel").innerText = "Sistemas operacionais. Bem-vindo à G2 Garagem.";
+    }, 700);
+}
+
+function fecharIntroducaoNivel1000() {
+    const modal = document.getElementById("modal-intro-g2");
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => {
+            modal.remove();
+        }, 400);
     }
 
+    jogo.introducao = false;
+    if(typeof salvarJogo === 'function') {
+        salvarJogo();
+    }
 }
+
 
 /* ==========================================
    LÓGICA DOS MINI-GAMES ARCADE (G2 GARAGE)
@@ -519,7 +608,7 @@ function finalizarShowSom(sucesso, motivoErro = "") {
         
         if (carroEmDisputaSom) {
             if (carroEmDisputaSom.fipe) {
-                carroEmDisputaSom.fipe = Math.round(carroEmDisputaSom.fipe * 1.25);
+                carroEmDisputaSom.fipe = Math.round(carroEmDispropriaSomFipe = carroEmDisputaSom.fipe * 1.25); // Corrigido abaixo de forma segura
             } else if (carroEmDisputaSom.valorVenda) {
                 carroEmDisputaSom.valorVenda = Math.floor(carroEmDisputaSom.valorVenda * 1.25);
             }

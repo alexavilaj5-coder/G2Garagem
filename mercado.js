@@ -1,7 +1,7 @@
-// ===========================
-// MERCADO.JS V2.3 (COMPLETO E CORRIGIDO)
+// ===========================================
+// MERCADO.JS V2.5 (COMPLETO, CORRIGIDO E COM SOM)
 // G2 GARAGEM
-// ===========================
+// ===========================================
 
 function gerarAno(modelo){
     if(typeof anosModelos !== "undefined" && anosModelos[modelo.modelo]){
@@ -200,19 +200,38 @@ function mostrarMercado(){
 }
 
 // ===========================
-// COMPRAR CARRO (COM ENVIO CORRETO DA FOTO)
+// COMPRAR CARRO (COM TRAVA DE VAGAS BLINDADA + SONS)
 // ===========================
 function comprarCarro(){
     let carro = jogo.ofertaAtual;
 
     if(!carro){
+        if(typeof tocarSomErro === "function") tocarSomErro();
         mostrarAlerta("❌ Erro", "Nenhuma oferta disponível no momento.");
         return;
     }
 
-    if(jogo.dinheiro < carro.preco){
+    // --- GARANTE QUE A EMPRESA E AS VAGAS EXISTEM NO OBJETO JOGO ---
+    if(!jogo.empresa) jogo.empresa = { nivel: 1, vagas: 4 };
+    if(!jogo.empresa.vagas) jogo.empresa.vagas = 4;
+    if(!jogo.carros) jogo.carros = [];
+    // -------------------------------------------------------------
+
+    // --- TRAVA DE VAGAS DO PÁTIO ---
+    if (jogo.carros.length >= jogo.empresa.vagas) {
+        if(typeof tocarSomErro === "function") tocarSomErro();
         mostrarAlerta(
-            "💸 Dinheiro insuficiente",
+            "🅿️ Pátio Lotado!", 
+            `Seu pátio atingiu o limite de ${jogo.empresa.vagas} vagas.\n\nVenda um veículo ou expanda sua garagem para poder comprar mais!`
+        );
+        return; // Interrompe a compra imediatamente se estiver lotado
+    }
+    // -------------------------------
+
+    if(jogo.dinheiro < carro.preco){
+        if(typeof tocarSomErro === "function") tocarSomErro();
+        mostrarAlerta(
+            "💸 Dinheiro insuficiente", 
             `Você não possui saldo suficiente para comprar este veículo.\n\nCaixa: R$ ${jogo.dinheiro.toLocaleString("pt-BR")}\nPreço: R$ ${carro.preco.toLocaleString("pt-BR")}`
         );
         return;
@@ -220,10 +239,13 @@ function comprarCarro(){
 
     jogo.dinheiro -= carro.preco;
 
+    // Toca o som de compra bem-sucedida! 💰
+    if(typeof tocarSomCompra === "function") {
+        tocarSomCompra();
+    }
+
     if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0, lucroTotal: 0 };
     jogo.estatisticas.comprados++;
-
-    if(!jogo.carros) jogo.carros = [];
 
     // Adiciona o carro na garagem levando a foto junto!
     jogo.carros.push({
@@ -234,7 +256,7 @@ function comprarCarro(){
         cor: carro.cor,
         fipe: carro.fipe,
         precoCompra: carro.preco,
-        foto: carro.imagem, // <--- Aqui garante que a foto vai para a oficina
+        foto: carro.imagem, 
         defeitos: [...carro.defeitos],
         reparos: []
     });
@@ -245,7 +267,7 @@ function comprarCarro(){
     salvarJogo();
 
     mostrarAlerta(
-        "🎉 Compra Realizada",
+        "🎉 Compra Realizada", 
         `Você comprou o ${carro.marca} ${carro.nome}!\n\nO carro foi enviado para a oficina.`
     );
 
