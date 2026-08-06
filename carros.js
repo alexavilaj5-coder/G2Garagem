@@ -34,7 +34,7 @@ function mostrarPatio() {
         html += `<div class="patio-grid">`;
 
         jogo.carros.forEach(function (carro, index) {
-            let imagemPadrao = 'imagens/gol.jpg';
+            let imagemPadrao = 'imagens/semimagem.jpg';
             let imagemUrl = carro.foto ? `imagens/${carro.foto}` : imagemPadrao;
 
             let kmSeguro = (carro.km || 0).toLocaleString("pt-BR");

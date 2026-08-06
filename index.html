@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
+<head> <link rel="manifest" href="manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚗 G2 Garage</title>
+<title>🚗 G2 Garagem</title> 
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  
+
+<!-- VÍDEO DE INTRODUÇÃO (SEMPRE QUE ABRE) -->
+<div id="containerIntroVideo" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: flex; justify-content: center; align-items: center;">
+    <video id="videoIntro" src="imagens/intro.mp4" controls autoplay playsinline style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>
+    <button onclick="fecharIntroVideo()" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; z-index: 100000; font-weight: bold;">Pular Intro ⏭️</button>
+</div>
 
 <div id="app">
 
@@ -16,12 +23,13 @@
   <div class="topbar">
     <div class="empresa">
       <div class="empresa-info">
-        <h1>🚗 G2 GARAGEM </h1>
+        <h1>🚗 G2 GARAGEM   <small>versão pré lançamento</small> </h1>
+         
         <div class="hud-mini">
           <div class="box">
             <span>💵</span>
             <small>Caixa</small>
-            <strong id="caixa">R$ 400.000</strong>
+            <strong id="caixa">R$ CARLOS</strong>
           </div>
           <div class="box">
             <span>📅</span>
@@ -72,7 +80,7 @@
   <button id="btnLeilao">🔨<span>Leilão</span></button>
   <button id="btnBanco">🏦<span>Banco</span></button>
   <button id="btnEmpresa">🏢<span>Empresa</span></button>
-  <button id="btnEstatisticas">📊<span>Stats</span></button>
+  <button id="btnEstatisticas" style="display: none !important;" onclick="abrirEstatisticas()">📊<span>Stats</span></button>
   <button id="btnProximoDia">⏩<span>Dia</span></button>
 </nav>
 
@@ -81,42 +89,6 @@
     <h2 id="alertaTitulo">Mensagem</h2>
     <p id="alertaTexto"></p>
     <button onclick="fecharAlerta()">OK</button>
-  </div>
-</div>
-
-<!-- ==========================================
-     MODAL MINI-GAME 1: TESTE DE PISTA (SHIFT LIGHT)
-========================================== -->
-<div id="modalTesteDrive" class="alerta" style="display: none;">
-  <div class="alerta-box teste-drive-box" style="text-align: center;">
-    <h2 style="color: var(--accent, #38bdf8); margin-bottom: 5px;">🏎️ TESTE DE PISTA & DINÂMICO</h2>
-    <p id="infoCarroTeste" style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Ajustando motor...</p>
-    
-    <!-- Painel RPM Moderno / Shift Light -->
-    <div class="painel-rpm-arcade">
-      <div class="luzes-shift">
-        <span id="luz1" class="luz-led"></span>
-        <span id="luz2" class="luz-led"></span>
-        <span id="luz3" class="luz-led"></span>
-        <span id="luz4" class="luz-led"></span>
-        <span id="luz5" class="luz-led red"></span>
-      </div>
-      <div class="barra-tacometro">
-        <div id="ponteiroDinamico" class="ponteiro-fluid"></div>
-        <div class="zona-perfeita"></div>
-      </div>
-      <div style="display: flex; justify-content: space-between; margin-top: 8px; font-family: monospace; font-size: 11px; color: #cbd5e1;">
-        <span id="txtRpmDigital">0 RPM</span>
-        <span>MARCHA: <strong id="txtMarchaArcade" style="color: #38bdf8;">1ª</strong></span>
-        <span>ACERTOS: <strong id="txtProgressoArcade" style="color: #10b981;">0 / 3</strong></span>
-      </div>
-    </div>
-
-    <p id="statusTesteMsg" style="font-size: 13px; margin: 15px 0; font-weight: bold; color: #fff;">Acelere no tempo certo para trocar de marcha!</p>
-
-    <!-- Botões de Ação -->
-    <button id="btnAcelerarTeste" onclick="executarTrocaMarcha()" class="btn-arcade-acao">🔥 SUBIR MARCHA NO CORTE!</button>
-    <button id="btnFecharTeste" onclick="fecharTesteDrive()" style="display:none; background: #334155; width: 100%; padding: 12px; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px;">Voltar para Oficina</button>
   </div>
 </div>
 
@@ -141,6 +113,46 @@
 <script src="alerta.js"></script>
 <script src="script.js"></script>
 <script src="conquistas.js"></script>
+
+<!-- SCRIPT DE CONTROLE DO VÍDEO DE INTRO -->
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+    let containerVideo = document.getElementById("containerIntroVideo");
+    let elementoVideo = document.getElementById("videoIntro");
+
+    if (containerVideo && elementoVideo) {
+        containerVideo.style.display = "flex";
+        elementoVideo.muted = false;
+        let promessaPlay = elementoVideo.play();
+        
+        if (promessaPlay !== undefined) {
+            promessaPlay.catch(() => {
+                elementoVideo.muted = true;
+                elementoVideo.play();
+            });
+        }
+
+        elementoVideo.onended = () => {
+            fecharIntroVideo();
+        };
+    }
+});
+
+function fecharIntroVideo() {
+    let containerVideo = document.getElementById("containerIntroVideo");
+    let elementoVideo = document.getElementById("videoIntro");
+    
+    if (elementoVideo) elementoVideo.pause();
+
+    if (containerVideo) {
+        containerVideo.style.transition = "opacity 0.6s ease";
+        containerVideo.style.opacity = "0";
+        setTimeout(() => {
+            containerVideo.style.display = "none";
+        }, 600);
+    }
+}
+</script>
 
 </body>
 </html>

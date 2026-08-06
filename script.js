@@ -620,7 +620,7 @@ function finalizarShowSom(sucesso, motivoErro = "") {
         }
     } else {
         msgBox.style.color = "#ef4444";
-        msgBox.innerHTML = `⚠️ <strong>DISPUTA PERDIDA:</strong> ${motivoErro}<br><span style="color: #94a3b8;">O sistema precisará de uma revisão rápida.</span>`;
+        msgBox.innerHTML = `⚠️ <strong>DISPUTA PERDIDA :</strong> ${motivoErro}<br><span style="color: #94a3b8;">O sistema precisará de uma revisão rápida.</span>`;
     }
 }
 
@@ -629,3 +629,5 @@ function fecharShowSom() {
     if (loopDecadenciaSpl) clearInterval(loopDecadenciaSpl);
     document.getElementById('modalShowSom').style.display = 'none';
 }
+
+

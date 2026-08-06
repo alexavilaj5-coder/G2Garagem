@@ -27,11 +27,41 @@ function registrarExtrato(descricao, valor, tipo) {
     }
 }
 
+// 🎁 EASTER EGG: Precisa clicar 8 vezes no título do banco para ganhar 50k + Foto do Edson
+let contadorEasterEgg = 0;
+
+function easterEggGrana() {
+    contadorEasterEgg++;
+    
+    if (contadorEasterEgg >= 8) {
+        contadorEasterEgg = 0; // Reseta para poder usar de novo se quiser
+        jogo.dinheiro = (jogo.dinheiro || 0) + 50000;
+        registrarExtrato("Easter Egg (Bônus)", 50000, 'entrada');
+        salvarJogo();
+        atualizarPainel();
+        if(typeof tocarSomDinheiro === "function") tocarSomDinheiro();
+        
+        // Exibe o alerta com a foto do Edson (substitua 'edson.png' pelo nome exato do arquivo da foto se for diferente)
+        let mensagemComFoto = `
+            <div style="text-align: center;">
+                <img src="edson.png" alt="Edson" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #ffb700; margin-bottom: 10px;"><br>
+                <span>Você recebeu R$ 50.000,00 de brinde na conta após 8 cliques!</span>
+            </div>
+        `;
+        mostrarAlerta("🎁 Easter Egg do Carlinhos Ativado!", mensagemComFoto);
+    } else {
+        let faltam = 8 - contadorEasterEgg;
+        console.log(`Easter egg: clique ${contadorEasterEgg}/8 (Faltam ${faltam})`);
+    }
+    
+    mostrarBanco();
+}
+
 function mostrarBanco(){
     let emprestimos = jogo.emprestimos || [];
 
     let html = `
-    <h2>🏦 BANCO G2 & CENTRO FINANCEIRO</h2>
+    <h2 onclick="easterEggGrana()" style="cursor: pointer;" title="Clique 8 vezes aqui...">🏦 BANCO G2 & CENTRO FINANCEIRO</h2>
     <div class="card">
         <p>Gerencie seus financiamentos e empréstimos parcelados, acompanhe seu extrato ou tente a sorte no cassino!</p>
         <hr>
@@ -157,7 +187,7 @@ function contratarEmprestimo(nome, valorRecebido, totalParcelas, valorParcela){
     salvarJogo();
     atualizarPainel();
     
-    mostrarAlerta("📑 Financiamento Liberado", `O Banco G2 depositou R$ ${valorRecebido.toLocaleString("pt-BR")} em sua conta!\n\nContrato: ${nome}\nVocê assumiu ${totalParcelas} parcelas de R$ ${valorParcela.toLocaleString("pt-BR")}.\nVocê tem 30 dias para pagar a primeira parcela.`);
+    mostrarAlerta("📑 Financiamento Liberado", `O Banco G2 depositou R$ ${valorRecebido.toLocaleString("pt-BR")} em sua conta!\n\nContrato: ${nome}\nVocê assumiu ${totalParcelas} parcelas de R$ ${valorParcela.toLocaleString("pt-BR")}.\nVocê tiene 30 dias para pagar a primeira parcela.`);
     mostrarBanco();
 }
 
@@ -505,7 +535,7 @@ function jogarCaçaNiquel(){
 function jogarTudoOuNada(){
     let aposta = 10000;
     if(jogo.dinheiro < aposta){
-        mostrarAlerta("💸 Sem Grana", "Você precisa de R$ 10.000 para encarar o Tudo ou Nada!");
+        mostrarAlerta("💸 Sem Grana", "You need R$ 10.000 para encarar o Tudo ou Nada!");
         return;
     }
     jogo.dinheiro -= aposta;
