@@ -1,7 +1,6 @@
-// ===========================================
-// OFICINA.JS V7.7 - EDIÇÃO DEFINITIVA AJUSTADA 🚀🔥
-// (REMOVIDO POP & BANGS, CORTE DE GIRO RÁPIDO & SOM DO MOTOR ESCALA COM O TURBO/MOTOR)
-// ===========================================
+// ============================================================================
+// OFICINA.JS V16.0 - DINAMÔMETRO FT-550 & LAYOUT OTIMIZADO 🏎️💨
+// ============================================================================
 
 const opcoesCoresPintura = [
     { nome: "Preto Fosco", valor: 1200, bonusValor: 1.15 },
@@ -26,35 +25,53 @@ const opcoesPneus = [
 ];
 
 const opcoesMotor = [
-    { nome: "Motor Original", valor: 0, bonusValor: 1.0, cvBase: 95, pressaoMax: 0.0, redline: 6500, tipoSom: "original" },
-    { nome: "Remap Estágio 1 + Filtro Esportivo", valor: 2500, bonusValor: 1.15, cvBase: 130, pressaoMax: 0.5, redline: 7000, tipoSom: "esportivo" },
-    { nome: "Preparação Aspirada (Comando + Escape)", valor: 6000, bonusValor: 1.30, cvBase: 175, pressaoMax: 0.0, redline: 7800, tipoSom: "aspirado" },
-    { nome: "Kit Turbo Forjado Completo 🐌", valor: 14000, bonusValor: 1.60, cvBase: 280, pressaoMax: 1.5, redline: 7500, tipoSom: "turbo" }
+    { nome: "Motor Original 1.6 8V", valor: 0, cvBase: 101, torqueBase: 15.4, pressaoMaxPermitida: 0.0, redline: 6300, tipoSom: "original", limiteResistencia: 160, forjado: false },
+    { nome: "1.4 Turbo Remap Stg 2", valor: 4500, cvBase: 170, torqueBase: 25.5, pressaoMaxPermitida: 1.5, redline: 6800, tipoSom: "esportivo", limiteResistencia: 230, forjado: false },
+    { nome: "2.0 16V Aspirado Preparado", valor: 8500, cvBase: 210, torqueBase: 23.0, pressaoMaxPermitida: 0.0, redline: 8200, tipoSom: "aspirado", limiteResistencia: 260, forjado: false },
+    { nome: "2.0 20V Turbo Forjado Completo 🐌", valor: 18000, cvBase: 310, torqueBase: 42.0, pressaoMaxPermitida: 3.5, redline: 8200, tipoSom: "turbo", limiteResistencia: 750, forjado: true }
 ];
 
-// Estado global para as simulações em tempo real e telemetria
 let telemetryState = {
     ativo: false,
     indiceCarro: null,
-    modo: null, // 'scanner' ou 'dyno'
+    carroQuebrado: false,
     ignicaoLigada: false,
-    pedalAcelerador: 0, // 0 a 100%
+    pedalAcelerador: 0,
+    pressionandoPedal: false,
     rpmAtual: 0,
     pressaoTurboAtual: 0.0,
-    temperaturaAgua: 25,
+    pressaoOleoAtual: 0.0,
+    temperaturaAgua: 35.0,
     tensaoBateria: 12.4,
-    lambda: 1.0,
-    avancoPonto: 12,
+    lambdaAtual: 1.0,
+    avancoPontoAtual: 12,
     velocidadeRolo: 0,
     potenciaAtual: 0,
     torqueAtual: 0,
     redline: 6500,
-    maxTurbo: 0.0,
+    maxTurboConfigurado: 0.0,
     tipoSomMotor: "original",
-    intervaloId: null
+    intervaloId: null,
+
+    mapaECU: {
+        combustivel: "gasolina",
+        alvoLambda: 0.88,
+        pontoIgricao: 18,
+        pressaoWastegate: 0.0,
+        corteRpm: 6500,
+        twoStepAtivo: false,
+        twoStepRpm: 4500,
+        malhaFechada: true,
+        tempoInjecaoMs: 4.2
+    },
+
+    puxadaDyna: {
+        gravando: false,
+        potenciaPico: 0,
+        torquePico: 0
+    }
 };
 
-// Gerenciador de Áudio Web (Web Audio API Synth & FX Engine Completo)
 let audioCtx = null;
 let motorOscillator = null;
 let motorGain = null;
@@ -92,88 +109,41 @@ function inicializarAudioMotor() {
 function atualizarSomMotor() {
     if (!audioCtx || !motorOscillator || !motorGain || !motorFilter) return;
 
-    if (telemetryState.ignicaoLigada && telemetryState.ativo) {
-        // Detecta alívio rápido de acelerador para disparar o chiado do turbo (Blow-off / Tssst) se tiver turbo
-        if (ultimoAceleradorParaBlowoff > 50 && telemetryState.pedalAcelerador < 15 && telemetryState.maxTurbo > 0) {
+    if (telemetryState.ignicaoLigada && telemetryState.ativo && !telemetryState.carroQuebrado) {
+        if (ultimoAceleradorParaBlowoff > 50 && telemetryState.pedalAcelerador < 15 && telemetryState.mapaECU.pressaoWastegate > 0) {
             tocarSomBlowoff();
         }
         ultimoAceleradorParaBlowoff = telemetryState.pedalAcelerador;
 
-        // Modifica a forma de onda e o corte com base no motor escolhido pelo jogador!
         let tipo = telemetryState.tipoSomMotor;
-        
-        if (tipo === "turbo") {
-            motorOscillator.type = 'square'; // Som mais encorpado e metálico de turbo preparado
-        } else if (tipo === "aspirado") {
-            motorOscillator.type = 'sawtooth'; // Ronco forte e limpo
-        } else if (tipo === "esportivo") {
-            motorOscillator.type = 'triangle'; // Ronco encorpado
-        } else {
-            motorOscillator.type = 'sine'; // Original mais abafado e suave
-        }
+        motorOscillator.type = tipo === "turbo" ? 'square' : (tipo === "aspirado" ? 'sawtooth' : 'sine');
 
-        // Detecta se o carro chegou perto do limite de giro (Redline) para o corte rápido
-        let emCorte = telemetryState.rpmAtual >= (telemetryState.redline - 120);
+        let limiteRpm = (telemetryState.mapaECU.twoStepAtivo && telemetryState.pedalAcelerador > 80 && !telemetryState.puxadaDyna.gravando) 
+            ? telemetryState.mapaECU.twoStepRpm 
+            : telemetryState.mapaECU.corteRpm;
+
+        let emCorte = telemetryState.rpmAtual >= (limiteRpm - 100);
 
         if (emCorte) {
-            // Corte ultra-rápido (pulso menor e mais acelerado)
-            let cortePulsante = Math.floor(Date.now() / 25) % 2 === 0;
-            
-            let freqCorte = 45 + ((telemetryState.redline - 150) / telemetryState.redline) * 220;
-            motorOscillator.frequency.setTargetAtTime(cortePulsante ? freqCorte : 50, audioCtx.currentTime, 0.005);
-            
-            let ganhoCorte = cortePulsante ? (tipo === "turbo" || tipo === "aspirado" ? 0.25 : 0.18) : 0.01;
-            motorGain.gain.setTargetAtTime(ganhoCorte, audioCtx.currentTime, 0.005);
+            let cortePulsante = Math.floor(Date.now() / 20) % 2 === 0;
+            let freqCorte = 45 + ((limiteRpm - 150) / limiteRpm) * 220;
+            motorOscillator.frequency.setTargetAtTime(cortePulsante ? freqCorte : 40, audioCtx.currentTime, 0.005);
+            motorGain.gain.setTargetAtTime(cortePulsante ? 0.25 : 0.01, audioCtx.currentTime, 0.005);
         } else {
-            let freqBase = 35 + (telemetryState.rpmAtual / telemetryState.redline) * (tipo === "aspirado" ? 220 : 180);
+            let freqBase = 35 + (telemetryState.rpmAtual / telemetryState.mapaECU.corteRpm) * 200;
             motorOscillator.frequency.setTargetAtTime(freqBase, audioCtx.currentTime, 0.05);
 
-            // Ajusta corte de frequência do filtro de acordo com a preparação do motor
-            let freqFiltroAlvo = 300 + (telemetryState.pedalAcelerador / 100) * (tipo === "turbo" || tipo === "aspirado" ? 3500 : 1800);
+            let freqFiltroAlvo = 300 + (telemetryState.pedalAcelerador / 100) * 3000;
             motorFilter.frequency.setTargetAtTime(freqFiltroAlvo, audioCtx.currentTime, 0.05);
 
-            let ganhoAlvo = 0.06 + (telemetryState.pedalAcelerador / 100) * (tipo === "turbo" || tipo === "aspirado" ? 0.22 : 0.14);
+            let ganhoAlvo = 0.05 + (telemetryState.pedalAcelerador / 100) * 0.20;
             motorGain.gain.setTargetAtTime(ganhoAlvo, audioCtx.currentTime, 0.05);
         }
     } else {
-        motorGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+        motorGain.gain.setValueAtTime(0, audioCtx.currentTime);
     }
 }
 
-// 1. Som de Partida do Motor (Crank / Motor de Arranque)
-function tocarSomPartida() {
-    if (!audioCtx) return;
-    try {
-        let duracao = 0.8;
-        let bufferSize = audioCtx.sampleRate * duracao;
-        let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        let data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            let t = i / audioCtx.sampleRate;
-            data[i] = (Math.random() * 2 - 1) * Math.sin(t * 35 * Math.PI) * 0.5;
-        }
-
-        let noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(400, audioCtx.currentTime);
-
-        let gainNode = audioCtx.createGain();
-        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracao);
-
-        noise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        noise.start();
-    } catch (e) {}
-}
-
-// 2. Alívio de Pressão do Turbo / Sopro (Blow-off / Tssst)
 function tocarSomBlowoff() {
     if (!audioCtx) return;
     try {
@@ -182,9 +152,7 @@ function tocarSomBlowoff() {
         let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         let data = buffer.getChannelData(0);
 
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
         let noise = audioCtx.createBufferSource();
         noise.buffer = buffer;
@@ -206,873 +174,811 @@ function tocarSomBlowoff() {
     } catch (e) {}
 }
 
-// 3. Pneus Cantando / Derrapando (Skid)
-function tocarSomPneus() {
-    if (!audioCtx) return;
-    try {
-        let duracao = 0.15;
-        let bufferSize = audioCtx.sampleRate * duracao;
-        let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        let data = buffer.getChannelData(0);
-
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * 0.7;
-        }
-
-        let noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
-        filter.Q.setValueAtTime(6.0, audioCtx.currentTime);
-
-        let gainNode = audioCtx.createGain();
-        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duracao);
-
-        noise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        noise.start();
-    } catch (e) {}
-}
-
-// 4. Buzina Esportiva (Horn)
-function tocarBuzina() {
-    if (!audioCtx) return;
-    try {
-        let osc1 = audioCtx.createOscillator();
-        let osc2 = audioCtx.createOscillator();
-        let gainNode = audioCtx.createGain();
-
-        osc1.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(349.23, audioCtx.currentTime);
-        
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(440.00, audioCtx.currentTime);
-
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime + 0.3);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1500, audioCtx.currentTime);
-
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        osc1.start();
-        osc2.start();
-        osc1.stop(audioCtx.currentTime + 0.35);
-        osc2.stop(audioCtx.currentTime + 0.35);
-    } catch (e) {}
-}
-
 function desligarAudioMotor() {
     if (motorGain && audioCtx) {
         motorGain.gain.setValueAtTime(0, audioCtx.currentTime);
     }
 }
 
-// ===========================
+function pararTelemetria() {
+    telemetryState.ativo = false;
+    if (telemetryState.intervaloId) {
+        clearInterval(telemetryState.intervaloId);
+        telemetryState.intervaloId = null;
+    }
+    desligarAudioMotor();
+}
+
+// ============================================================================
 // TELA PRINCIPAL DA OFICINA
-// ===========================
-function mostrarOficina(){
+// ============================================================================
+function mostrarOficina() {
     pararTelemetria(); 
 
-    if(!jogo.melhoriasOficina) {
-        jogo.melhoriasOficina = { elevadorNivel: 1, ferramentasNivel: 1 };
-    }
-    if(!jogo.estatisticas) {
-        jogo.estatisticas = { consertados: 0 };
-    }
+    if (!jogo.melhoriasOficina) jogo.melhoriasOficina = { elevadorNivel: 1 };
+    if (!jogo.estatisticas) jogo.estatisticas = { consertados: 0 };
+    if (!jogo.reparosAndamento) jogo.reparosAndamento = [];
+
+    verificarProgressoReparosPorDias();
 
     let funcionarios = (jogo.empresa && jogo.empresa.funcionarios) ? jogo.empresa.funcionarios : 0;
+    
+    let carrosOcupandoElevador = [...new Set(jogo.reparosAndamento.map(r => r.carroIndex))];
+    let elevadoresTotais = jogo.melhoriasOficina.elevadorNivel;
+    let elevadoresOcupados = carrosOcupandoElevador.length;
+    let custoProximoElevador = jogo.melhoriasOficina.elevadorNivel * 3500; // Custo Rebalanceado
 
     let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🔧</span>
-            <div class="garagem-texto-titulo">
-                <h1>OFICINA & TELEMETRIA AVANÇADA</h1>
-                <p>Centro de Diagnóstico OBD-II em Tempo Real & Dinamômetro Inercial</p>
+    <div id="painelOficinaContainer">
+        <!-- HEADER DA OFICINA -->
+        <div style="margin-bottom: 10px; background: #0f172a; padding: 10px 12px; border-radius: 8px; border: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 0.95rem; color: #38bdf8; margin: 0; font-weight: 800;">🏎️ ACF PERFORMANCE</h1>
+                <span style="font-size: 0.7rem; color: #64748b;">👷 ${funcionarios} Mecânicos</span>
             </div>
+            <button onclick="melhorarElevador()" style="padding: 6px 10px; background: #2563eb; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem;">
+                ⬆️ +1 Vaga (R$ ${custoProximoElevador.toLocaleString("pt-BR")})
+            </button>
         </div>
-    </div>
 
-    <div class="card" style="margin-bottom: 20px; background: linear-gradient(135deg, #111827 0%, #0f172a 100%); border: 1px solid #1e293b;">
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">🏗️ Infraestrutura & Baías</h3>
-        <hr style="border-color: #334155; margin: 8px 0 12px 0;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border: 1px solid #334155;">
-                <span style="font-size: 0.8rem; color: #94a3b8;">ELEVADORES</span>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #fff; margin-top: 2px;">Nível ${jogo.melhoriasOficina.elevadorNivel}</p>
-                <small style="color: #10b981;">${jogo.melhoriasOficina.elevadorNivel} Vagas simultâneas</small>
-            </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border: 1px solid #334155;">
-                <span style="font-size: 0.8rem; color: #94a3b8;">FERRAMENTARIA</span>
-                <p style="font-size: 1.1rem; font-weight: bold; color: #fff; margin-top: 2px;">Nível ${jogo.melhoriasOficina.ferramentasNivel}</p>
-                <small style="color: #f59e0b;">Equipe (${funcionarios} mecânicos) ativa</small>
-            </div>
+        <!-- INFRAESTRUTURA COMPACTA DE ELEVADORES -->
+        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: bold;">🏗️ ELEVADORES</span>
+            <span style="font-size: 0.8rem; font-weight: bold; color: ${elevadoresOcupados >= elevadoresTotais ? '#ef4444' : '#10b981'};">
+                ${elevadoresOcupados} / ${elevadoresTotais} Ocupados
+            </span>
         </div>
-         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button onclick="melhorarElevador()" style="padding: 10px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                ⬆️ Upar Elevador <br><small>R$ ${(jogo.melhoriasOficina.elevadorNivel * 7500).toLocaleString("pt-BR")}</small>
-            </button>
-            <button onclick="melhorarFerramentas()" style="padding: 10px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                ⬆️ Upar Ferramentas <br><small>R$ ${(jogo.melhoriasOficina.ferramentasNivel * 5000).toLocaleString("pt-BR")}</small>
-            </button>
-        </div>
-    </div>
     `;
 
-    if(!jogo.carros || jogo.carros.length == 0){
+    // EXIBE OS CARROS NOS ELEVADORES
+    if (jogo.reparosAndamento.length > 0) {
         html += `
-        <div class="card" style="text-align: center; padding: 30px; background: #0f172a; border: 1px solid #1e293b;">
-            <span style="font-size: 2.5rem; display: block; margin-bottom: 10px;">📭</span>
-            <p style="color: #94a3b8;">Sua oficina está vazia no momento.</p>
-        </div>`;
+        <div style="margin-bottom: 10px; background: #1e1b4b; border: 1px solid #4338ca; border-radius: 8px; padding: 10px;">
+            <span style="color: #a5b4fc; font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 6px;">🚧 EM MANUTENÇÃO</span>
+        `;
+
+        jogo.reparosAndamento.forEach((rep) => {
+            if (rep.tipo === 'expresso') {
+                let perc = Math.min(100, Math.floor((rep.progressoAtual / rep.tempoTotalSegundos) * 100));
+                html += `
+                <div style="background: rgba(0,0,0,0.3); padding: 6px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #6366f1;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#fff; margin-bottom:2px;">
+                        <span>🚗 <strong>${rep.nomeCarro}</strong> (${rep.defeitoNome})</span>
+                        <span style="color:#f59e0b; font-weight:bold;">⚡ Na Hora ${perc}%</span>
+                    </div>
+                    <div style="width: 100%; background: #334155; height: 6px; border-radius: 3px; overflow: hidden;">
+                        <div style="width: ${perc}%; background: #f59e0b; height: 100%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                `;
+            } else {
+                let diasRestantes = Math.max(0, rep.diaConclusao - (jogo.dia || 1));
+                html += `
+                <div style="background: rgba(0,0,0,0.3); padding: 6px 8px; border-radius: 4px; margin-bottom: 4px; border: 1px solid #4338ca; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:#fff; font-size:0.7rem;">🚗 <strong>${rep.nomeCarro}</strong> - ${rep.defeitoNome}</span>
+                    <span style="background:#312e81; color:#c7d2fe; padding:2px 6px; border-radius:4px; font-size:0.65rem; font-weight:bold;">
+                        📅 Pronto em ${diasRestantes}DIA
+                    </span>
+                </div>
+                `;
+            }
+        });
+
+        html += `</div>`;
+    }
+
+    if (!jogo.carros || jogo.carros.length == 0) {
+        html += `
+        <div style="text-align: center; padding: 20px; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;">
+            <p style="color: #94a3b8; font-size: 0.8rem; margin: 0;">Nenhum veículo no pátio no momento.</p>
+        </div></div>`;
         conteudo.innerHTML = html;
         return;
     }
 
-    jogo.carros.forEach(function(carro, index){
+    // LISTAGEM DOS CARROS NO PÁTIO
+    jogo.carros.forEach(function (carro, index) {
+        let valorAgr = carro.valorAdicionadoRemap ? carro.valorAdicionadoRemap : 0;
+        let temDefeito = carro.defeitos && carro.defeitos.length > 0;
+
         html += `
-        <div class="card" style="margin-bottom: 15px; background: #0f172a; border: 1px solid #1e293b;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+        <div style="margin-bottom: 10px; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px;">
+            <!-- CABEÇALHO DO CARRO -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px; margin-bottom: 6px;">
                 <div>
-                    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 3px;">🚗 ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}</h3>
-                    <p style="color: #94a3b8; font-size: 0.85rem;">📅 Ano: ${carro.ano || 'N/D'} | 🛣️ KM: ${carro.km ? carro.km.toLocaleString("pt-BR") : "0"}</p>
+                    <strong style="color: #fff; font-size: 0.85rem;">🚗 ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}</strong>
+                    <small style="color: #64748b; font-size: 0.68rem; display: block;">Ano: ${carro.ano || 'N/D'} | KM: ${carro.km ? carro.km.toLocaleString("pt-BR") : "0"}</small>
+                </div>
+                <div style="display: flex; gap: 4px;">
+                    <button onclick="abrirEstetica(${index})" style="padding: 4px 8px; background: #1e293b; color: #38bdf8; border: 1px solid #334155; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 0.68rem;">
+                        🎨 Customizar
+                    </button>
+                    <button onclick="abrirModuloInjecaoDyna(${index})" style="padding: 4px 8px; background: ${temDefeito ? '#334155' : '#10b981'}; color: ${temDefeito ? '#94a3b8' : '#000'}; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.68rem;">
+                        🖥️ Dyno
+                    </button>
                 </div>
             </div>
-             
-            <div style="background: rgba(0,0,0,0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid #334155; margin-bottom: 12px; font-size: 0.85rem; color: #cbd5e1;">
-                <p style="margin-bottom: 4px;">🎨 Cor: <strong style="color:#fff">${carro.cor || "Original"}</strong></p>
-                <p style="margin-bottom: 4px;">🕶️ Película: <strong style="color:#fff">${carro.pelicula || "Original"}</strong></p>
-                <p style="margin-bottom: 4px;">🛞 Pneus: <strong style="color:#fff">${carro.pneus || "Original"}</strong></p>
-                <p style="margin-bottom: 0;">🏎️ Motor: <strong style="color:#fff">${carro.motor || "Motor Original"}</strong></p>
+
+            <!-- DETALHES DO CARRO -->
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; font-size: 0.65rem; margin-bottom: 8px;">
+                <span style="background: #1e293b; color: #cbd5e1; padding: 2px 6px; border-radius: 3px;">🎨 ${carro.cor || "Original"}</span>
+                <span style="background: #1e293b; color: #cbd5e1; padding: 2px 6px; border-radius: 3px;">🕶️ ${carro.pelicula || "Sem Insulfilm"}</span>
+                <span style="background: #1e293b; color: #cbd5e1; padding: 2px 6px; border-radius: 3px;">🛞 ${carro.pneus || "Original"}</span>
+                <span style="background: #1e293b; color: #cbd5e1; padding: 2px 6px; border-radius: 3px;">⚙️ ${carro.motor || "1.6 Original"}</span>
+                ${valorAgr > 0 ? `<span style="background: rgba(16,185,129,0.15); color: #10b981; padding: 2px 6px; border-radius: 3px; font-weight: bold;">+R$ ${valorAgr.toLocaleString("pt-BR")} Remap</span>` : ''}
             </div>
         `;
 
-        if(carro.reparos && carro.reparos.length > 0){
-            html += `<h4 style="color: #f59e0b; font-size: 0.9rem; margin-bottom: 6px;">⏳ Reparos em Andamento (Na baia)</h4>`;
-            carro.reparos.forEach(function(reparo){
-                html += `
-                <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.85rem;">
-                    <strong>🔧 ${reparo.nome}</strong><br>
-                    <span style="color: #94a3b8;">Custo: R$ ${reparo.valor.toLocaleString("pt-BR")}</span><br>
-                    <span style="color: #f59e0b; font-weight: bold;">⏰ Tempo restante: ${reparo.dias} dia(s)</span>
-                </div>
-                `;
-            });
-        }
+        // LISTA DE DEFEITOS
+        if (temDefeito) {
+            html += `<div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 6px; padding: 6px;">`;
+            carro.defeitos.forEach(function (defeito, posicao) {
+                let diasEstimados = Math.max(1, Math.ceil(defeito.valor / 1500));
+                let taxaExpressa = Math.round(defeito.valor * 0.35);
 
-        if(carro.defeitos && carro.defeitos.length > 0){
-            html += `<h4 style="color: #ef4444; font-size: 0.9rem; margin-bottom: 6px;">⚠️ Defeitos Identificados</h4>`;
-            carro.defeitos.forEach(function(defeito, posicao){
                 html += `
-                <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <div>
-                        <strong style="color: #fca5a5; font-size: 0.85rem;">🔧 ${defeito.nome}</strong><br>
-                        <span style="color: #94a3b8; font-size: 0.8rem;">Custo: R$ ${defeito.valor.toLocaleString("pt-BR")}</span>
+                        <span style="color: #fca5a5; font-size: 0.72rem; font-weight: bold;">🔧 ${defeito.nome}</span>
+                        <small style="color: #94a3b8; font-size: 0.65rem; display: block;">Peça: R$ ${defeito.valor.toLocaleString("pt-BR")}</small>
                     </div>
-                    <button onclick="iniciarReparo(${index}, ${posicao})" style="padding: 8px 12px; background: #ef4444; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                        🔧 Consertar
-                    </button>
+                    <div style="display: flex; gap: 4px;">
+                        <button onclick="agendarConsertoNormal(${index}, ${posicao}, ${diasEstimados})" style="padding: 4px 6px; background: #2563eb; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.65rem;">
+                            🕒 ${diasEstimados} DIA
+                        </button>
+                        <button onclick="iniciarConsertoExpresso(${index}, ${posicao}, ${taxaExpressa})" style="padding: 4px 6px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.65rem;">
+                            ⚡ Express (+R$ ${taxaExpressa.toLocaleString("pt-BR")})
+                        </button>
+                    </div>
                 </div>
                 `;
             });
-        }
-
-        if((!carro.defeitos || carro.defeitos.length == 0) && (!carro.reparos || carro.reparos.length == 0)){
-            html += `
-            <div style="background: rgba(16,185,129,0.1); border: 1px solid #10b981; padding: 10px; border-radius: 6px; margin-bottom: 12px; text-align: center;">
-                <span style="color:#10b981; font-weight: bold; font-size: 0.85rem;">✅ Veículo revisado e pronto para calibração ou venda!</span>
-            </div>
-             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                <button onclick="abrirEstetica(${index})" style="padding: 10px; background: #06b6d4; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                    🎨 Estética & Motor
-                </button>
-                <button onclick="iniciarScannerAoVivo(${index})" style="padding: 10px; background: #3b82f6; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                    💻 Scanner OBD Ao Vivo
-                </button>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
-                <button onclick="iniciarDynoAoVivo(${index})" style="padding: 10px; background: #10b981; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                    📈 Dinamômetro Dinâmico (Dyno Room)
-                </button>
-            </div>
-            `;
+            html += `</div>`;
         }
 
         html += `</div>`;
     });
 
+    html += `</div>`;
     conteudo.innerHTML = html;
 }
 
-// ===========================
-// SISTEMA DE UPGRADES DA OFICINA
-// ===========================
-function melhorarElevador(){
-    let custo = jogo.melhoriasOficina.elevadorNivel * 7500;
-    if(jogo.dinheiro < custo){
-        mostrarAlerta("💸 Saldo Insuficiente", "Você não tem dinheiro para melhorar o elevador.");
-        return;
-    }
+function melhorarElevador() {
+    let custo = jogo.melhoriasOficina.elevadorNivel * 3500;
+    if (jogo.dinheiro < custo) return mostrarAlerta("💸 Saldo Insuficiente", "Você não tem saldo suficiente para comprar mais um elevador.");
     jogo.dinheiro -= custo;
     jogo.melhoriasOficina.elevadorNivel++;
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("🏗️ Elevador Melhorado!", `Sua oficina agora suporta mais eficiência nos reparos simultâneos!`);
-    mostrarOficina();
+    atualizarPainel(); salvarJogo(); mostrarOficina();
 }
 
-function melhorarFerramentas(){
-    let custo = jogo.melhoriasOficina.ferramentasNivel * 5000;
-    if(jogo.dinheiro < custo){
-        mostrarAlerta("💸 Saldo Insuficiente", "Você não tem dinheiro para comprar ferramentas melhores.");
-        return;
+function validarVagaElevador(indiceCarro) {
+    if (!jogo.reparosAndamento) jogo.reparosAndamento = [];
+
+    let jaEstaNoElevador = jogo.reparosAndamento.some(r => r.carroIndex === indiceCarro);
+    if (jaEstaNoElevador) return true;
+
+    let carrosOcupando = [...new Set(jogo.reparosAndamento.map(r => r.carroIndex))];
+
+    if (carrosOcupando.length >= jogo.melhoriasOficina.elevadorNivel) {
+        mostrarAlerta(
+            "🏗️ Elevadores Ocupados", 
+            `Todos os seus ${jogo.melhoriasOficina.elevadorNivel} elevadores estão ocupados por outros veículos!\n\nEspere a manutenção terminar ou compre mais um elevador.`
+        );
+        return false;
     }
-    jogo.dinheiro -= custo;
-    jogo.melhoriasOficina.ferramentasNivel++;
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("🛠️ Ferramentas Atualizadas!", `Os reparos agora serão concluídos mais rapidamente!`);
-    mostrarOficina();
+    return true;
 }
 
-// ===========================
-// INICIAR REPARO MECÂNICO
-// ===========================
-function iniciarReparo(indiceCarro, indiceDefeito){
+function agendarConsertoNormal(indiceCarro, indiceDefeito, diasNecessarios) {
+    if (!validarVagaElevador(indiceCarro)) return;
+
     let carro = jogo.carros[indiceCarro];
     let defeito = carro.defeitos[indiceDefeito];
 
-    let totalEmReparo = 0;
-    jogo.carros.forEach(c => {
-        if(c.reparos && c.reparos.length > 0) totalEmReparo += c.reparos.length;
-    });
-
-    if(totalEmReparo >= jogo.melhoriasOficina.elevadorNivel){
-        mostrarAlerta("⚠️ Vagas Ocupadas", `Seu nível atual de estrutura (${jogo.melhoriasOficina.elevadorNivel}) só permite realizar ${jogo.melhoriasOficina.elevadorNivel} reparo(s) simultâneo(s) por dia!`);
-        return;
+    if (jogo.dinheiro < defeito.valor) {
+        return mostrarAlerta("💸 Saldo Insuficiente", `Você precisa de R$ ${defeito.valor.toLocaleString("pt-BR")} para comprar as peças de "${defeito.nome}".`);
     }
-
-    if(!carro.reparos) carro.reparos = [];
-
-    if(jogo.dinheiro < defeito.valor){
-        mostrarAlerta("💸 Dinheiro insuficiente", "Você não possui dinheiro para realizar esse reparo.");
-        return;
-    }
-
-    let reducaoFerramentas = jogo.melhoriasOficina.ferramentasNivel - 1;
-    let funcionarios = (jogo.empresa && jogo.empresa.funcionarios) ? jogo.empresa.funcionarios : 0;
-    let reducaoEquipe = Math.floor(funcionarios / 2);
-
-    let prazoBase = Math.floor(Math.random() * 4) + 3;
-    let prazo = Math.max(1, prazoBase - reducaoFerramentas - reducaoEquipe);
 
     jogo.dinheiro -= defeito.valor;
-     
+
+    if (!carro.reparos) carro.reparos = [];
     carro.reparos.push({
         nome: defeito.nome,
-        valor: defeito.valor,
-        dias: prazo,
-        totalDias: prazo
+        valor: defeito.valor
     });
 
     carro.defeitos.splice(indiceDefeito, 1);
-     
-    if(!jogo.financeiro) jogo.financeiro = { gastosConsertos: 0 };
-    jogo.financeiro.gastosConsertos += defeito.valor;
+
+    let diaAtual = jogo.dia || 1;
+    jogo.reparosAndamento.push({
+        tipo: "normal",
+        carroIndex: indiceCarro,
+        nomeCarro: `${carro.marca} ${carro.modelo || carro.nome}`,
+        defeitoNome: defeito.nome,
+        valor: defeito.valor,
+        diaConclusao: diaAtual + diasNecessarios
+    });
 
     atualizarPainel();
     salvarJogo();
-
-    mostrarAlerta("🔧 Reparo iniciado", `${defeito.nome}\n⏳ Prazo: ${prazo} dia(s)\n(Equipe acelerou o serviço!)\nO veículo entrou na linha de montagem.`);
     mostrarOficina();
+
+    mostrarAlerta("🕒 Serviço Agendado", `O veículo entrou no elevador. O conserto de "${defeito.nome}" ficará pronto em ${diasNecessarios} dia(s).`);
 }
 
-// ===========================================
-// MOTOR DE TELEMETRIA AO VIVO & SIMULAÇÃO FÍSICA
-// ===========================================
+function iniciarConsertoExpresso(indiceCarro, indiceDefeito, taxaUrgencia) {
+    if (!validarVagaElevador(indiceCarro)) return;
 
-function iniciarScannerAoVivo(indiceCarro) {
     let carro = jogo.carros[indiceCarro];
-    if (!carro) return;
+    let defeito = carro.defeitos[indiceDefeito];
+    let custoTotal = defeito.valor + taxaUrgencia;
 
-    let motorObj = opcoesMotor.find(m => m.nome === carro.motor) || opcoesMotor[0];
-
-    telemetryState = {
-        ativo: true,
-        indiceCarro: indiceCarro,
-        modo: 'scanner',
-        ignicaoLigada: false,
-        pedalAcelerador: 0,
-        rpmAtual: 0,
-        pressaoTurboAtual: 0.0,
-        temperaturaAgua: 25,
-        tensaoBateria: 12.4,
-        lambda: 1.0,
-        avancoPonto: 12,
-        velocidadeRolo: 0,
-        potenciaAtual: 0,
-        torqueAtual: 0,
-        redline: motorObj.redline,
-        maxTurbo: motorObj.pressaoMax,
-        tipoSomMotor: motorObj.tipoSom
-    };
-
-    renderizarInterfaceScanner(carro);
-    lancarLoopTelemetria();
-}
-
-function iniciarDynoAoVivo(indiceCarro) {
-    let carro = jogo.carros[indiceCarro];
-    if (!carro) return;
-
-    let motorObj = opcoesMotor.find(m => m.nome === carro.motor) || opcoesMotor[0];
-
-    telemetryState = {
-        ativo: true,
-        indiceCarro: indiceCarro,
-        modo: 'dyno',
-        ignicaoLigada: false,
-        pedalAcelerador: 0,
-        rpmAtual: 0,
-        pressaoTurboAtual: 0.0,
-        temperaturaAgua: 30,
-        tensaoBateria: 12.4,
-        lambda: 1.0,
-        avancoPonto: 12,
-        velocidadeRolo: 0,
-        potenciaAtual: 0,
-        torqueAtual: 0,
-        redline: motorObj.redline,
-        maxTurbo: motorObj.pressaoMax,
-        tipoSomMotor: motorObj.tipoSom
-    };
-
-    renderizarInterfaceDyno(carro);
-    lancarLoopTelemetria();
-}
-
-function pararTelemetria() {
-    desligarAudioMotor();
-    if (telemetryState.intervaloId) {
-        clearInterval(telemetryState.intervaloId);
-        telemetryState.intervaloId = null;
+    if (jogo.dinheiro < custoTotal) {
+        return mostrarAlerta("💸 Saldo Insuficiente", `Você precisa de R$ ${custoTotal.toLocaleString("pt-BR")} (Peça: R$ ${defeito.valor.toLocaleString("pt-BR")} + Taxa Expresso: R$ ${taxaUrgencia.toLocaleString("pt-BR")}).`);
     }
-    telemetryState.ativo = false;
+
+    jogo.dinheiro -= custoTotal;
+
+    if (!carro.reparos) carro.reparos = [];
+    carro.reparos.push({
+        nome: `${defeito.nome} (Express)`,
+        valor: custoTotal
+    });
+
+    carro.defeitos.splice(indiceDefeito, 1);
+
+    let tempoSegundos = 60;
+
+    let objetoReparo = {
+        tipo: "expresso",
+        carroIndex: indiceCarro,
+        nomeCarro: `${carro.marca} ${carro.modelo || carro.nome}`,
+        defeitoNome: defeito.nome,
+        progressoAtual: 0,
+        tempoTotalSegundos: tempoSegundos
+    };
+
+    jogo.reparosAndamento.push(objetoReparo);
+
+    atualizarPainel();
+    salvarJogo();
+    mostrarOficina();
+
+    let timer = setInterval(() => {
+        objetoReparo.progressoAtual += 1;
+        
+        if (objetoReparo.progressoAtual >= objetoReparo.tempoTotalSegundos) {
+            clearInterval(timer);
+            let idxRemover = jogo.reparosAndamento.indexOf(objetoReparo);
+            if (idxRemover !== -1) jogo.reparosAndamento.splice(idxRemover, 1);
+
+            if (jogo.estatisticas) jogo.estatisticas.consertados = (jogo.estatisticas.consertados || 0) + 1;
+            
+            atualizarPainel();
+            salvarJogo();
+            
+            // CORREÇÃO: Só força o recarregamento se o usuário ESTIVER VISIVELMENTE no painel da oficina
+            if (document.getElementById("painelOficinaContainer") !== null) { 
+                mostrarOficina(); 
+            }
+            mostrarAlerta("⚡ Concluído!", `O conserto expresso de "${defeito.nome}" no ${carro.marca} ${carro.modelo || carro.nome} foi finalizado!`);
+        } else {
+            // CORREÇÃO: Só atualiza progresso visualmente se o usuário estiver na tela da oficina
+            if (document.getElementById("painelOficinaContainer") !== null) {
+                mostrarOficina();
+            }
+        }
+    }, 1000);
+}
+
+function verificarProgressoReparosPorDias() {
+    if (!jogo.reparosAndamento) return;
+    let diaAtual = jogo.dia || 1;
+
+    for (let i = jogo.reparosAndamento.length - 1; i >= 0; i--) {
+        let rep = jogo.reparosAndamento[i];
+        if (rep.tipo === "normal" && diaAtual >= rep.diaConclusao) {
+            if (jogo.estatisticas) jogo.estatisticas.consertados = (jogo.estatisticas.consertados || 0) + 1;
+            jogo.reparosAndamento.splice(i, 1);
+        }
+    }
+}
+
+// ============================================================================
+// CUSTOMIZAÇÃO ESTÉTICA
+// ============================================================================
+function abrirEstetica(indiceCarro) {
+    let carro = jogo.carros[indiceCarro];
+    if (!carro) return;
+
+    let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <button onclick="mostrarOficina()" style="padding: 5px 10px; background: #334155; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold;">
+            ⬅️ Voltar
+        </button>
+        <h2 style="color: #38bdf8; font-size: 0.95rem; margin: 0;">🎨 CUSTOMIZAÇÃO: ${carro.marca || ''} ${carro.modelo || carro.nome}</h2>
+    </div>
+
+    <div class="card" style="margin-bottom: 10px; background: #0f172a; border: 1px solid #1e293b; padding: 10px; border-radius: 8px;">
+        <h3 style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 8px 0; text-transform: uppercase;">Pintura / Funilaria</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+    `;
+
+    opcoesCoresPintura.forEach(cor => {
+        html += `
+            <button onclick="aplicarPintura(${indiceCarro}, '${cor.nome}', ${cor.valor})" style="padding: 6px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; text-align: left; cursor: pointer;">
+                <div style="color: #38bdf8; font-size: 0.75rem; font-weight: bold;">${cor.nome}</div>
+                <small style="color: #64748b; font-size: 0.68rem;">R$ ${cor.valor.toLocaleString("pt-BR")}</small>
+            </button>
+        `;
+    });
+
+    html += `</div></div>
+
+    <div class="card" style="margin-bottom: 10px; background: #0f172a; border: 1px solid #1e293b; padding: 10px; border-radius: 8px;">
+        <h3 style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 8px 0; text-transform: uppercase;">Películas (Insulfilm)</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+    `;
+
+    opcoesPelicula.forEach(p => {
+        html += `
+            <button onclick="aplicarPelicula(${indiceCarro}, '${p.nome}', ${p.valor})" style="padding: 6px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; text-align: left; cursor: pointer;">
+                <div style="color: #38bdf8; font-size: 0.75rem; font-weight: bold;">${p.nome}</div>
+                <small style="color: #64748b; font-size: 0.68rem;">R$ ${p.valor.toLocaleString("pt-BR")}</small>
+            </button>
+        `;
+    });
+
+    html += `</div></div>
+
+    <div class="card" style="margin-bottom: 10px; background: #0f172a; border: 1px solid #1e293b; padding: 10px; border-radius: 8px;">
+        <h3 style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 8px 0; text-transform: uppercase;">Conjuntos de Pneus</h3>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+    `;
+
+    opcoesPneus.forEach(pn => {
+        html += `
+            <button onclick="aplicarPneus(${indiceCarro}, '${pn.nome}', ${pn.valor})" style="padding: 6px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; text-align: left; cursor: pointer;">
+                <div style="color: #38bdf8; font-size: 0.75rem; font-weight: bold;">${pn.nome}</div>
+                <small style="color: #64748b; font-size: 0.68rem;">R$ ${pn.valor.toLocaleString("pt-BR")}</small>
+            </button>
+        `;
+    });
+
+    html += `</div></div>
+
+    <div class="card" style="margin-bottom: 10px; background: #0f172a; border: 1px solid #1e293b; padding: 10px; border-radius: 8px;">
+        <h3 style="color: #94a3b8; font-size: 0.8rem; margin: 0 0 8px 0; text-transform: uppercase;">Engine Swap & Preparação</h3>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+    `;
+
+    opcoesMotor.forEach(m => {
+        html += `
+            <button onclick="aplicarMotor(${indiceCarro}, '${m.nome}', ${m.valor})" style="padding: 6px 8px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="color: #f59e0b; font-size: 0.75rem; font-weight: bold;">${m.nome}</div>
+                    <small style="color: #64748b; font-size: 0.68rem;">Base: ${m.cvBase} HP | ${m.torqueBase} Kgfm</small>
+                </div>
+                <span style="color: #10b981; font-size: 0.75rem; font-weight: bold;">R$ ${m.valor.toLocaleString("pt-BR")}</span>
+            </button>
+        `;
+    });
+
+    html += `</div></div>`;
+    conteudo.innerHTML = html;
+}
+
+function aplicarPintura(indiceCarro, nomeCor, valor) {
+    if (jogo.dinheiro < valor) return mostrarAlerta("💸 Saldo Insuficiente", "Sem dinheiro para pintar.");
+    jogo.dinheiro -= valor;
+    jogo.carros[indiceCarro].cor = nomeCor;
+    atualizarPainel(); salvarJogo(); abrirEstetica(indiceCarro);
+}
+
+function aplicarPelicula(indiceCarro, nomePelicula, valor) {
+    if (jogo.dinheiro < valor) return mostrarAlerta("💸 Saldo Insuficiente", "Sem dinheiro para película.");
+    jogo.dinheiro -= valor;
+    jogo.carros[indiceCarro].pelicula = nomePelicula;
+    atualizarPainel(); salvarJogo(); abrirEstetica(indiceCarro);
+}
+
+function aplicarPneus(indiceCarro, nomePneus, valor) {
+    if (jogo.dinheiro < valor) return mostrarAlerta("💸 Saldo Insuficiente", "Sem dinheiro para pneus.");
+    jogo.dinheiro -= valor;
+    jogo.carros[indiceCarro].pneus = nomePneus;
+    atualizarPainel(); salvarJogo(); abrirEstetica(indiceCarro);
+}
+
+function aplicarMotor(indiceCarro, nomeMotor, valor) {
+    if (jogo.dinheiro < valor) return mostrarAlerta("💸 Saldo Insuficiente", "Sem dinheiro para troca de motor.");
+    jogo.dinheiro -= valor;
+    jogo.carros[indiceCarro].motor = nomeMotor;
+    delete jogo.carros[indiceCarro].mapaEcu;
+    delete jogo.carros[indiceCarro].valorAdicionadoRemap;
+    atualizarPainel(); salvarJogo(); abrirEstetica(indiceCarro);
+}
+
+// ============================================================================
+// DINAMÔMETRO COMPLETO COM REMAP DA ECU
+// ============================================================================
+function abrirModuloInjecaoDyna(indiceCarro) {
+    let carro = jogo.carros[indiceCarro];
+    if (!carro) return;
+
+    let motorObj = opcoesMotor.find(m => m.nome === carro.motor) || opcoesMotor[0];
+    let temDefeito = carro.defeitos && carro.defeitos.length > 0;
+
+    if (!carro.mapaEcu) {
+        carro.mapaEcu = {
+            combustivel: "gasolina",
+            alvoLambda: 0.88,
+            pontoIgricao: 18,
+            pressaoWastegate: motorObj.pressaoMaxPermitida > 0 ? 0.8 : 0.0,
+            corteRpm: motorObj.redline,
+            twoStepAtivo: false,
+            twoStepRpm: 4500,
+            malhaFechada: true,
+            tempoInjecaoMs: 4.2
+        };
+    }
+
+    telemetryState = {
+        ativo: true,
+        indiceCarro: indiceCarro,
+        carroQuebrado: temDefeito,
+        ignicaoLigada: false,
+        pedalAcelerador: 0,
+        pressionandoPedal: false,
+        rpmAtual: 0,
+        pressaoTurboAtual: 0.0,
+        pressaoOleoAtual: 0.0,
+        temperaturaAgua: 35.0,
+        tensaoBateria: 12.4,
+        lambdaAtual: 1.0,
+        avancoPontoAtual: carro.mapaEcu.pontoIgricao,
+        velocidadeRolo: 0,
+        potenciaAtual: 0,
+        torqueAtual: 0,
+        redline: motorObj.redline,
+        maxTurboConfigurado: motorObj.pressaoMaxPermitida,
+        tipoSomMotor: motorObj.tipoSom,
+        intervaloId: null,
+
+        mapaECU: { ...carro.mapaEcu },
+
+        puxadaDyna: {
+            gravando: false,
+            potenciaPico: 0,
+            torquePico: 0
+        }
+    };
+
+    renderizarInterfaceIntegrada(carro, motorObj);
+    lancarLoopTelemetria();
+}
+
+function renderizarInterfaceIntegrada(carro, motorObj) {
+    let quebrado = telemetryState.carroQuebrado;
+
+    let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <button onclick="mostrarOficina()" style="padding: 4px 8px; background: #334155; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem; font-weight: bold;">
+            ⬅️ Sair do Dyno
+        </button>
+        <div style="font-size: 0.8rem; font-weight: 800; color: #10b981;">ACF DYNOCENTER FT-550</div>
+    </div>
+
+    <!-- PAINEL DIGITAL FT-550 -->
+    <div style="background: #000; border: 2px solid #1e293b; border-radius: 8px; padding: 10px; margin-bottom: 10px; font-family: monospace;">
+        <!-- SHIFT LIGHT BAR -->
+        <div style="display: flex; gap: 3px; margin-bottom: 8px; height: 6px;" id="shiftLightBar">
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+            <div style="flex:1; background:#1e293b; border-radius:1px;" class="led"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 6px; margin-bottom: 8px;">
+            <div>
+                <span style="color: #64748b; font-size: 0.65rem; display: block;">ECU MAP: <strong style="color:#fff" id="lblCombustivelAct">${telemetryState.mapaECU.combustivel.toUpperCase()}</strong></span>
+                <span id="txtAlertaFt" style="color: ${quebrado ? '#ef4444' : '#10b981'}; font-weight: bold; font-size: 0.7rem;">
+                    ${quebrado ? '🚨 MOTOR DANIFICADO' : 'SYSTEM: READY'}
+                </span>
+            </div>
+            
+            <button onclick="alternarIgnicao()" id="btnIgnicao" ${quebrado ? 'disabled' : ''} style="padding: 5px 10px; background: ${quebrado ? '#475569' : '#10b981'}; color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem;">
+                ${quebrado ? 'BLOQUEADO' : '🔑 IGNIÇÃO'}
+            </button>
+        </div>
+
+        <!-- TELEMETRIA EM TEMPO REAL -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px;">
+            <div style="background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; text-align: center;">
+                <span style="font-size: 0.55rem; color: #64748b; display: block;">RPM</span>
+                <span id="ftRpm" style="font-size: 1.1rem; color: #38bdf8; font-weight: bold;">0</span>
+            </div>
+            <div style="background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; text-align: center;">
+                <span style="font-size: 0.55rem; color: #64748b; display: block;">TURBO (BAR)</span>
+                <span id="ftTurbo" style="font-size: 1.1rem; color: #f59e0b; font-weight: bold;">0.00</span>
+            </div>
+            <div style="background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; text-align: center;">
+                <span style="font-size: 0.55rem; color: #64748b; display: block;">LAMBDA</span>
+                <span id="ftLambda" style="font-size: 1.1rem; color: #10b981; font-weight: bold;">1.00</span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; margin-bottom: 8px;">
+            <div style="background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; text-align: center;">
+                <span style="font-size: 0.55rem; color: #64748b; display: block;">POTÊNCIA ATUAL</span>
+                <span id="ftPotencia" style="font-size: 1rem; color: #ef4444; font-weight: bold;">0 HP</span>
+            </div>
+            <div style="background: #090d16; padding: 4px; border-radius: 4px; border: 1px solid #1e293b; text-align: center;">
+                <span style="font-size: 0.55rem; color: #64748b; display: block;">TORQUE ATUAL</span>
+                <span id="ftTorque" style="font-size: 1rem; color: #8b5cf6; font-weight: bold;">0.0 Kgfm</span>
+            </div>
+        </div>
+
+        <!-- POTÊNCIA MÁXIMA DE PICO -->
+        <div style="background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.65rem; color: #9ca3af;">PICO DE PUXADA:</span>
+            <span id="ftPicoDyna" style="font-size: 0.75rem; color: #facc15; font-weight: bold;">0 HP / 0.0 Kgfm</span>
+        </div>
+
+        <!-- CONTROLE DO ACELERADOR -->
+        <div style="margin-top: 8px; background: #090d16; padding: 8px; border-radius: 4px; border: 1px solid #1e293b;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: #94a3b8; margin-bottom: 4px;">
+                <span>ACELERADOR</span>
+                <span id="lblPedal">%</span>
+            </div>
+            <input type="range" id="pedalAcelerador" min="0" max="100" value="0" style="width: 100%; accent-color: #ef4444;" oninput="ajustarPedal(this.value)">
+            
+            <button id="btnPuxadaDyna" onmousedown="pressionarAceleradorMaximo()" onmouseup="soltarAceleradorMaximo()" ontouchstart="pressionarAceleradorMaximo()" ontouchend="soltarAceleradorMaximo()" style="width: 100%; margin-top: 6px; padding: 8px; background: #ef4444; color: #fff; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">
+                🏎️ SEGURE PARA ACELERAR TUDO (PUXADA)
+            </button>
+        </div>
+    </div>
+
+    <!-- AJUSTES AVANÇADOS DA ECU -->
+    <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px;">
+        <h3 style="color: #38bdf8; font-size: 0.8rem; margin: 0 0 10px 0; border-bottom: 1px solid #1e293b; padding-bottom: 4px;">🛠️ MAPEAMENTO DA ECU & TURBO</h3>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px;">
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Combustível</label>
+                <select id="cfgCombustivel" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+                    <option value="gasolina" ${telemetryState.mapaECU.combustivel === 'gasolina' ? 'selected' : ''}>Gasolina (Stg 1)</option>
+                    <option value="etanol" ${telemetryState.mapaECU.combustivel === 'etanol' ? 'selected' : ''}>Etanol E100 (Stg 2/3)</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Wastegate / Pressão Turbo</label>
+                <input type="number" id="cfgWastegate" step="0.1" min="0" max="${motorObj.pressaoMaxPermitida}" value="${telemetryState.mapaECU.pressaoWastegate}" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px;">
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Alvo Lambda (Mistura)</label>
+                <input type="number" id="cfgLambda" step="0.01" min="0.70" max="1.10" value="${telemetryState.mapaECU.alvoLambda}" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+            </div>
+
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Avanço de Ignição (°)</label>
+                <input type="number" id="cfgPonto" step="1" min="5" max="32" value="${telemetryState.mapaECU.pontoIgricao}" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 8px;">
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Corte de Giro (RPM)</label>
+                <input type="number" id="cfgCorteRpm" step="100" min="5000" max="${motorObj.redline}" value="${telemetryState.mapaECU.corteRpm}" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+            </div>
+
+            <div>
+                <label style="font-size: 0.65rem; color: #94a3b8; display: block;">Two-Step (RPM)</label>
+                <input type="number" id="cfgTwoStepRpm" step="100" min="2500" max="6000" value="${telemetryState.mapaECU.twoStepRpm}" onchange="alterarConfigEcu()" style="width: 100%; padding: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 4px; font-size: 0.7rem;">
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <label style="font-size: 0.7rem; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="cfgTwoStepAtivo" ${telemetryState.mapaECU.twoStepAtivo ? 'checked' : ''} onchange="alterarConfigEcu()"> Activar Two-Step (Launch Control)
+            </label>
+
+            <button onclick="salvarRemapCarro(${telemetryState.indiceCarro})" style="padding: 6px 12px; background: #10b981; color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-size: 0.7rem;">
+                💾 Gravacao de Mapa ECU
+            </button>
+        </div>
+    </div>
+    `;
+
+    conteudo.innerHTML = html;
 }
 
 function alternarIgnicao() {
     inicializarAudioMotor();
     telemetryState.ignicaoLigada = !telemetryState.ignicaoLigada;
-    if (telemetryState.ignicaoLigada) {
-        tocarSomPartida();
-        telemetryState.rpmAtual = 850;
-        telemetryState.tensaoBateria = 14.2; 
-    } else {
-        telemetryState.pedalAcelerador = 0;
-        telemetryState.rpmAtual = 0;
-        telemetryState.pressaoTurboAtual = 0;
-        telemetryState.tensaoBateria = 12.4;
-        let slider = document.getElementById("sliderAcelerador");
-        if (slider) slider.value = 0;
-        desligarAudioMotor();
+    let btn = document.getElementById("btnIgnicao");
+    if (btn) {
+        btn.innerText = telemetryState.ignicaoLigada ? "🛑 DESLIGAR" : "🔑 IGNIÇÃO";
+        btn.style.background = telemetryState.ignicaoLigada ? "#ef4444" : "#10b981";
     }
-    atualizarElementosTelaTelemetria();
 }
 
-function setAcelerador(valor) {
-    if (!telemetryState.ignicaoLigada) return;
-    telemetryState.pedalAcelerador = Number(valor);
+function ajustarPedal(val) {
+    telemetryState.pedalAcelerador = parseInt(val);
+    let lbl = document.getElementById("lblPedal");
+    if (lbl) lbl.innerText = val + "%";
 }
 
+function pressionarAceleradorMaximo() {
+    telemetryState.pressionandoPedal = true;
+    telemetryState.puxadaDyna.gravando = true;
+    ajustarPedal(100);
+}
+
+function soltarAceleradorMaximo() {
+    telemetryState.pressionandoPedal = false;
+    ajustarPedal(0);
+}
+
+function alterarConfigEcu() {
+    let comb = document.getElementById("cfgCombustivel").value;
+    let wg = parseFloat(document.getElementById("cfgWastegate").value) || 0.0;
+    let lmb = parseFloat(document.getElementById("cfgLambda").value) || 0.88;
+    let pto = parseInt(document.getElementById("cfgPonto").value) || 18;
+    let crt = parseInt(document.getElementById("cfgCorteRpm").value) || 6500;
+    let tsRpm = parseInt(document.getElementById("cfgTwoStepRpm").value) || 4500;
+    let tsAct = document.getElementById("cfgTwoStepAtivo").checked;
+
+    telemetryState.mapaECU.combustivel = comb;
+    telemetryState.mapaECU.pressaoWastegate = wg;
+    telemetryState.mapaECU.alvoLambda = lmb;
+    telemetryState.mapaECU.pontoIgricao = pto;
+    telemetryState.mapaECU.corteRpm = crt;
+    telemetryState.mapaECU.twoStepRpm = tsRpm;
+    telemetryState.mapaECU.twoStepAtivo = tsAct;
+
+    let lblComb = document.getElementById("lblCombustivelAct");
+    if (lblComb) lblComb.innerText = comb.toUpperCase();
+}
+
+function salvarRemapCarro(index) {
+    let carro = jogo.carros[index];
+    if (!carro) return;
+
+    carro.mapaEcu = { ...telemetryState.mapaECU };
+    
+    // Calcula o valor agregado ao preço de revenda do veículo
+    let bonusRemap = Math.round((telemetryState.puxadaDyna.potenciaPico * 45) + (telemetryState.mapaECU.pressaoWastegate * 2000));
+    carro.valorAdicionadoRemap = bonusRemap;
+
+    salvarJogo();
+    mostrarAlerta("💾 ECU Gravação Concluída", `O mapa foi gravado na ECU com sucesso!\n\nValorização estimada no veículo: +R$ ${bonusRemap.toLocaleString("pt-BR")}`);
+}
+
+// ============================================================================
+// LOOP DE SIMULAÇÃO DE TELEMETRIA
+// ============================================================================
 function lancarLoopTelemetria() {
-    pararTelemetria();
-    telemetryState.ativo = true;
+    if (telemetryState.intervaloId) clearInterval(telemetryState.intervaloId);
+
     telemetryState.intervaloId = setInterval(() => {
         if (!telemetryState.ativo) return;
 
-        if (telemetryState.ignicaoLigada) {
-            let rpmAlvo = 850 + (telemetryState.pedalAcelerador / 100) * (telemetryState.redline - 850);
-            
-            if (telemetryState.rpmAtual < rpmAlvo) {
-                telemetryState.rpmAtual += Math.max(150, (rpmAlvo - telemetryState.rpmAtual) * 0.25);
-            } else if (telemetryState.rpmAtual > rpmAlvo) {
-                telemetryState.rpmAtual -= Math.max(200, (telemetryState.rpmAtual - rpmAlvo) * 0.20);
+        let motorObj = opcoesMotor.find(m => m.nome === (jogo.carros[telemetryState.indiceCarro] ? jogo.carros[telemetryState.indiceCarro].motor : '')) || opcoesMotor[0];
+
+        if (telemetryState.ignicaoLigada && !telemetryState.carroQuebrado) {
+            let alvoRpm = 900;
+            let ped = telemetryState.pedalAcelerador;
+
+            let limiteCorte = (telemetryState.mapaECU.twoStepAtivo && ped > 80 && !telemetryState.puxadaDyna.gravando)
+                ? telemetryState.mapaECU.twoStepRpm
+                : telemetryState.mapaECU.corteRpm;
+
+            if (ped > 0) {
+                alvoRpm = 900 + ((limiteCorte - 900) * (ped / 100));
             }
 
-            if (telemetryState.rpmAtual > telemetryState.redline) {
-                telemetryState.rpmAtual = telemetryState.redline - (Math.random() * 200);
+            // Suavização do RPM
+            telemetryState.rpmAtual += (alvoRpm - telemetryState.rpmAtual) * 0.15;
+
+            // Simulação de Pressão de Turbo
+            if (telemetryState.mapaECU.pressaoWastegate > 0 && telemetryState.rpmAtual > 2200) {
+                let fatorTurbo = Math.min(1.0, (telemetryState.rpmAtual - 2000) / 3000);
+                let pressaoAlvo = telemetryState.mapaECU.pressaoWastegate * fatorTurbo * (ped / 100);
+                telemetryState.pressaoTurboAtual += (pressaoAlvo - telemetryState.pressaoTurboAtual) * 0.2;
+            } else {
+                telemetryState.pressaoTurboAtual *= 0.8;
             }
 
-            if (telemetryState.temperaturaAgua < 90) {
-                telemetryState.temperaturaAgua += 0.05;
+            // Cálculo Dynamometrico da Potência / Torque
+            let fatorEtanol = telemetryState.mapaECU.combustivel === 'etanol' ? 1.15 : 1.0;
+            let cvBase = motorObj.cvBase * fatorEtanol;
+            let tqBase = motorObj.torqueBase * fatorEtanol;
+
+            let ganhoTurboCv = telemetryState.pressaoTurboAtual * 70;
+            let ganhoTurboTq = telemetryState.pressaoTurboAtual * 10;
+
+            let curvaRpm = Math.sin((telemetryState.rpmAtual / telemetryState.mapaECU.corteRpm) * Math.PI);
+            telemetryState.potenciaAtual = Math.max(0, Math.round((cvBase + ganhoTurboCv) * curvaRpm * (ped / 100)));
+            telemetryState.torqueAtual = Math.max(0, parseFloat(((tqBase + ganhoTurboTq) * curvaRpm * (ped / 100)).toFixed(1)));
+
+            // Registrar Pico
+            if (telemetryState.potenciaAtual > telemetryState.puxadaDyna.potenciaPico) {
+                telemetryState.puxadaDyna.potenciaPico = telemetryState.potenciaAtual;
+                telemetryState.puxadaDyna.torquePico = telemetryState.torqueAtual;
             }
 
-            let cargaFator = telemetryState.pedalAcelerador / 100;
-            let rpmFator = telemetryState.rpmAtual / telemetryState.redline;
-            let turboAlvo = telemetryState.maxTurbo * cargaFator * (rpmFator > 0.3 ? 1.0 : (rpmFator / 0.3));
-            telemetryState.pressaoTurboAtual += (turboAlvo - telemetryState.pressaoTurboAtual) * 0.3;
+            // Riscos de Quebra do Motor
+            let pressaoExcessiva = telemetryState.pressaoTurboAtual > (motorObj.limiteResistencia / 100);
+            let pontoMuitoAvancado = telemetryState.mapaECU.pontoIgricao > 26 && telemetryState.mapaECU.combustivel === 'gasolina';
 
-            telemetryState.lambda = 0.85 + (0.15 * (1 - cargaFator)) + ((Math.random() - 0.5) * 0.04);
-            telemetryState.avancoPonto = Math.round(32 - (cargaFator * 18) + ((Math.random() - 0.5) * 2));
+            if ((pressaoExcessiva || pontoMuitoAvancado) && ped > 90 && Math.random() < 0.03) {
+                telemetryState.carroQuebrado = true;
+                telemetryState.ignicaoLigada = false;
+                
+                // Adiciona defeito de motor quebrado no carro
+                let carro = jogo.carros[telemetryState.indiceCarro];
+                if (carro) {
+                    if (!carro.defeitos) carro.defeitos = [];
+                    carro.defeitos.push({ nome: "Motor Fundido / Biela Quebrada", valor: 6500 });
+                }
+                salvarJogo();
+            }
 
-            let torqueBaseMax = 22 + (telemetryState.maxTurbo * 25);
-            let fatorCurvaTorque = Math.sin((telemetryState.rpmAtual / telemetryState.redline) * Math.PI * 0.8);
-            if (fatorCurvaTorque < 0.2) fatorCurvaTorque = 0.2;
-
-            telemetryState.torqueAtual = Math.round(torqueBaseMax * fatorCurvaTorque * (telemetryState.pedalAcelerador / 100));
-            telemetryState.potenciaAtual = Math.round((telemetryState.torqueAtual * telemetryState.rpmAtual) / 5252);
-            telemetryState.velocidadeRolo = Math.round((telemetryState.rpmAtual / telemetryState.redline) * 240);
-
-            atualizarSomMotor();
+            // Mistura Lambda
+            telemetryState.lambdaAtual = telemetryState.mapaECU.alvoLambda + ((Math.random() - 0.5) * 0.02);
         } else {
-            if (telemetryState.temperaturaAgua > 25) telemetryState.temperaturaAgua -= 0.1;
-            telemetryState.rpmAtual = 0;
-            telemetryState.pressaoTurboAtual = 0;
+            telemetryState.rpmAtual *= 0.7;
+            telemetryState.pressaoTurboAtual *= 0.5;
             telemetryState.potenciaAtual = 0;
             telemetryState.torqueAtual = 0;
-            telemetryState.velocidadeRolo = 0;
-            desligarAudioMotor();
+            telemetryState.lambdaAtual = 1.0;
         }
 
-        atualizarElementosTelaTelemetria();
-    }, 80);
+        atualizarSomMotor();
+        atualizarPainelDynoDOM();
+    }, 50);
 }
 
-// ===========================
-// RENDERIZAÇÃO DAS TELAS DE TELEMETRIA (HTML)
-// ===========================
+function atualizarPainelDynoDOM() {
+    let elRpm = document.getElementById("ftRpm");
+    let elTurbo = document.getElementById("ftTurbo");
+    let elLambda = document.getElementById("ftLambda");
+    let elPot = document.getElementById("ftPotencia");
+    let elTorq = document.getElementById("ftTorque");
+    let elPico = document.getElementById("ftPicoDyna");
+    let elAlerta = document.getElementById("txtAlertaFt");
 
-function renderizarInterfaceScanner(carro) {
-    let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">💻</span>
-            <div class="garagem-texto-titulo">
-                <h1>SCANNER OBD-II EM TEMPO REAL</h1>
-                <p>Leitura de parâmetros diretos da Central (ECU): ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}</p>
-            </div>
-        </div>
-    </div>
+    if (elRpm) elRpm.innerText = Math.round(telemetryState.rpmAtual);
+    if (elTurbo) elTurbo.innerText = telemetryState.pressaoTurboAtual.toFixed(2);
+    if (elLambda) elLambda.innerText = telemetryState.lambdaAtual.toFixed(2);
+    if (elPot) elPot.innerText = telemetryState.potenciaAtual + " HP";
+    if (elTorq) elTorq.innerText = telemetryState.torqueAtual.toFixed(1) + " Kgfm";
+    if (elPico) elPico.innerText = `${telemetryState.puxadaDyna.potenciaPico} HP / ${telemetryState.puxadaDyna.torquePico.toFixed(1)} Kgfm`;
 
-    <div class="card" style="margin-bottom: 20px; background: #080c14; border-color: #3b82f6; font-family: monospace;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 15px;">
-            <div>
-                <span style="font-size: 0.85rem; color: #94a3b8; display: block;">ESTADO DA IGNIÇÃO</span>
-                <span id="txtStatusIgnicao" style="font-size: 1rem; font-weight: bold; color: #ef4444;">🔴 DESLIGADA</span>
-            </div>
-            <button onclick="alternarIgnicao()" id="btnIgnicao" style="padding: 10px 18px; background: #10b981; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                🔑 Virar Chave / Start
-            </button>
-        </div>
-
-        <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem;">
-                <span style="color: #94a3b8;">🕹️ PEDAL DO ACELERADOR (TPS)</span>
-                <span id="txtValorAcelerador" style="color: #38bdf8; font-weight: bold;">0%</span>
-            </div>
-            <input type="range" min="0" max="100" value="0" id="sliderAcelerador" oninput="setAcelerador(this.value)" style="width: 100%; accent-color: #38bdf8; cursor: pointer;">
-        </div>
-
-        <h3 style="color: #38bdf8; margin-bottom: 12px; border-bottom: 1px dashed #1e293b; padding-bottom: 6px; font-size: 0.95rem;">📊 DADOS VITAIS DA ECU AO VIVO</h3>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">ROTAÇÃO (RPM)</span>
-                <span id="valRpm" style="font-size: 1.3rem; font-weight: bold; color: #10b981;">0 RPM</span>
-            </div>
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">PRESSÃO DO TURBO</span>
-                <span id="valTurbo" style="font-size: 1.3rem; font-weight: bold; color: #f59e0b;">0.00 Bar</span>
-            </div>
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">TEMPERATURA DA ÁGUA</span>
-                <span id="valTemp" style="font-size: 1.3rem; font-weight: bold; color: #38bdf8;">25°C</span>
-            </div>
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">TENSÃO DA BATERIA</span>
-                <span id="valBat" style="font-size: 1.3rem; font-weight: bold; color: #10b981;">12.4 V</span>
-            </div>
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">SONDA LAMBDA (AFR)</span>
-                <span id="valLambda" style="font-size: 1.3rem; font-weight: bold; color: #e2e8f0;">1.00</span>
-            </div>
-            <div style="background: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #1e293b;">
-                <span style="font-size: 0.75rem; color: #94a3b8; display: block;">AVANÇO DE IGNIÇÃO</span>
-                <span id="valPonto" style="font-size: 1.3rem; font-weight: bold; color: #a855f7;">12°</span>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <button onclick="tocarBuzina()" style="padding: 10px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                📢 Tocar Buzina
-            </button>
-            <button onclick="tocarSomPneus()" style="padding: 10px; background: #38bdf8; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                🛞 Cantar Pneus
-            </button>
-        </div>
-
-        <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); padding: 10px; border-radius: 6px; text-align: center;">
-            <span style="color: #10b981; font-size: 0.8rem; font-weight: bold;">🔊 Som Dinâmico do Motor Ativo (Corte Rápido + Diferencial por Preparação)!</span>
-        </div>
-    </div>
-
-    <button onclick="pararTelemetria(); mostrarOficina();" style="width:100%; padding:12px; background:#334155; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom: 20px;">
-        ⬅️ Voltar para Oficina
-    </button>
-    `;
-
-    conteudo.innerHTML = html;
-    atualizarElementosTelaTelemetria();
-}
-
-function renderizarInterfaceDyno(carro) {
-    let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">📈</span>
-            <div class="garagem-texto-titulo">
-                <h1>DINAMÔMETRO INERCIAL (DYNO ROOM)</h1>
-                <p>Banco de Prova em Tempo Real: ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 20px; background: #080c14; border-color: #10b981; font-family: monospace;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 15px;">
-            <div>
-                <span style="font-size: 0.85rem; color: #94a3b8; display: block;">MOTOR DO VEÍCULO</span>
-                <span id="txtStatusIgnicao" style="font-size: 1rem; font-weight: bold; color: #ef4444;">🔴 DESLIGADO</span>
-            </div>
-            <button onclick="alternarIgnicao()" id="btnIgnicao" style="padding: 10px 18px; background: #10b981; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                🔑 Ligar Motor
-            </button>
-        </div>
-
-        <div style="background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 15px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem;">
-                <span style="color: #94a3b8;">🕹️ DOSAGEM DE ACELERAÇÃO (WOT)</span>
-                <span id="txtValorAcelerador" style="color: #ef4444; font-weight: bold;">0%</span>
-            </div>
-            <input type="range" min="0" max="100" value="0" id="sliderAcelerador" oninput="setAcelerador(this.value)" style="width: 100%; accent-color: #ef4444; cursor: pointer;">
-        </div>
-
-        <div style="background: #020617; padding: 15px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 15px; text-align: center;">
-            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 2px;">ROTAÇÃO ATUAL NO ROLO</div>
-            <div id="valRpm" style="font-size: 2.2rem; font-weight: bold; color: #38bdf8; margin-bottom: 10px;">0 RPM</div>
-            
-            <div style="width: 100%; background: #1e293b; height: 14px; border-radius: 7px; overflow: hidden; margin-bottom: 15px;">
-                <div id="barraProgressoDyno" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); transition: width 0.05s linear;"></div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 0.7rem; color: #94a3b8; display: block;">VELOCIDADE</span>
-                    <span id="valVelocidade" style="font-size: 1.1rem; font-weight: bold; color: #fff;">0 km/h</span>
-                </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 0.7rem; color: #94a3b8; display: block;">POTÊNCIA</span>
-                    <span id="valPotencia" style="font-size: 1.1rem; font-weight: bold; color: #38bdf8;">0 CV</span>
-                </div>
-                <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 0.7rem; color: #94a3b8; display: block;">TORQUE</span>
-                    <span id="valTorque" style="font-size: 1.1rem; font-weight: bold; color: #f59e0b;">0 kgfm</span>
-                </div>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <button onclick="tocarBuzina()" style="padding: 10px; background: #f59e0b; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                📢 Tocar Buzina
-            </button>
-            <button onclick="tocarSomPneus()" style="padding: 10px; background: #38bdf8; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                🛞 Cantar Pneus
-            </button>
-        </div>
-
-        <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); padding: 10px; border-radius: 6px; text-align: center;">
-            <span style="color: #60a5fa; font-size: 0.8rem;">🔊 Dica: Acelere até o corte rápido ou solte o acelerador para ouvir o chiado do turbo!</span>
-        </div>
-    </div>
-
-    <button onclick="pararTelemetria(); mostrarOficina();" style="width:100%; padding:12px; background:#334155; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom: 20px;">
-        ⬅️ Voltar para Oficina
-    </button>
-    `;
-
-    conteudo.innerHTML = html;
-    atualizarElementosTelaTelemetria();
-}
-
-function atualizarElementosTelaTelemetria() {
-    if (!telemetryState.ativo) return;
-
-    let txtIgn = document.getElementById("txtStatusIgnicao");
-    let btnIgn = document.getElementById("btnIgnicao");
-    let txtAcc = document.getElementById("txtValorAcelerador");
-
-    if (txtIgn) {
-        if (telemetryState.ignicaoLigada) {
-            txtIgn.innerHTML = "🟢 LIGADO";
-            txtIgn.style.color = "#10b981";
-            if (btnIgn) btnIgn.innerText = "🛑 Desligar Motor";
-        } else {
-            txtIgn.innerHTML = "🔴 DESLIGADO";
-            txtIgn.style.color = "#ef4444";
-            if (btnIgn) btnIgn.innerText = "🔑 Ligar Motor";
-        }
+    if (elAlerta && telemetryState.carroQuebrado) {
+        elAlerta.innerText = "🚨 MOTOR DANIFICADO / QUEBRADO";
+        elAlerta.style.color = "#ef4444";
     }
 
-    if (txtAcc) {
-        txtAcc.innerText = Math.round(telemetryState.pedalAcelerador) + "%";
+    // Shift light leds
+    let leds = document.querySelectorAll("#shiftLightBar .led");
+    if (leds.length > 0) {
+        let pct = telemetryState.rpmAtual / telemetryState.mapaECU.corteRpm;
+        leds.forEach((led, idx) => {
+            let threshold = (idx + 1) / leds.length;
+            if (pct >= threshold) {
+                led.style.background = idx > 5 ? "#ef4444" : (idx > 3 ? "#f59e0b" : "#10b981");
+            } else {
+                led.style.background = "#1e293b";
+            }
+        });
     }
-
-    let elRpm = document.getElementById("valRpm");
-    if (elRpm) elRpm.innerText = Math.round(telemetryState.rpmAtual).toLocaleString("pt-BR") + " RPM";
-
-    let elTurbo = document.getElementById("valTurbo");
-    let elTemp = document.getElementById("valTemp");
-    let elBat = document.getElementById("valBat");
-    let elLambda = document.getElementById("valLambda");
-    let elPonto = document.getElementById("valPonto");
-
-    if (elTurbo) elTurbo.innerText = telemetryState.pressaoTurboAtual.toFixed(2) + " Bar";
-    if (elTemp) elTemp.innerText = Math.round(telemetryState.temperaturaAgua) + "°C";
-    if (elBat) elBat.innerText = telemetryState.tensaoBateria.toFixed(1) + " V";
-    if (elLambda) elLambda.innerText = telemetryState.lambda.toFixed(2);
-    if (elPonto) elPonto.innerText = telemetryState.avancoPonto + "°";
-
-    let elVel = document.getElementById("valVelocidade");
-    let elPot = document.getElementById("valPotencia");
-    let elTorq = document.getElementById("valTorque");
-    let barraDyno = document.getElementById("barraProgressoDyno");
-
-    if (elVel) elVel.innerText = telemetryState.velocidadeRolo + " km/h";
-    if (elPot) elPot.innerText = telemetryState.potenciaAtual + " CV";
-    if (elTorq) elTorq.innerText = telemetryState.torqueAtual + " kgfm";
-
-    if (barraDyno) {
-        let porcentagemGiro = (telemetryState.rpmAtual / telemetryState.redline) * 100;
-        barraDyno.style.width = Math.min(100, Math.max(0, porcentagemGiro)) + "%";
-    }
-}
-
-// ===========================
-// PAINEL DE ESTÉTICA, PELÍCULA, PNEUS E MOTOR
-// ===========================
-function abrirEstetica(indiceCarro) {
-    pararTelemetria();
-    let carro = jogo.carros[indiceCarro];
-    if (!carro) return;
-
-    let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🎨</span>
-            <div class="garagem-texto-titulo">
-                <h1>CUSTOMIZAÇÃO & ESTÉTICA</h1>
-                <p>Personalize ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'} para valorizar o preço</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 15px; background: #0f172a; border-color: #1e293b;">
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">🎨 Escolher Pintura:</h3>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-    `;
-
-    opcoesCoresPintura.forEach((cor, i) => {
-        html += `
-        <button onclick="aplicarPintura(${indiceCarro}, ${i})" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 6px; cursor:pointer;">
-            <span>🎨 ${cor.nome}</span>
-            <strong style="color: #10b981;">R$ ${cor.valor.toLocaleString("pt-BR")}</strong>
-        </button>`;
-    });
-
-    html += `
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 15px; background: #0f172a; border-color: #1e293b;">
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">🕶️ Película nos Vidros:</h3>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-    `;
-
-    opcoesPelicula.forEach((pelicula, i) => {
-        html += `
-        <button onclick="aplicarPelicula(${indiceCarro}, ${i})" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 6px; cursor:pointer;">
-            <span>🕶️ ${pelicula.nome}</span>
-            <strong style="color: #10b981;">R$ ${pelicula.valor.toLocaleString("pt-BR")}</strong>
-        </button>`;
-    });
-
-    html += `
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 15px; background: #0f172a; border-color: #1e293b;">
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">🛞 Troca de Pneus:</h3>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-    `;
-
-    opcoesPneus.forEach((pneu, i) => {
-        html += `
-        <button onclick="aplicarPneus(${indiceCarro}, ${i})" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 6px; cursor:pointer;">
-            <span>🛞 ${pneu.nome}</span>
-            <strong style="color: #10b981;">R$ ${pneu.valor.toLocaleString("pt-BR")}</strong>
-        </button>`;
-    });
-
-    html += `
-        </div>
-    </div>
-
-    <div class="card" style="margin-bottom: 20px; background: #0f172a; border-color: #1e293b;">
-        <h3 style="margin-bottom: 10px; color: #f59e0b;">🏎️ Upgrade de Motor & Performance:</h3>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-    `;
-
-    opcoesMotor.forEach((motor, i) => {
-        html += `
-        <button onclick="aplicarMotor(${indiceCarro}, ${i})" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; background: #1e293b; border: 1px solid #f59e0b; color: #fff; border-radius: 6px; cursor:pointer;">
-            <span>🏎️ ${motor.nome}</span>
-            <strong style="color: #10b981;">R$ ${motor.valor.toLocaleString("pt-BR")}</strong>
-        </button>`;
-    });
-
-    html += `
-        </div>
-    </div>
-
-    <button onclick="mostrarOficina()" style="width:100%; padding:12px; background:#334155; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom: 20px;">
-        ⬅️ Voltar para Oficina
-    </button>
-    `;
-
-    conteudo.innerHTML = html;
-}
-
-function aplicarPintura(indiceCarro, indiceCor) {
-    let carro = jogo.carros[indiceCarro];
-    let corEscolhida = opcoesCoresPintura[indiceCor];
-
-    if (jogo.dinheiro < corEscolhida.valor) {
-        mostrarAlerta("💸 Saldo Insuficiente", "Dinheiro insuficiente para a pintura.");
-        return;
-    }
-
-    jogo.dinheiro -= corEscolhida.valor;
-    carro.cor = corEscolhida.nome;
-    if (carro.fipe) carro.fipe = Math.round(carro.fipe * corEscolhida.bonusValor);
-    if (carro.valorVenda) carro.valorVenda = Math.round(carro.valorVenda * corEscolhida.bonusValor);
-
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("✨ Pintura Concluída!", `Veículo pintado de ${corEscolhida.nome}!`);
-    abrirEstetica(indiceCarro);
-}
-
-function aplicarPelicula(indiceCarro, indicePelicula) {
-    let carro = jogo.carros[indiceCarro];
-    let peliculaEscolhida = opcoesPelicula[indicePelicula];
-
-    if (peliculaEscolhida.valor > 0 && jogo.dinheiro < peliculaEscolhida.valor) {
-        mostrarAlerta("💸 Saldo Insuficiente", "Dinheiro insuficiente para a película.");
-        return;
-    }
-
-    if (peliculaEscolhida.valor > 0) jogo.dinheiro -= peliculaEscolhida.valor;
-    carro.pelicula = peliculaEscolhida.nome;
-    if (carro.fipe) carro.fipe = Math.round(carro.fipe * peliculaEscolhida.bonusValor);
-    if (carro.valorVenda) carro.valorVenda = Math.round(carro.valorVenda * peliculaEscolhida.bonusValor);
-
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("🕶️ Película Aplicada!", `Instalado ${peliculaEscolhida.nome}!`);
-    abrirEstetica(indiceCarro);
-}
-
-function aplicarPneus(indiceCarro, indicePneus) {
-    let carro = jogo.carros[indiceCarro];
-    let pneuEscolhido = opcoesPneus[indicePneus];
-
-    if (pneuEscolhido.valor > 0 && jogo.dinheiro < pneuEscolhido.valor) {
-        mostrarAlerta("💸 Saldo Insuficiente", "Dinheiro insuficiente para os pneus.");
-        return;
-    }
-
-    if (pneuEscolhido.valor > 0) jogo.dinheiro -= pneuEscolhido.valor;
-    carro.pneus = pneuEscolhido.nome;
-    if (carro.fipe) carro.fipe = Math.round(carro.fipe * pneuEscolhido.bonusValor);
-    if (carro.valorVenda) carro.valorVenda = Math.round(carro.valorVenda * pneuEscolhido.bonusValor);
-
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("🛞 Pneus Trocados!", `Instalado ${pneuEscolhido.nome}!`);
-    abrirEstetica(indiceCarro);
-}
-
-function aplicarMotor(indiceCarro, indiceMotor) {
-    let carro = jogo.carros[indiceCarro];
-    let motorEscolhido = opcoesMotor[indiceMotor];
-
-    if (motorEscolhido.valor > 0 && jogo.dinheiro < motorEscolhido.valor) {
-        mostrarAlerta("💸 Saldo Insuficiente", "Dinheiro insuficiente para o upgrade de motor.");
-        return;
-    }
-
-    if (motorEscolhido.valor > 0) jogo.dinheiro -= motorEscolhido.valor;
-    carro.motor = motorEscolhido.nome;
-    if (carro.fipe) carro.fipe = Math.round(carro.fipe * motorEscolhido.bonusValor);
-    if (carro.valorVenda) carro.valorVenda = Math.round(carro.valorVenda * motorEscolhido.bonusValor);
-
-    atualizarPainel();
-    salvarJogo();
-    mostrarAlerta("🏎️ Upgrade de Motor Realizado!", `O possante agora tá equipado com: ${motorEscolhido.nome}!`);
-    abrirEstetica(indiceCarro);
-}
-
-// ===========================
-// AVANÇO DE DIAS DA OFICINA
-// ===========================
-function atualizarOficinaDia(){
-    pararTelemetria();
-    if(!jogo.carros) return;
-
-    jogo.carros.forEach(function(carro){
-        if(carro.reparos && carro.reparos.length > 0){
-            carro.reparos.forEach(function(reparo){
-                reparo.dias--;
-            });
-
-            carro.reparos = carro.reparos.filter(function(reparo){
-                if(reparo.dias <= 0){
-                    if(!jogo.estatisticas) jogo.estatisticas = { consertados: 0 };
-                    jogo.estatisticas.consertados++;
-                    jogo.reputacao = (jogo.reputacao || 0) + 1;
-
-                    mostrarAlerta("✅ Reparo concluído", `${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}\n🔧 ${reparo.nome}\nPronto para customização ou venda!`);
-                    return false;
-                }
-                return true;
-            });
-        }
-    });
-
-    salvarJogo();
 }

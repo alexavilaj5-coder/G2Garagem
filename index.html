@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head> <link rel="manifest" href="manifest.json">
+<head> 
+<link rel="manifest" href="manifest.json">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🚗 G2 Garagem</title> 
@@ -8,13 +9,6 @@
 </head>
 
 <body>
-  
-
-<!-- VÍDEO DE INTRODUÇÃO (SEMPRE QUE ABRE) -->
-<div id="containerIntroVideo" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: flex; justify-content: center; align-items: center;">
-    <video id="videoIntro" src="imagens/intro.mp4" controls autoplay playsinline style="max-width: 100%; max-height: 100%; object-fit: contain;"></video>
-    <button onclick="fecharIntroVideo()" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); color: #fff; border: 1px solid #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; z-index: 100000; font-weight: bold;">Pular Intro ⏭️</button>
-</div>
 
 <div id="app">
 
@@ -23,7 +17,7 @@
   <div class="topbar">
     <div class="empresa">
       <div class="empresa-info">
-        <h1>🚗 G2 GARAGEM   <small>versão pré lançamento</small> </h1>
+        <h1>🚗 G2 GARAGEM    <small>versão pré lançamento</small> </h1>
          
         <div class="hud-mini">
           <div class="box">
@@ -92,12 +86,9 @@
   </div>
 </div>
 
-
-
-<!-- SCRIPTS -->
+<!-- SCRIPTS ORIGINAIS -->
 <script src="dados.js"></script>
 <script src="anos.js"></script>
-<script src="sound-engine-global.js"></script>
 <script src="som.js"></script>
 <script src="carros.js"></script>
 <script src="arena.js"></script>
@@ -105,6 +96,7 @@
 <script src="mercado.js"></script>
 <script src="oficina.js"></script>
 <script src="leilao.js"></script>
+<script src="financiamentos.js"></script>
 <script src="clientes.js"></script>
 <script src="empresa.js"></script>
 <script src="estatisticas.js"></script>
@@ -114,44 +106,66 @@
 <script src="script.js"></script>
 <script src="conquistas.js"></script>
 
-<!-- SCRIPT DE CONTROLE DO VÍDEO DE INTRO -->
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-    let containerVideo = document.getElementById("containerIntroVideo");
-    let elementoVideo = document.getElementById("videoIntro");
+<!-- 📻 PLAYER DA RÁDIO EMBUTIDO DIRETO NO INDEX (SEM MEXER NO SCRIPT.JS) -->
+<div id="g2-radio-container" style="position: fixed; top: 12px; right: 15px; z-index: 99999; display: flex; align-items: center; gap: 6px; background: rgba(24, 24, 27, 0.85); border: 1px solid #3f3f46; padding: 4px 10px; border-radius: 8px; font-family: inherit; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px);">
+    <span style="font-size: 1.1rem;"></span>
+    <audio id="audioRadioG2" src="https://stream.zeno.fm/7wjwmstqahhvv" preload="auto" loop></audio>
+    <button id="btnToggleRadioIndex" onclick="alternarRadioIndex()" style="background: #27272a; border: 1px solid #52525b; color: #fff; padding: 3px 8px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold;">
+        ▶️ Play Radio 
+    </button>
+</div>
 
-    if (containerVideo && elementoVideo) {
-        containerVideo.style.display = "flex";
-        elementoVideo.muted = false;
-        let promessaPlay = elementoVideo.play();
-        
-        if (promessaPlay !== undefined) {
-            promessaPlay.catch(() => {
-                elementoVideo.muted = true;
-                elementoVideo.play();
+<script>
+    let radioLigadaIndex = false;
+
+    function alternarRadioIndex() {
+        let audio = document.getElementById("audioRadioG2");
+        let btn = document.getElementById("btnToggleRadioIndex");
+        if (!audio) return;
+
+        if (audio.paused) {
+            audio.volume = 0.35;
+            audio.play().then(() => {
+                radioLigadaIndex = true;
+                btn.innerText = "⏸️";
+                btn.style.background = "#059669";
+            }).catch(e => console.log("Erro ao tocar rádio:", e));
+        } else {
+            audio.pause();
+            radioLigadaIndex = false;
+            btn.innerText = "▶️";
+            btn.style.background = "#27272a";
+        }
+    }
+
+    // Tenta rodar automaticamente ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+        let audio = document.getElementById("audioRadioG2");
+        let btn = document.getElementById("btnToggleRadioIndex");
+        if (audio) {
+            audio.volume = 0.35;
+            audio.play().then(() => {
+                radioLigadaIndex = true;
+                if(btn) {
+                    btn.innerText = "⏸️";
+                    btn.style.background = "#059669";
+                }
+            }).catch(() => {
+                // Se o navegador bloquear o autoplay, libera no primeiro clique do usuário
+                window.addEventListener('click', () => {
+                    if (!radioLigadaIndex && audio.paused) {
+                        audio.play().then(() => {
+                            radioLigadaIndex = true;
+                            if(btn) {
+                                btn.innerText = "⏸️";
+                                btn.style.background = "#059669";
+                            }
+                        }).catch(e => {});
+                    }
+                }, { once: true });
             });
         }
-
-        elementoVideo.onended = () => {
-            fecharIntroVideo();
-        };
-    }
-});
-
-function fecharIntroVideo() {
-    let containerVideo = document.getElementById("containerIntroVideo");
-    let elementoVideo = document.getElementById("videoIntro");
-    
-    if (elementoVideo) elementoVideo.pause();
-
-    if (containerVideo) {
-        containerVideo.style.transition = "opacity 0.6s ease";
-        containerVideo.style.opacity = "0";
-        setTimeout(() => {
-            containerVideo.style.display = "none";
-        }, 600);
-    }
-}
+    });
 </script>
 
 </body>

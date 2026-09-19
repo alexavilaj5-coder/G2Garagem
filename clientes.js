@@ -1,5 +1,5 @@
 // ===========================================
-// CLIENTES.JS V14.1 - CREDIÁRIO, ESCOLHA DE VENCIMENTO & TRAVA DE ARGUMENTO 🚗💳📅
+// CLIENTES.JS V15.3 - LAYOUT MODERNO & REESTRUTURADO 🚗💳📅
 // G2 GARAGEM
 // ===========================================
 
@@ -18,43 +18,48 @@ const nomesClientes = [
 const tiposClientes = [
     { nome: "Cliente Comum", bonus: 0, tolerancia: 2, descricao: "Busca um carro honesto pelo preço justo de mercado." },
     { nome: "Revendedor", bonus: -5, tolerancia: 3, descricao: "Olho clínico para lucro rápido. Quer pagar barato para revender." },
-    { nome: "Colecionador", bonus: 6, tolerancia: 1, descricao: "Apaixonado por raridades. Paga bien se o carro estiver impecável." },
+    { nome: "Colecionador", bonus: 6, tolerancia: 1, descricao: "Apaixonado por raridades. Paga bem se o carro estiver impecável." },
     { nome: "Cliente Exigente", bonus: -3, tolerancia: 1, descricao: "Nota cada detalhe e defeito. Chato na negociação, mas tem bom orçamento." },
     { nome: "Comprador Desesperado", bonus: 10, tolerancia: 4, descricao: "Precisa de um carro para ontem. Aceita pagar ágio sem pensar duas vezes." }
 ];
 
 function mostrarClientes(){
     if (typeof jogo === 'undefined') window.jogo = {};
+    if (!jogo.financiamentosAtivos) jogo.financiamentosAtivos = [];
     if (!jogo.carros || !Array.isArray(jogo.carros)) {
         let salvo = localStorage.getItem("g2_garagem_jogo") || localStorage.getItem("jogo");
         if (salvo) {
             try {
                 let dados = JSON.parse(salvo);
                 if (dados && dados.carros) jogo.carros = dados.carros;
+                if (dados && dados.financiamentosAtivos) jogo.financiamentosAtivos = dados.financiamentosAtivos;
             } catch(e) {}
         }
     }
 
-    let qtdFinanciamentos = jogo.financiamentosAtivos ? jogo.financiamentosAtivos.length : 0;
+    let qtdFinanciamentos = jogo.financiamentosAtivos.length;
 
     if(!jogo.carros || !Array.isArray(jogo.carros) || jogo.carros.length === 0){
         conteudo.innerHTML = `
-        <div class="garagem-header" style="margin-bottom: 15px;">
-            <div class="garagem-titulo">
-                <span class="garagem-icone">👥</span>
-                <div class="garagem-texto-titulo">
-                    <h1>SALÃO DE VENDAS</h1>
-                    <p>Gerenciamento de Pátio e Crediário Mensal</p>
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 0 auto; font-family: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <span style="font-size: 2.2rem; background: rgba(156,39,176,0.15); padding: 10px; border-radius: 10px;">👥</span>
+                    <div>
+                        <h1 style="margin: 0; font-size: 1.3rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">SALÃO DE VENDAS</h1>
+                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Gerenciamento de Pátio e Crediário Mensal</p>
+                    </div>
                 </div>
+                <button onclick="abrirPainelFinanciamentos()" style="background: #9333ea; color: #fff; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; transition: background 0.2s;">
+                    💳 Crediário <span style="background: rgba(0,0,0,0.25); padding: 2px 7px; border-radius: 12px; font-size: 0.75rem;">${qtdFinanciamentos}</span>
+                </button>
             </div>
-            <button onclick="abrirPainelFinanciamentos()" style="background: #9c27b0; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                💳 Crediário Mensal (${qtdFinanciamentos})
-            </button>
-        </div>
-        <div class="card" style="text-align: center; padding: 40px;">
-            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">👥</span>
-            <h2>Salão de Vendas Vazio</h2>
-            <p style="color: #aaa; margin-top: 10px;">Você não possui nenhum veículo no pátio para atrair compradores.</p>
+            
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; text-align: center; padding: 50px 30px;">
+                <span style="font-size: 3.5rem; display: block; margin-bottom: 15px; opacity: 0.8;">🏢</span>
+                <h2 style="color: #f4f4f5; margin: 0 0 8px 0; font-size: 1.4rem;">Salão de Vendas Vazio</h2>
+                <p style="color: #a1a1aa; font-size: 0.95rem; margin: 0 auto; max-width: 420px; line-height: 1.5;">Você não possui nenhum veículo no pátio para atrair compradores no momento.</p>
+            </div>
         </div>
         `;
         return;
@@ -92,10 +97,21 @@ function gerarNovoCliente(){
     let tipo = tiposClientes[aleatorio(0, tiposClientes.length - 1)];
     let ofertaInicial = calcularOfertaInicial(carro, tipo.bonus);
 
-    let carroTroca = null;
-    if(Math.random() < 0.28) {
-        carroTroca = gerarCarroAleatorioParaTroca();
-    }
+    let randCred = Math.random();
+    let querParcelar = randCred >= 0.05 && randCred <= 0.20;
+    let parcelasQtd = querParcelar ? 3 : 1;
+
+    let randTroca = Math.random();
+    let temTroca = randTroca >= 0.05 && randTroca <= 0.15;
+    let carroTroca = temTroca ? gerarCarroAleatorioParaTroca() : null;
+
+    let valorParcelaCalc = querParcelar ? Math.round(ofertaInicial / parcelasQtd) : 0;
+
+    let falaInicial = carroTroca 
+        ? `Olá, vi este ${carro.marca || ''} ${carro.modelo || 'Veículo'} e quero negociar. Posso dar meu ${carroTroca.modelo} na troca mais uma volta em dinheiro!`
+        : querParcelar
+            ? `Olá! Gostei muito do ${carro.marca || ''} ${carro.modelo || 'Veículo'}, mas não tenho todo o valor à vista. Posso parcelar com você em ${parcelasQtd}x de R$ ${valorParcelaCalc.toLocaleString("pt-BR")}?`
+            : `Olá, vim dar uma olhada neste ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}. Quanto faz nele?`;
 
     jogo.clienteAtual = {
         nome: nome,
@@ -107,14 +123,13 @@ function gerarNovoCliente(){
         ofertaAtual: ofertaInicial,
         ofertaInicial: ofertaInicial,
         fatorPechincha: 0,
-        jaArgumentou: false, // TRAVA CONTRA FARM DE DINHEIRO INFINITO
+        jaArgumentou: false,
         humor: "Neutro",
+        querParcelar: querParcelar,
+        parcelas: parcelasQtd,
+        valorParcela: valorParcelaCalc,
         carroTroca: carroTroca,
-        historicoDialogo: [
-            carroTroca 
-                ? `Olá, vi este ${carro.marca || ''} ${carro.modelo || 'Veículo'} e quero negociar. Posso dar meu ${carroTroca.modelo} na troca mais uma volta em dinheiro!`
-                : `Olá, vim dar uma olhada neste ${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}. Quanto faz nele?`
-        ]
+        historicoDialogo: [falaInicial]
     };
 
     salvarJogo();
@@ -162,34 +177,37 @@ function mostrarClienteAtual(){
 
     if(!cliente || cliente.semCliente){
         conteudo.innerHTML = `
-        <div class="garagem-header" style="margin-bottom: 15px;">
-            <div class="garagem-titulo">
-                <span class="garagem-icone">👥</span>
-                <div class="garagem-texto-titulo">
-                    <h1>SALÃO DE VENDAS</h1>
-                    <p>Movimento no Pátio</p>
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 900px; margin: 0 auto; font-family: inherit;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <span style="font-size: 2.2rem; background: rgba(156,39,176,0.15); padding: 10px; border-radius: 10px;">👥</span>
+                    <div>
+                        <h1 style="margin: 0; font-size: 1.3rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">SALÃO DE VENDAS</h1>
+                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Movimento no Pátio</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="abrirPainelFinanciamentos()" style="background: #9333ea; color: #fff; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                        💳 Crediário (${qtdFinanciamentos})
+                    </button>
+                    <button onclick="abrirPainelMarketing()" style="background: #eab308; color: #000; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                        📢 Marketing
+                    </button>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="abrirPainelFinanciamentos()" style="background: #9c27b0; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                    💳 Crediário Mensal (${qtdFinanciamentos})
-                </button>
-                <button onclick="abrirPainelMarketing()" style="background: #ffb700; color: #000; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                    📢 Marketing
-                </button>
-            </div>
-        </div>
-        <div class="card" style="text-align: center; padding: 40px;">
-            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">😴</span>
-            <h2>Movimento Fraco no Pátio</h2>
-            <p style="color: #aaa; margin-top: 10px; margin-bottom: 25px;">Nenhum comprador se interessou pelos veículos hoje. Use campanhas de marketing para impulsionar as vendas!</p>
-            <div style="display: flex; justify-content: center; gap: 10px;">
-                <button onclick="proximoDia()" class="btn-leilao-lance" style="max-width: 220px; cursor: pointer;">
-                    ⏭️ Avançar o Dia
-                </button>
-                <button onclick="abrirPainelMarketing()" style="background: #ffb700; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                    📢 Impulsionar Vendas
-                </button>
+
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; text-align: center; padding: 45px 30px;">
+                <span style="font-size: 3.5rem; display: block; margin-bottom: 15px; opacity: 0.8;">😴</span>
+                <h2 style="color: #f4f4f5; margin: 0 0 8px 0; font-size: 1.4rem;">Movimento Fraco no Pátio</h2>
+                <p style="color: #a1a1aa; font-size: 0.95rem; margin: 0 auto 25px auto; max-width: 440px; line-height: 1.5;">Nenhum comprador se interessou pelos veículos hoje. Use campanhas de marketing para impulsionar as vendas!</p>
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button onclick="proximoDia()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; padding: 11px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                        ⏭️ Avançar o Dia
+                    </button>
+                    <button onclick="abrirPainelMarketing()" style="background: #eab308; color: #000; border: none; padding: 11px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                        📢 Impulsionar Vendas
+                    </button>
+                </div>
             </div>
         </div>
         `;
@@ -204,95 +222,119 @@ function mostrarClienteAtual(){
     }
 
     let carro = jogo.carros[cliente.carro];
-    let corHumor = "#00e676";
-    if(cliente.humor === "Desconfiado") corHumor = "#ffb700";
-    if(cliente.humor === "Irritado") corHumor = "#ff5252";
+    let corHumor = "#22c55e";
+    if(cliente.humor === "Desconfiado") corHumor = "#eab308";
+    if(cliente.humor === "Irritado") corHumor = "#ef4444";
 
     let temDefeitos = carro.defeitos && Array.isArray(carro.defeitos) && carro.defeitos.length > 0;
 
+    let botoesAcaoHtml = "";
+    if (cliente.querParcelar) {
+        botoesAcaoHtml = `
+            <button onclick="aceitarPropostaCrediario()" style="background: #eab308; color: #000; border: none; padding: 13px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s;">
+                💳 Aceitar Parcelamento (${cliente.parcelas}x R$ ${cliente.valorParcela.toLocaleString("pt-BR")})
+            </button>
+            <button onclick="exigirPagamentoAVista()" style="background: #22c55e; color: #000; border: none; padding: 13px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s;">
+                💵 Exigir À Vista (R$ ${(cliente.ofertaAtual || 0).toLocaleString("pt-BR")})
+            </button>
+        `;
+    } else {
+        botoesAcaoHtml = `
+            <button onclick="aceitarOferta()" style="background: #22c55e; color: #000; border: none; padding: 13px; border-radius: 8px; font-weight: 600; grid-column: span 2; cursor: pointer; font-size: 0.95rem;">
+                💵 Vender à Vista (R$ ${(cliente.ofertaAtual || 0).toLocaleString("pt-BR")})
+            </button>
+        `;
+    }
+
     let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🤝</span>
-            <div class="garagem-texto-titulo">
-                <h1>MESA DE NEGOCIAÇÃO</h1>
-                <p>Negociando com ${cliente.nome} (${cliente.tipo})</p>
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 960px; margin: 0 auto; font-family: inherit;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.2rem; background: rgba(34,197,94,0.15); padding: 10px; border-radius: 10px;">🤝</span>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.3rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">MESA DE NEGOCIAÇÃO</h1>
+                    <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Negociando com <strong style="color: #f4f4f5;">${cliente.nome}</strong> (${cliente.tipo})</p>
+                </div>
             </div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-            <button onclick="abrirPainelFinanciamentos()" style="background: #9c27b0; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                💳 Crediário (${qtdFinanciamentos})
-            </button>
-            <button onclick="abrirPainelMarketing()" style="background: #ffb700; color: #000; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                📢 Marketing
-            </button>
-        </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 15px;">
-        <div class="card" style="margin: 0;">
-            <h3>🚗 Veículo em Foco</h3>
-            <hr style="border-color: #333; margin: 10px 0;">
-            <p style="font-size: 1.1rem; font-weight: bold; color: #fff;">${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'} (${carro.ano || 'N/D'})</p>
-            <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">🛣️ KM: ${carro.km ? carro.km.toLocaleString("pt-BR") : "0"} | 🎨 Cor: ${carro.cor || "Original"}</p>
-            <p style="color: #aaa; font-size: 0.9rem;">💰 Tabela FIPE: <strong style="color: #00e676;">R$ ${(carro.fipe || 15000).toLocaleString("pt-BR")}</strong></p>
-            
-            ${temDefeitos ? `
-                <div style="margin-top: 12px; background: rgba(255,82,82,0.1); border: 1px solid #ff5252; padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 0.8rem; color: #ff5252; font-weight: bold;">⚠️ Defeitos Relatados:</span>
-                    <ul style="margin: 5px 0 0 15px; font-size: 0.8rem; color: #ff8a80;">
-                        ${carro.defeitos.map(d => `<li>${d.nome || d}</li>`).join('')}
-                    </ul>
-                </div>
-            ` : `<div style="margin-top: 12px; background: rgba(0,230,118,0.1); border: 1px solid #00e676; padding: 8px; border-radius: 6px; font-size: 0.8rem; color: #00e676; font-weight: bold;">✅ Veículo íntegro e pronto para venda!</div>`}
-
-            ${cliente.carroTroca ? `
-                <div style="margin-top: 12px; background: rgba(33,150,243,0.1); border: 1px solid #2196F3; padding: 8px; border-radius: 6px;">
-                    <span style="font-size: 0.8rem; color: #2196F3; font-weight: bold;">🔄 Proposta de Troca (Trade-in):</span>
-                    <p style="font-size: 0.85rem; color: #fff; margin-top: 4px;">Dá o ${cliente.carroTroca.marca} ${cliente.carroTroca.modelo} (${cliente.carroTroca.ano}) avaliado em R$ ${cliente.carroTroca.fipe.toLocaleString("pt-BR")} na troca!</p>
-                </div>
-            ` : ''}
-
-            <div style="margin-top: 20px;">
-                <button onclick="abrirSeletorTrocaCarro()" style="width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
-                    🔄 Oferecer Outro Carro do Pátio
+            <div style="display: flex; gap: 10px;">
+                <button onclick="abrirPainelFinanciamentos()" style="background: #9333ea; color: #fff; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                    💳 Crediário (${qtdFinanciamentos})
+                </button>
+                <button onclick="abrirPainelMarketing()" style="background: #eab308; color: #000; border: none; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                    📢 Marketing
                 </button>
             </div>
         </div>
 
-        <div class="card" style="margin: 0; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-size: 0.85rem; color: #888; text-transform: uppercase;">Perfil: ${cliente.descricaoTipo}</span>
-                    <span style="font-size: 0.85rem; font-weight: bold; color: ${corHumor};">Humor: ${cliente.humor}</span>
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; align-items: start;">
+            <!-- CARD DO VEÍCULO -->
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #71717a; font-weight: 700;">Veículo em Foco</span>
+                    <h3 style="margin: 4px 0 0 0; font-size: 1.15rem; color: #f4f4f5; font-weight: 600;">${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'} <span style="color: #a1a1aa; font-weight: 400;">(${carro.ano || 'N/D'})</span></h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #09090b; padding: 12px; border-radius: 8px; border: 1px solid #27272a;">
+                    <div>
+                        <span style="font-size: 0.75rem; color: #71717a; display: block;">Quilometragem</span>
+                        <strong style="color: #f4f4f5; font-size: 0.9rem;">🛣️ ${carro.km ? carro.km.toLocaleString("pt-BR") + " km" : "0 km"}</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.75rem; color: #71717a; display: block;">Cor</span>
+                        <strong style="color: #f4f4f5; font-size: 0.9rem;">🎨 ${carro.cor || "Original"}</strong>
+                    </div>
                 </div>
 
-                <div style="background: #121212; border: 1px solid #333; padding: 12px; border-radius: 8px; min-height: 90px; max-height: 120px; overflow-y: auto; margin-bottom: 15px;">
-                    ${Array.isArray(cliente.historicoDialogo) ? cliente.historicoDialogo.map(msg => `<p style="font-size: 0.9rem; color: #ddd; margin-bottom: 6px;">💬 ${msg}</p>`).join('') : ''}
+                <div style="background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: #a1a1aa;">Valor Tabela FIPE:</span>
+                    <strong style="color: #22c55e; font-size: 1.05rem;">R$ ${(carro.fipe || 15000).toLocaleString("pt-BR")}</strong>
                 </div>
+                
+                ${temDefeitos ? `
+                    <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); padding: 12px; border-radius: 8px;">
+                        <span style="font-size: 0.8rem; color: #ef4444; font-weight: 700; display: block; margin-bottom: 4px;">⚠️ Defeitos Relatados:</span>
+                        <ul style="margin: 0 0 0 16px; padding: 0; font-size: 0.82rem; color: #fca5a5;">
+                            ${carro.defeitos.map(d => `<li style="margin-bottom: 2px;">${d.nome || d}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : `
+                    <div style="background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); padding: 12px; border-radius: 8px; font-size: 0.82rem; color: #22c55e; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                        ✅ Veículo íntegro e pronto para venda!
+                    </div>
+                `}
 
-                <div style="text-align: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid #222;">
-                    <span style="font-size: 0.75rem; color: #aaa; text-transform: uppercase; display: block;">Oferta Atual da Mesa</span>
-                    <h1 style="color: #00e676; font-size: 2rem; margin: 5px 0;">R$ ${(cliente.ofertaAtual || 0).toLocaleString("pt-BR")}</h1>
-                </div>
+                ${cliente.carroTroca ? `
+                    <div style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.25); padding: 12px; border-radius: 8px;">
+                        <span style="font-size: 0.8rem; color: #3b82f6; font-weight: 700; display: block; margin-bottom: 4px;">🔄 Proposta de Troca (Trade-in):</span>
+                        <p style="font-size: 0.85rem; color: #f4f4f5; margin: 0; line-height: 1.4;">Dá o ${cliente.carroTroca.marca} ${cliente.carroTroca.modelo} (${cliente.carroTroca.ano}) avaliado em <strong style="color: #3b82f6;">R$ ${cliente.carroTroca.fipe.toLocaleString("pt-BR")}</strong> na troca!</p>
+                    </div>
+                ` : ''}
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
-                <button onclick="aceitarOferta()" style="background: #00e676; color: #000; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
-                    💵 Vender à Vista
-                </button>
-                <button onclick="abrirModalFinanciamento()" style="background: #9c27b0; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">
-                    💳 Crediário Mensal
-                </button>
-                <button onclick="abrirModalNegociacaoAvancada()" style="background: #ffb700; color: #000; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">
-                    💬 Contraproposta
-                </button>
-                <button onclick="tentarPressaoPsicologica()" style="background: ${cliente.jaArgumentou ? '#444' : '#2196F3'}; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;" ${cliente.jaArgumentou ? 'title="Você já usou este argumento com este cliente!"' : ''}>
-                    🧠 Argumentar ${cliente.jaArgumentou ? '(Usado)' : ''}
-                </button>
-                <button onclick="recusarOferta()" style="background: #ff5252; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; grid-column: span 2; cursor: pointer; font-size: 0.8rem;">
-                    ❌ Mandar o Cliente Embora
-                </button>
+            <!-- CARD DA MESA DE NEGOCIAÇÃO E DIÁLOGO -->
+            <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; color: #a1a1aa; text-transform: uppercase; font-weight: 600;">Perfil: ${cliente.descricaoTipo}</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: ${corHumor}; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 6px; border: 1px solid #27272a;">Humor: ${cliente.humor}</span>
+                    </div>
+
+                    <div style="background: #09090b; border: 1px solid #27272a; padding: 12px; border-radius: 8px; min-height: 100px; max-height: 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px;">
+                        ${Array.isArray(cliente.historicoDialogo) ? cliente.historicoDialogo.map(msg => `<p style="font-size: 0.87rem; color: #d4d4d8; margin: 0; line-height: 1.4;">💬 ${msg}</p>`).join('') : ''}
+                    </div>
+
+                    <div style="text-align: center; background: #09090b; padding: 14px; border-radius: 8px; border: 1px solid #27272a;">
+                        <span style="font-size: 0.72rem; color: #a1a1aa; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 2px;">Oferta Atual da Mesa</span>
+                        <h2 style="color: #22c55e; font-size: 1.8rem; margin: 0; font-weight: 700;">R$ ${(cliente.ofertaAtual || 0).toLocaleString("pt-BR")}</h2>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    ${botoesAcaoHtml}
+                    <button onclick="recusarOferta()" style="background: #27272a; color: #ef4444; border: 1px solid #3f3f46; padding: 11px; border-radius: 8px; font-weight: 600; grid-column: span 2; cursor: pointer; font-size: 0.82rem; transition: background 0.2s;">
+                        ❌ Mandar o Cliente Embora / Recusar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -302,39 +344,148 @@ function mostrarClienteAtual(){
 }
 
 // ===========================================
-// PAINEL DE CREDIÁRIO MENSAL & CENTRAL DE COBRANÇA
+// VENDAS À VISTA E CREDIÁRIO
+// ===========================================
+
+function aceitarOferta(){
+    let cliente = jogo.clienteAtual;
+    if(!cliente) return;
+
+    let valorFinal = cliente.ofertaAtual || 0;
+    
+    jogo.dinheiro = (jogo.dinheiro || 0) + valorFinal;
+    
+    if(cliente.carroTroca) {
+        if(!jogo.carros) jogo.carros = [];
+        jogo.carros.push(cliente.carroTroca);
+    }
+
+    jogo.carros.splice(cliente.carro, 1);
+    jogo.clienteAtual = null;
+
+    if(typeof tocarSomDinheiro === "function") tocarSomDinheiro();
+    
+    mostrarAlerta("🎉 VENDA CONCLUÍDA!", `Você vendeu o veículo à vista por R$ ${valorFinal.toLocaleString("pt-BR")}! O dinheiro já entrou na sua conta.`);
+    
+    if(typeof atualizarPainel === "function") atualizarPainel();
+    salvarJogo();
+    mostrarClientes();
+}
+
+function aceitarPropostaCrediario(){
+    let cliente = jogo.clienteAtual;
+    if(!cliente) return;
+
+    if(!jogo.financiamentosAtivos) jogo.financiamentosAtivos = [];
+    let carroVendido = jogo.carros[cliente.carro];
+
+    let novoContrato = {
+        clienteNome: cliente.nome,
+        carroModelo: `${carroVendido.marca || ''} ${carroVendido.modelo || 'Veículo'}`,
+        carroObjeto: carroVendido,
+        parcelaMensal: cliente.valorParcela,
+        totalMeses: cliente.parcelas,
+        mesesRestantes: cliente.parcelas,
+        mesesAtraso: 0,
+        diaVencimento: ((jogo.dia || 1) % 30) + 1,
+        dataVenda: `Dia ${jogo.dia || 1}`
+    };
+
+    jogo.financiamentosAtivos.push(novoContrato);
+
+    if(cliente.carroTroca) {
+        if(!jogo.carros) jogo.carros = [];
+        jogo.carros.push(cliente.carroTroca);
+    }
+
+    jogo.carros.splice(cliente.carro, 1);
+    jogo.clienteAtual = null;
+
+    if(typeof tocarSomDinheiro === "function") tocarSomDinheiro();
+
+    mostrarAlerta("💳 CREDIÁRIO FECHADO!", `Negócio fechado com ${cliente.nome} em ${cliente.parcelas}x de R$ ${cliente.valorParcela.toLocaleString("pt-BR")}!`);
+
+    if(typeof atualizarPainel === "function") atualizarPainel();
+    salvarJogo();
+    mostrarClientes();
+}
+
+function exigirPagamentoAVista(){
+    let cliente = jogo.clienteAtual;
+    if(!cliente) return;
+
+    if(Math.random() > 0.5){
+        cliente.querParcelar = false;
+        mostrarAlerta("💵 Negociação Alterada", `${cliente.nome} aceitou pagar à vista!`);
+        mostrarClienteAtual();
+    } else {
+        mostrarAlerta("❌ Recusou", `${cliente.nome} disse que não tem o valor integral à vista e foi embora.`);
+        jogo.clienteAtual = null;
+        salvarJogo();
+        mostrarClientes();
+    }
+}
+
+function recusarOferta(){
+    jogo.clienteAtual = null;
+    salvarJogo();
+    mostrarClientes();
+}
+
+// ===========================================
+// PAINEL DE CREDIÁRIO & SISTEMA DE COBRANÇA
 // ===========================================
 function abrirPainelFinanciamentos(){
     let financiamentos = jogo.financiamentosAtivos || [];
 
     let listaHtml = "";
     if(financiamentos.length === 0) {
-        listaHtml = `<p style="color: #aaa; text-align: center; padding: 25px;">Nenhum contrato de crediário mensal ativo no momento.</p>`;
+        listaHtml = `<p style="color: #a1a1aa; text-align: center; padding: 35px; font-size: 0.95rem; margin: 0;">Nenhum contrato de crediário mensal ativo no momento.</p>`;
     } else {
         listaHtml = financiamentos.map((f, idx) => {
-            let parcelaAtualNum = (f.totalMeses - f.mesesRestantes) + 1;
-            if (parcelaAtualNum > f.totalMeses) parcelaAtualNum = f.totalMeses;
-            let formatoParcela = `${String(parcelaAtualNum).padStart(2, '0')}/${String(f.totalMeses).padStart(2, '0')}`;
+            let parcelasPagas = f.totalMeses - f.mesesRestantes;
+            let formatoParcela = `${String(parcelasPagas).padStart(2, '0')}/${String(f.totalMeses).padStart(2, '0')}`;
+            let atraso = f.mesesAtraso || 0;
 
-            let estaInadimplente = f.mesesAtraso >= 2;
+            let podeCobrar = atraso >= 2;
+            let statusBadge = "";
+            let corBorda = "#27272a";
+            
+            if (atraso === 0) {
+                statusBadge = `<span style="color: #22c55e; font-weight: 600; font-size: 0.8rem; background: rgba(34,197,94,0.1); padding: 2px 8px; border-radius: 4px;">Em Dia</span>`;
+            } else if (atraso === 1) {
+                statusBadge = `<span style="color: #eab308; font-weight: 600; font-size: 0.8rem; background: rgba(234,179,8,0.1); padding: 2px 8px; border-radius: 4px;">1 Mês Atrasado</span>`;
+                corBorda = "#eab308";
+            } else {
+                statusBadge = `<span style="color: #ef4444; font-weight: 600; font-size: 0.8rem; background: rgba(239,68,68,0.1); padding: 2px 8px; border-radius: 4px;">${atraso} Meses Atrasados</span>`;
+                corBorda = "#ef4444";
+            }
 
             return `
-            <div style="background: #1e1e1e; border: 1px solid ${estaInadimplente ? '#ff5252' : '#333'}; padding: 12px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong>👤 ${f.clienteNome}</strong><br>
-                    <small style="color: #aaa;">Carro: ${f.carroModelo} | Vencimento dia <strong>${f.diaVencimento}</strong></small><br>
-                    <small style="color: ${f.mesesAtraso > 0 ? '#ff5252' : '#00e676'};">
-                        Parcela: ${formatoParcela} (R$ ${f.parcelaMensal.toLocaleString("pt-BR")}) 
-                        ${f.mesesAtraso > 0 ? `(⚠️ Atrasado ${f.mesesAtraso}m - Faltam ${f.mesesRestantes} parcelas)` : `(Faltam ${f.mesesRestantes} parcelas)`}
-                    </small>
+            <div style="background: #09090b; border: 1px solid ${corBorda}; padding: 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <strong style="color: #f4f4f5; font-size: 0.95rem;">👤 ${f.clienteNome}</strong>
+                        ${statusBadge}
+                    </div>
+                    <span style="color: #a1a1aa; font-size: 0.83rem;">Carro: <strong style="color: #d4d4d8;">${f.carroModelo}</strong> | Vencimento: Dia <strong>${f.diaVencimento}</strong></span>
+                    <span style="color: #d4d4d8; font-size: 0.83rem;">
+                        Parcelas Pagas: <strong>${formatoParcela}</strong> | Valor Parcela: <strong style="color: #22c55e;">R$ ${(f.parcelaMensal || 0).toLocaleString("pt-BR")}</strong>
+                    </span>
                 </div>
-                <div style="display: flex; gap: 6px;">
-                    <button onclick="abrirCentralCobranca(${idx})" style="background: ${estaInadimplente ? '#ff9800' : '#2196F3'}; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">
-                        📞 Ligar / Cobrar
-                    </button>
-                    ${estaInadimplente ? `
-                        <button onclick="apreenderVeiculoInadimplente(${idx})" style="background: #ff5252; color: #fff; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold;">🚨 Apreender</button>
-                    ` : ''}
+                <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+                    ${podeCobrar ? `
+                        <button onclick="abrirCentralCobranca(${idx})" style="background: #f97316; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                            📞 Cobrar
+                        </button>
+                        <button onclick="apreenderVeiculoInadimplente(${idx})" style="background: #ef4444; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                            🚨 Guincho
+                        </button>
+                    ` : `
+                        <button disabled style="background: #27272a; color: #71717a; border: 1px solid #3f3f46; padding: 8px 12px; border-radius: 6px; cursor: not-allowed; font-size: 0.78rem; font-weight: 600;" title="Opção liberada somente após 2 meses de atraso">
+                            🔒 Cobrar (Mín. 2 Atrasos)
+                        </button>
+                    `}
                 </div>
             </div>
         `;
@@ -342,30 +493,34 @@ function abrirPainelFinanciamentos(){
     }
 
     conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">💳</span>
-            <div class="garagem-texto-titulo">
-                <h1>CREDIÁRIO MENSAL (FLUXO DE CAIXA)</h1>
-                <p>Recebimentos e controle de inadimplência</p>
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 900px; margin: 0 auto; font-family: inherit;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.2rem; background: rgba(147,51,234,0.15); padding: 10px; border-radius: 10px;">💳</span>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.3rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">CREDIÁRIO MENSAL</h1>
+                    <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Acompanhe pagamentos e gerencie contratos ativos</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card">
-        <h3>Contratos de Parcelamento Ativos</h3>
-        <hr style="border-color: #333; margin: 10px 0;">
-        <div style="max-height: 380px; overflow-y: auto;">
-            ${listaHtml}
-        </div>
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="mostrarClientes()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Voltar ao Salão de Vendas</button>
+        
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <h3 style="margin: 0; font-size: 1.05rem; color: #f4f4f5; font-weight: 600;">Contratos de Parcelamento Ativos</h3>
+            
+            <div style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px;">
+                ${listaHtml}
+            </div>
+            
+            <div style="margin-top: 5px; text-align: center; border-top: 1px solid #27272a; padding-top: 15px;">
+                <button onclick="mostrarClientes()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; padding: 9px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">← Voltar ao Salão de Vendas</button>
+            </div>
         </div>
     </div>
     `;
 }
 
 // ===========================================
-// CENTRAL DE RENEGOCIAÇÃO E LIGAÇÃO TELEFÔNICA
+// CENTRAL DE COBRANÇA
 // ===========================================
 function abrirCentralCobranca(index){
     let f = jogo.financiamentosAtivos[index];
@@ -373,46 +528,43 @@ function abrirCentralCobranca(index){
 
     if(typeof tocarSomTelefone === "function") tocarSomTelefone();
 
-    let statusTexto = f.mesesAtraso > 0 
-        ? `<span style="color: #ff5252;">⚠️ Cliente com ${f.mesesAtraso} mês(es) de atraso na praça!</span>` 
-        : `<span style="color: #00e676;">✅ Cliente em dia com os pagamentos.</span>`;
-
     conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">📞</span>
-            <div class="garagem-texto-titulo">
-                <h1>CENTRAL DE COBRANÇA TELEFÔNICA</h1>
-                <p>Em chamada com ${f.clienteNome} (${f.carroModelo})</p>
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 650px; margin: 0 auto; font-family: inherit;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.2rem; background: rgba(249,115,22,0.15); padding: 10px; border-radius: 10px;">📞</span>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.25rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">CENTRAL DE COBRANÇA</h1>
+                    <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Em ligação com <strong style="color: #f4f4f5;">${f.clienteNome}</strong> (${f.carroModelo})</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card">
-        <h3>Detalhes do Contrato</h3>
-        <p style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">${statusTexto}</p>
-        <p style="color: #ddd; font-size: 0.9rem; margin-top: 5px;">Valor da Parcela: <strong>R$ ${f.parcelaMensal.toLocaleString("pt-BR")}</strong> | Vencimento Dia: <strong>${f.diaVencimento}</strong> | Restam: <strong>${f.mesesRestantes} parcelas</strong></p>
-        <hr style="border-color: #333; margin: 15px 0;">
 
-        <h4 style="color: #fff; margin-bottom: 10px;">O que você deseja dizer ao cliente?</h4>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button onclick="executarAcaoCobranca(${index}, 'amigavel')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #00e676;">🤝 Cobrança Amigável / Lembrete</strong><br>
-                <small style="color: #aaa;">Lembra o cliente educadamente da parcela. Baixo risco de atrito.</small>
-            </button>
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); padding: 14px; border-radius: 8px;">
+                <h3 style="color: #ef4444; margin: 0 0 6px 0; font-size: 1rem; font-weight: 700;">⚠️ Parcela Atrasada em ${f.mesesAtraso} Meses!</h3>
+                <p style="color: #d4d4d8; font-size: 0.87rem; margin: 0; line-height: 1.4;">
+                    Valor por Parcela: <strong style="color: #22c55e;">R$ ${(f.parcelaMensal || 0).toLocaleString("pt-BR")}</strong> | Restam: <strong>${f.mesesRestantes} parcelas</strong>
+                </p>
+            </div>
 
-            <button onclick="executarAcaoCobranca(${index}, 'renegociar')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ffb700;">🔄 Propor Renegociação / Esticar Prazo</strong><br>
-                <small style="color: #aaa;">Alonga o contrato em +2 meses para dar respiro financeiro ao cliente.</small>
-            </button>
+            <h4 style="color: #f4f4f5; margin: 0; font-size: 0.95rem; font-weight: 600;">Escolha a abordagem para a cobrança:</h4>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="executarAcaoCobranca(${index}, 'cobrar')" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 14px; border-radius: 8px; text-align: left; cursor: pointer; transition: border-color 0.2s;">
+                    <strong style="color: #22c55e; font-size: 0.95rem; display: block; margin-bottom: 2px;">💵 Exigir Pagamento Imediato</strong>
+                    <span style="color: #a1a1aa; font-size: 0.83rem; display: block;">Pressiona o cliente a quitar ao menos 1 parcela pendente na hora.</span>
+                </button>
 
-            <button onclick="executarAcaoCobranca(${index}, 'ultimato')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ff5252;">⚠️ Dar Ultimato Rígido</strong><br>
-                <small style="color: #aaa;">Ameaça acionar o jurídico/guincho. Pode pagar na hora ou se irritar profundamente.</small>
-            </button>
-        </div>
+                <button onclick="executarAcaoCobranca(${index}, 'renegociar')" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 14px; border-radius: 8px; text-align: left; cursor: pointer; transition: border-color 0.2s;">
+                    <strong style="color: #eab308; font-size: 0.95rem; display: block; margin-bottom: 2px;">🔄 Prolongar Contrato (+2 Meses)</strong>
+                    <span style="color: #a1a1aa; font-size: 0.83rem; display: block;">Reduz o valor da parcela mensal recalculando o saldo e limpa o nome do cliente.</span>
+                </button>
+            </div>
 
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="abrirPainelFinanciamentos()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Desligar Telefone</button>
+            <div style="margin-top: 5px; text-align: center; border-top: 1px solid #27272a; padding-top: 15px;">
+                <button onclick="abrirPainelFinanciamentos()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; padding: 9px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">📞 Desligar / Voltar</button>
+            </div>
         </div>
     </div>
     `;
@@ -422,27 +574,29 @@ function executarAcaoCobranca(index, acao){
     let f = jogo.financiamentosAtivos[index];
     if(!f) return;
 
-    if(acao === 'amigavel'){
-        mostrarAlerta("📞 Chamada Concluída", `${f.clienteNome} foi atencioso, pediu desculpas pelo transtorno e prometeu regularizar.`);
-    } else if(acao === 'renegociar'){
-        f.mesesRestantes += 2;
-        f.parcelaMensal = Math.max(500, Math.floor(f.parcelaMensal * 0.85));
-        if(f.mesesAtraso > 0) f.mesesAtraso = 0;
-        salvarJogo();
-        mostrarAlerta("🤝 Acordo Fechado!", `${f.clienteNome} aceitou a renegociação! Prazo esticado e parcela ajustada para aliviar o orçamento dele.`);
-    } else if(acao === 'ultimato'){
-        if(Math.random() < 0.5){
-            f.mesesAtraso = 0;
+    if(acao === 'cobrar'){
+        if(Math.random() < 0.65){
+            f.mesesAtraso = Math.max(0, f.mesesAtraso - 1);
+            f.mesesRestantes--;
             jogo.dinheiro = (jogo.dinheiro || 0) + f.parcelaMensal;
             if(typeof tocarSomDinheiro === "function") tocarSomDinheiro();
-            mostrarAlerta("💰 Pagamento Efetuado sob Pressão!", `${f.clienteNome} se assustou com o tom firme, correu e transferiu a parcela atual!`);
+            mostrarAlerta("💰 PAGAMENTO RECEBIDO!", `${f.clienteNome} se desculpou e realizou o pagamento de 1 parcela atrasada (R$ ${f.parcelaMensal.toLocaleString("pt-BR")}).`);
         } else {
-            f.mesesAtraso++;
-            mostrarAlerta("😡 Cliente Revoltado", `${f.clienteNome} odiou a ameaça, bateu boca com você e desligou o telefone na sua cara!`);
+            mostrarAlerta("❌ Não Pagou", `${f.clienteNome} inventou uma desculpa e disse que não tem dinheiro essa semana.`);
         }
-        salvarJogo();
+    } else if(acao === 'renegociar'){
+        let saldoDevedorRestante = f.mesesRestantes * f.parcelaMensal;
+        f.mesesRestantes += 2;
+        f.totalMeses += 2;
+        
+        f.parcelaMensal = Math.max(150, Math.floor(saldoDevedorRestante / f.mesesRestantes));
+        f.mesesAtraso = 0;
+        
+        mostrarAlerta("🤝 Contrato Renegociado", `Prazo estendido em 2 meses!\nSaldo de R$ ${saldoDevedorRestante.toLocaleString("pt-BR")} recalculado em ${f.mesesRestantes}x de R$ ${f.parcelaMensal.toLocaleString("pt-BR")}.`);
     }
 
+    salvarJogo();
+    if(typeof atualizarPainel === "function") atualizarPainel();
     abrirPainelFinanciamentos();
 }
 
@@ -451,24 +605,26 @@ function apreenderVeiculoInadimplente(index){
     if(!f) return;
 
     if(!jogo.carros) jogo.carros = [];
-    jogo.carros.push(f.carroObjeto);
+    if(f.carroObjeto) {
+        jogo.carros.push(f.carroObjeto);
+    }
 
     jogo.financiamentosAtivos.splice(index, 1);
     
     if(typeof tocarSomGuincho === "function") tocarSomGuincho();
-    else if(typeof tocarSomCompra === "function") tocarSomCompra();
 
     salvarJogo();
+    if(typeof atualizarPainel === "function") atualizarPainel();
 
     mostrarAlerta(
         "🚨 VEÍCULO APREENDIDO!",
-        `Você acionou o guincho e tomou de volta o ${f.carroModelo} de ${f.clienteNome} por inadimplência crônica!\n\nO veículo retornou para o seu pátio.`
+        `O guincho buscou o veículo de ${f.clienteNome} devido às parcelas atrasadas.\n\nO carro voltou para o pátio da sua garagem.`
     );
     abrirPainelFinanciamentos();
 }
 
 // ===========================================
-// PROCESSAMENTO DIÁRIO DAS PARCELAS (COM ESCOLHA DE DIA)
+// MOTOR DO PROCESSAMENTO DIÁRIO DAS PARCELAS
 // ===========================================
 function processarParcelasDiarias(){
     if(!jogo.financiamentosAtivos || jogo.financiamentosAtivos.length === 0) return;
@@ -477,45 +633,53 @@ function processarParcelasDiarias(){
     let diaDoMes = ((diaAtual - 1) % 30) + 1;
 
     let totalRecebidoHoje = 0;
-    let relatorioPagamentos = [];
-    let contratosFinalizados = [];
+    let mensagensPagamento = [];
+    let indicesParaRemover = [];
 
-    jogo.financiamentosAtivos.forEach((contrato, index) => {
-        if(contrato.diaVencimento === diaDoMes) {
-            if(Math.random() < contrato.taxaRisco) {
-                contrato.mesesAtraso = (contrato.mesesAtraso || 0) + 1;
+    jogo.financiamentosAtivos.forEach((f, idx) => {
+        if(f.diaVencimento === diaDoMes){
+            let vaiAtrasar = Math.random() < 0.20;
+
+            if(vaiAtrasar){
+                f.mesesAtraso = (f.mesesAtraso || 0) + 1;
             } else {
-                totalRecebidoHoje += contrato.parcelaMensal;
-                contrato.mesesRestantes--;
-                if(contrato.mesesAtraso > 0) contrato.mesesAtraso--; 
+                totalRecebidoHoje += f.parcelaMensal;
+                f.mesesRestantes--;
+                
+                let numParcelaPaga = f.totalMeses - f.mesesRestantes;
+                mensagensPagamento.push(`💳 <strong>${f.clienteNome}</strong> pagou a parcela ${numParcelaPaga}/${f.totalMeses} (R$ ${f.parcelaMensal.toLocaleString("pt-BR")}) do ${f.carroModelo}`);
 
-                let parcelaAtualNum = (contrato.totalMeses - contrato.mesesRestantes);
-                relatorioPagamentos.push(`💳 ${contrato.clienteNome} pagou a parcela ${String(parcelaAtualNum).padStart(2, '0')}/${String(contrato.totalMeses).padStart(2, '0')}: R$ ${contrato.parcelaMensal.toLocaleString("pt-BR")}`);
-            }
+                if (f.mesesAtraso > 0) f.mesesAtraso--;
 
-            if(contrato.mesesRestantes <= 0) {
-                contratosFinalizados.push(index);
+                if(f.mesesRestantes <= 0){
+                    indicesParaRemover.push(idx);
+                    mensagensPagamento.push(`🎉 <strong>CONTRATO QUITADO:</strong> ${f.clienteNome} terminou de pagar o ${f.carroModelo}!`);
+                }
             }
         }
     });
 
-    contratosFinalizados.reverse().forEach(idx => {
-        jogo.financiamentosAtivos.splice(idx, 1);
+    indicesParaRemover.reverse().forEach(i => {
+        jogo.financiamentosAtivos.splice(i, 1);
     });
 
-    if(totalRecebidoHoje > 0) {
+    if(totalRecebidoHoje > 0){
         jogo.dinheiro = (jogo.dinheiro || 0) + totalRecebidoHoje;
         if(typeof tocarSomDinheiro === "function") tocarSomDinheiro();
-    }
-
-    if(relatorioPagamentos.length > 0){
+        
         mostrarAlerta(
-            "💳 ENTRADA DE CREDIÁRIO",
-            relatorioPagamentos.join("<br>") + `<br><br><strong>Total creditado hoje: R$ ${totalRecebidoHoje.toLocaleString("pt-BR")}</strong>`
+            "💵 PARCELAS RECEBIDAS HOJE!",
+            mensagensPagamento.join("<br>") + `<br><br><strong style="color: #22c55e;">Total Depositado na Conta: R$ ${totalRecebidoHoje.toLocaleString("pt-BR")}</strong>`
         );
     }
 
+    if(typeof atualizarPainel === "function") atualizarPainel();
     salvarJogo();
+
+    let divPainel = document.querySelector(".garagem-texto-titulo h1");
+    if (divPainel && divPainel.innerText.includes("CREDIÁRIO MENSAL")) {
+        abrirPainelFinanciamentos();
+    }
 }
 
 if (typeof window.proximoDia === 'function' && !window._proximoDiaFinanciamentoDiarioHooked) {
@@ -528,42 +692,44 @@ if (typeof window.proximoDia === 'function' && !window._proximoDiaFinanciamentoD
 }
 
 // ===========================================
-// PAINEL DE MARKETING E IMPULSO DE VENDAS
+// PAINEL DE MARKETING
 // ===========================================
 function abrirPainelMarketing(){
     conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">📢</span>
-            <div class="garagem-texto-titulo">
-                <h1>CAMPANHAS DE MARKETING</h1>
-                <p>Atraia compradores qualificados instantaneamente</p>
+    <div style="display: flex; flex-direction: column; gap: 16px; max-width: 650px; margin: 0 auto; font-family: inherit;">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #18181b; border: 1px solid #27272a; padding: 16px 20px; border-radius: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 2.2rem; background: rgba(234,179,8,0.15); padding: 10px; border-radius: 10px;">📢</span>
+                <div>
+                    <h1 style="margin: 0; font-size: 1.25rem; color: #f4f4f5; font-weight: 700; letter-spacing: 0.5px;">CAMPANHAS DE MARKETING</h1>
+                    <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #a1a1aa;">Atraia compradores qualificados instantaneamente</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card">
-        <h3>Escolha a Estratégia de Divulgação:</h3>
-        <hr style="border-color: #333; margin: 10px 0;">
 
-        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-            <button onclick="executarMarketing(350, 'panfletos')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #00e676;">📄 Panfletos na Região (Custo: R$ 350)</strong><br>
-                <small style="color: #aaa;">Atrai clientes comuns e compradores focados em carros populares.</small>
-            </button>
+        <div style="background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <h3 style="margin: 0; font-size: 1.05rem; color: #f4f4f5; font-weight: 600;">Escolha a Estratégia de Divulgação:</h3>
 
-            <button onclick="executarMarketing(1500, 'redes')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ffb700;">🌐 Anúncio patrocinado online (Custo: R$ 1.500)</strong><br>
-                <small style="color: #aaa;">Atrai colecionadores e entusiastas dispostos a pagar mais caro.</small>
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="executarMarketing(350, 'panfletos')" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 14px; border-radius: 8px; text-align: left; cursor: pointer; transition: border-color 0.2s;">
+                    <strong style="color: #22c55e; font-size: 0.95rem; display: block; margin-bottom: 2px;">📄 Panfletos na Região (Custo: R$ 350)</strong>
+                    <span style="color: #a1a1aa; font-size: 0.83rem; display: block;">Atrai clientes comuns e compradores focados em carros populares.</span>
+                </button>
 
-            <button onclick="executarMarketing(4500, 'feirao')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ff5252;">🎪 Feirão Relâmpago de Garagem (Custo: R$ 4.500)</strong><br>
-                <small style="color: #aaa;">Gera fluxo massivo de compradores imediatos na hora!</small>
-            </button>
-        </div>
+                <button onclick="executarMarketing(1500, 'redes')" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 14px; border-radius: 8px; text-align: left; cursor: pointer; transition: border-color 0.2s;">
+                    <strong style="color: #eab308; font-size: 0.95rem; display: block; margin-bottom: 2px;">🌐 Anúncio patrocinado online (Custo: R$ 1.500)</strong>
+                    <span style="color: #a1a1aa; font-size: 0.83rem; display: block;">Atrai colecionadores e entusiastas dispostos a pagar mais caro.</span>
+                </button>
 
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="mostrarClientes()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Voltar</button>
+                <button onclick="executarMarketing(4500, 'feirao')" style="background: #09090b; border: 1px solid #27272a; color: #fff; padding: 14px; border-radius: 8px; text-align: left; cursor: pointer; transition: border-color 0.2s;">
+                    <strong style="color: #ef4444; font-size: 0.95rem; display: block; margin-bottom: 2px;">🎪 Feirão Relâmpago de Garagem (Custo: R$ 4.500)</strong>
+                    <span style="color: #a1a1aa; font-size: 0.83rem; display: block;">Gera fluxo massivo de compradores imediatos na hora!</span>
+                </button>
+            </div>
+
+            <div style="margin-top: 5px; text-align: center; border-top: 1px solid #27272a; padding-top: 15px;">
+                <button onclick="mostrarClientes()" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; padding: 9px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">← Voltar</button>
+            </div>
         </div>
     </div>
     `;
@@ -594,411 +760,4 @@ function executarMarketing(custo, tipo){
     if (typeof atualizarPainel === 'function') atualizarPainel();
     salvarJogo();
     mostrarClientes();
-}
-
-// ===========================================
-// MODAL DE CREDIÁRIO MENSAL (PLANOS)
-// ===========================================
-function abrirModalFinanciamento(){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-    let valorTotal = cliente.ofertaAtual;
-
-    conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">💳</span>
-            <div class="garagem-texto-titulo">
-                <h1>PLANOS DE CREDIÁRIO MENSAL</h1>
-                <p>Ofereça parcelamento mensal para ${cliente.nome}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Escolha o Plano Mensal:</h3>
-        <p style="color: #aaa; font-size: 0.85rem; margin-top: 5px;">Valor total da negociação: <strong style="color: #00e676;">R$ ${valorTotal.toLocaleString("pt-BR")}</strong></p>
-        <hr style="border-color: #333; margin: 12px 0;">
-
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button onclick="abrirSeletorDiaVencimento(3, 0.10)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #00e676;">3 Meses (Juros totais de 10%)</strong><br>
-                <small style="color: #aaa;">Entrada + 3 parcelas mensais. Risco baixo.</small>
-            </button>
-
-            <button onclick="abrirSeletorDiaVencimento(6, 0.22)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ffb700;">6 Meses (Juros totais de 22%)</strong><br>
-                <small style="color: #aaa;">Entrada + 6 parcelas mensais. Risco moderado.</small>
-            </button>
-
-            <button onclick="abrirSeletorDiaVencimento(12, 0.45)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ff5252;">12 Meses (Juros totais de 45%)</strong><br>
-                <small style="color: #aaa;">Entrada + 12 parcelas mensais. Alto retorno, risco alto de inadimplência.</small>
-            </button>
-        </div>
-
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="mostrarClienteAtual()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Voltar à Mesa</button>
-        </div>
-    </div>
-    `;
-}
-
-// ===========================================
-// SELETOR DO MELHOR DIA DE VENCIMENTO
-// ===========================================
-function abrirSeletorDiaVencimento(meses, taxaJuros){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-
-    conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">📅</span>
-            <div class="garagem-texto-titulo">
-                <h1>ESCOLHER DIA DE VENCIMENTO</h1>
-                <p>Combine com ${cliente.nome} a melhor data para o bolso dele</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Qual o dia de vencimento ideal das parcelas?</h3>
-        <p style="color: #aaa; font-size: 0.85rem; margin-top: 5px;">O cliente prefere pagar todo mês no dia:</p>
-        <hr style="border-color: #333; margin: 12px 0;">
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button onclick="fecharVendaFinanciada(${meses}, ${taxaJuros}, 5)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                📅 Todo dia <strong>05</strong>
-            </button>
-            <button onclick="fecharVendaFinanciada(${meses}, ${taxaJuros}, 10)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                📅 Todo dia <strong>10</strong>
-            </button>
-            <button onclick="fecharVendaFinanciada(${meses}, ${taxaJuros}, 15)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                📅 Todo dia <strong>15</strong>
-            </button>
-            <button onclick="fecharVendaFinanciada(${meses}, ${taxaJuros}, 20)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-                📅 Todo dia <strong>20</strong>
-            </button>
-            <button onclick="fecharVendaFinanciada(${meses}, ${taxaJuros}, 28)" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 14px; border-radius: 6px; font-weight: bold; grid-column: span 2; cursor: pointer;">
-                📅 Todo dia <strong>28</strong> (Fechamento do Mês)
-            </button>
-        </div>
-
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="abrirModalFinanciamento()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Voltar aos Planos</button>
-        </div>
-    </div>
-    `;
-}
-
-function fecharVendaFinanciada(meses, taxaJuros, diaVencimento){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-    let carro = jogo.carros[cliente.carro];
-    if(!carro) return;
-
-    if(carro.reparos && Array.isArray(carro.reparos) && carro.reparos.length > 0){
-        mostrarAlerta("🔧 Veículo em Reparo", "Você não pode parcelar um carro que está na oficina!");
-        mostrarClienteAtual();
-        return;
-    }
-
-    let valorTotal = cliente.ofertaAtual;
-    let valorEntrada = Math.floor(valorTotal * 0.35);
-    let valorRestante = valorTotal - valorEntrada;
-    let totalComJuros = valorRestante * (1 + taxaJuros);
-    let valorParcelaMensal = Math.floor(totalComJuros / meses);
-
-    jogo.dinheiro = (jogo.dinheiro || 0) + valorEntrada;
-
-    if(cliente.carroTroca) {
-        if(!jogo.carros) jogo.carros = [];
-        jogo.carros.push(cliente.carroTroca);
-    }
-
-    if(!jogo.financiamentosAtivos) jogo.financiamentosAtivos = [];
-    
-    let novoContrato = {
-        id: Date.now(),
-        clienteNome: cliente.nome,
-        carroModelo: `${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'}`,
-        carroObjeto: carro,
-        valorTotalComJuros: Math.floor(totalComJuros),
-        parcelaMensal: valorParcelaMensal,
-        mesesRestantes: meses,
-        totalMeses: meses,
-        diaVencimento: diaVencimento,
-        mesesAtraso: 0,
-        taxaRisco: meses > 6 ? 0.20 : 0.08
-    };
-
-    jogo.financiamentosAtivos.push(novoContrato);
-
-    let precoCompraOriginal = carro.precoCompra || carro.compra || (carro.fipe * 0.5);
-    let lucroVenda = (valorEntrada + (valorParcelaMensal * meses)) - precoCompraOriginal;
-
-    if(!jogo.lucro) jogo.lucro = 0;
-    jogo.lucro += lucroVenda;
-
-    if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0 };
-    jogo.estatisticas.vendidos++;
-
-    jogo.reputacao = (jogo.reputacao || 0) + 2;
-    jogo.carros.splice(cliente.carro, 1);
-    jogo.clienteAtual = null;
-
-    if(typeof tocarSomVenda === "function") tocarSomVenda();
-    if (typeof atualizarPainel === 'function') atualizarPainel();
-    salvarJogo();
-
-    mostrarAlerta(
-        "💳 CREDIÁRIO MENSAL APROVADO!",
-        `Venda efetuada com sucesso!\n\n💰 Entrada: R$ ${valorEntrada.toLocaleString("pt-BR")}\n📅 ${meses} Parcelas de R$ ${valorParcelaMensal.toLocaleString("pt-BR")} (Vencimento todo dia ${diaVencimento})${cliente.carroTroca ? `\n🚗 Veículo de troca adicionado ao pátio!` : ''}`
-    );
-
-    mostrarClientes();
-}
-
-function abrirModalNegociacaoAvancada(){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-
-    conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">💬</span>
-            <div class="garagem-texto-titulo">
-                <h1>ESTRATÉGIA DE NEGOCIAÇÃO</h1>
-                <p>Escolha como abordar ${cliente.nome}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Selecione sua Abordagem Comercial:</h3>
-        <hr style="border-color: #333; margin: 10px 0;">
-        
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-            <button onclick="executarTaticaNegociacao('suave')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #00e676;">🤝 Pechincha Amigável (Baixo Risco)</strong>
-            </button>
-            <button onclick="executarTaticaNegociacao('firme')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ffb700;">⚖️ Negociação Firme (Risco Moderado)</strong>
-            </button>
-            <button onclick="executarTaticaNegociacao('blefe')" style="background: #1e1e1e; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; text-align: left; cursor: pointer;">
-                <strong style="color: #ff5252;">🔥 Blefe / Jogo Duro (Alto Risco)</strong>
-            </button>
-        </div>
-
-        <div style="margin-top: 20px; text-align: center;">
-            <button onclick="mostrarClienteAtual()" class="btn-leilao-sair" style="padding: 8px 20px; cursor: pointer;">Voltar à Mesa</button>
-        </div>
-    </div>
-    `;
-}
-
-function executarTaticaNegociacao(tipo){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-    let carro = jogo.carros[cliente.carro];
-    let fipe = carro.fipe || 15000;
-
-    cliente.fatorPechincha++;
-
-    if(cliente.fatorPechincha > cliente.toleranciaMax + 2){
-        cliente.historicoDialogo.unshift(`Chega! Você testou demais minha paciência. Estou indo embora!`);
-        if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("🚪 Cliente Irritado", `${cliente.nome} foi embora.`);
-        jogo.clienteAtual = null;
-        salvarJogo();
-        mostrarClientes();
-        return;
-    }
-
-    let chanceSucesso = tipo === 'firme' ? 0.50 : tipo === 'blefe' ? 0.35 : 0.65;
-    let minM = tipo === 'firme' ? 0.07 : tipo === 'blefe' ? 0.12 : 0.04;
-    let maxM = tipo === 'firme' ? 0.14 : tipo === 'blefe' ? 0.22 : 0.08;
-
-    chanceSucesso += (jogo.reputacao || 0) * 0.005;
-
-    if(Math.random() < chanceSucesso){
-        let aumento = Math.floor(cliente.ofertaAtual * aleatorio(minM * 100, maxM * 100) / 100);
-        cliente.ofertaAtual += aumento;
-        if(cliente.ofertaAtual > fipe * 1.12) cliente.ofertaAtual = Math.floor(fipe * 1.12);
-
-        cliente.humor = "Interessado";
-        cliente.historicoDialogo.unshift(`Argumento aceito! O comprador subiu a oferta para R$ ${cliente.ofertaAtual.toLocaleString("pt-BR")}.`);
-        if(typeof tocarSomCompra === "function") tocarSomCompra();
-        mostrarAlerta("💬 Negociação Bem-Sucedida!", `${cliente.nome} melhorou a proposta.`);
-    } else {
-        cliente.humor = "Irritado";
-        cliente.ofertaAtual -= Math.floor(cliente.ofertaAtual * 0.04);
-        cliente.historicoDialogo.unshift(`O comprador não gostou da abordagem e a oferta caiu um pouco.`);
-        if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("⚠️ Negociação Tensa", `A oferta caiu um pouco.`);
-    }
-
-    salvarJogo();
-    mostrarClienteAtual();
-}
-
-function tentarPressaoPsicologica(){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-
-    if (cliente.jaArgumentou) {
-        if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("⚠️ Argumento Já Utilizado", "Você já apelou para os pontos fortes deste carro com este cliente. Tente negociar ou aceitar a oferta!");
-        return;
-    }
-
-    let carro = jogo.carros[cliente.carro];
-
-    if(carro.defeitos && Array.isArray(carro.defeitos) && carro.defeitos.length > 0){
-        if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("⚠️ Impossível Argumentar", "O cliente apontou os defeitos mecânicos do carro na hora e não caiu na sua lábia!");
-        cliente.humor = "Desconfiado";
-        cliente.jaArgumentou = true;
-        salvarJogo();
-        mostrarClienteAtual();
-        return;
-    }
-
-    cliente.jaArgumentou = true; // TRAVA O BOTÃO PARA NÃO FARMAS MAIS
-    let aumento = Math.floor(carro.fipe * 0.05);
-    cliente.ofertaAtual += aumento;
-    cliente.humor = "Interessado";
-    cliente.historicoDialogo.unshift(`Você destacou a excelente procedência. O cliente convenceu-se e adicionou R$ ${aumento.toLocaleString("pt-BR")} na oferta!`);
-    
-    if(typeof tocarSomCompra === "function") tocarSomCompra();
-    mostrarAlerta("🧠 Tacada Certa!", `Cliente convenceu-se da qualidade e subiu o valor! (Argumento utilizado com sucesso)`);
-    salvarJogo();
-    mostrarClienteAtual();
-}
-
-function abrirSeletorTrocaCarro(){
-    let cliente = jogo.clienteAtual;
-    if (!jogo.carros || !Array.isArray(jogo.carros) || jogo.carros.length === 0) return;
-
-    let listaHtml = jogo.carros.map((carro, index) => `
-        <div onclick="trocarCarroClienteMesa(${index})" style="background: #1e1e1e; padding: 12px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-            <div>
-                <strong>${carro.marca || ''} ${carro.modelo || carro.nome || 'Veículo'} (${carro.ano || 'N/D'})</strong><br>
-                <small style="color: #888;">FIPE: R$ ${(carro.fipe || 15000).toLocaleString("pt-BR")}</small>
-            </div>
-            <span style="background: #2196F3; color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Apresentar 🚗</span>
-        </div>
-    `).join('');
-
-    conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🔄</span>
-            <div class="garagem-texto-titulo">
-                <h1>APRESENTAR OUTRO VEÍCULO</h1>
-                <p>Mostre outro carro do pátio</p>
-            </div>
-        </div>
-    </div>
-    <div class="card" style="max-height: 420px; overflow-y: auto;">
-        ${listaHtml}
-        <div style="margin-top: 15px; text-align: center;">
-            <button onclick="mostrarClienteAtual()" class="btn-leilao-sair" style="padding: 8px 16px; cursor: pointer;">Voltar</button>
-        </div>
-    </div>
-    `;
-}
-
-function trocarCarroClienteMesa(indiceCarro){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-    let carro = jogo.carros[indiceCarro];
-    if(!carro) return;
-
-    cliente.carro = indiceCarro;
-    cliente.ofertaAtual = calcularOfertaInicial(carro, cliente.bonusTipo);
-    cliente.fatorPechincha = 0;
-    cliente.jaArgumentou = false; // Reseta a trava ao trocar de carro para o mesmo cliente
-    cliente.humor = "Neutro";
-    cliente.historicoDialogo = [`Pediu para ver este ${carro.marca || ''} ${carro.modelo || 'Veículo'}.`];
-
-    salvarJogo();
-    mostrarClienteAtual();
-}
-
-function aceitarOferta(){
-    let cliente = jogo.clienteAtual;
-    if(!cliente) return;
-
-    let carro = jogo.carros[cliente.carro];
-    if(!carro){
-        jogo.clienteAtual = null;
-        mostrarClientes();
-        return;
-    }
-
-    if(carro.reparos && Array.isArray(carro.reparos) && carro.reparos.length > 0){
-        mostrarAlerta("🔧 Veículo em Reparo", "Você não pode entregar um carro que ainda está na oficina!");
-        jogo.clienteAtual = null;
-        salvarJogo();
-        mostrarClientes();
-        return;
-    }
-
-    let valorVenda = cliente.ofertaAtual;
-    jogo.dinheiro = (jogo.dinheiro || 0) + valorVenda;
-
-    if(cliente.carroTroca) {
-        if(!jogo.carros) jogo.carros = [];
-        jogo.carros.push(cliente.carroTroca);
-    }
-
-    let precoCompraOriginal = carro.precoCompra || carro.compra || (carro.fipe * 0.5);
-    let lucroVenda = valorVenda - precoCompraOriginal;
-
-    if(!jogo.lucro) jogo.lucro = 0;
-    jogo.lucro += lucroVenda;
-
-    if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0 };
-    jogo.estatisticas.vendidos++;
-
-    jogo.reputacao = (jogo.reputacao || 0) + 2;
-    jogo.carros.splice(cliente.carro, 1);
-    jogo.clienteAtual = null;
-
-    if(typeof tocarSomVenda === "function") tocarSomVenda();
-    if (typeof atualizarPainel === 'function') atualizarPainel();
-    salvarJogo();
-
-    mostrarAlerta(
-        "🎉 VENDA FECHADA À VISTA!",
-        `Comprador: ${cliente.nome}\n\n💰 Valor Recebido: R$ ${valorVenda.toLocaleString("pt-BR")}\n📈 Lucro Líquido: R$ ${lucroVenda.toLocaleString("pt-BR")}${cliente.carroTroca ? `\n🚗 Veículo aceito na troca adicionado ao pátio!` : ''}`
-    );
-
-    mostrarClientes();
-}
-
-function recusarOferta(){
-    let cliente = jogo.clienteAtual;
-    if(cliente) {
-        if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("❌ Negócio Recusado", `${cliente.nome} foi embora.`);
-    }
-    jogo.clienteAtual = null;
-    salvarJogo();
-    gerarNovoCliente();
-}
-
-function limparClienteDia(){
-    jogo.clienteAtual = null;
-    salvarJogo();
-}
-
-function atualizarClientesNovoDia(){
-    limparClienteDia();
-}
-
-if(typeof jogo !== 'undefined' && jogo.clienteAtual === undefined){
-    jogo.clienteAtual = null;
 }

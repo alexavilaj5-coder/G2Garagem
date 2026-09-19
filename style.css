@@ -1,36 +1,108 @@
 /* ==========================================
-   G2 GARAGE PREMIUM STYLE V3.0 (SUPER EDITION)
+   G2 GARAGE MULTI-THEME SYSTEM
 ========================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=VT323&display=swap');
 
-:root{
-  --fundo: #080808;
-  --card: #121212;
-  --card2: #181818;
-
-  --amarelo: #ffc400;
-  --amarelo-glow: rgba(255, 196, 0, 0.4);
-  --verde: #00d26a;
-  --vermelho: #ff3030;
-  --azul: #00aaff;
-
+/* ==========================================
+   TEMA 1: ORIGINAL PREMIUM (Padrão Inicial)
+========================================== */
+:root, body.tema-original {
+  --fundo: #090a0f;
+  --fundo-body: radial-gradient(circle at top, #161724 0%, #08080c 70%);
+  --card: #12131a;
+  --card2: #181922;
+  --amarelo: #ffcc00;
+  --amarelo-glow: rgba(255, 204, 0, 0.3);
+  --verde: #00e676;
+  --vermelho: #ff3b3b;
+  --azul: #00b0ff;
   --texto: #ffffff;
-  --cinza: #999;
+  --cinza: #a1a1aa;
+  --borda-raio: 12px;
+  --fonte-principal: 'Rajdhani', Arial, sans-serif;
+  --botao-bg: #20212c;
+  --botao-borda: #333546;
+}
+
+/* ==========================================
+   TEMA 2: CLEAN MODERN (Estilo Mobile Limpo)
+========================================== */
+body.tema-clean {
+  --fundo: #0f172a;
+  --fundo-body: #0f172a;
+  --card: #1e293b;
+  --card2: #334155;
+  --amarelo: #eab308;
+  --amarelo-glow: rgba(234, 179, 8, 0.2);
+  --verde: #22c55e;
+  --vermelho: #ef4444;
+  --azul: #38bdf8;
+  --texto: #f8fafc;
+  --cinza: #94a3b8;
+  --borda-raio: 12px;
+  --fonte-principal: 'Rajdhani', Arial, sans-serif;
+  --botao-bg: #334155;
+  --botao-borda: #475569;
+}
+
+/* ==========================================
+   TEMA 3: RACING PRO (Midnight Club / Garagem)
+========================================== */
+body.tema-racing {
+  --fundo: #050508;
+  --fundo-body: #050508;
+  --card: #12131a;
+  --card2: #1c1d29;
+  --amarelo: #ffb703;
+  --amarelo-glow: rgba(255, 183, 3, 0.3);
+  --verde: #00f5d4;
+  --vermelho: #f72585;
+  --azul: #4cc9f0;
+  --texto: #ffffff;
+  --cinza: #8d99ae;
+  --borda-raio: 6px;
+  --fonte-principal: 'Rajdhani', Arial, sans-serif;
+  --botao-bg: #1c1d29;
+  --botao-borda: #4cc9f0;
+}
+
+/* ==========================================
+   TEMA 4: ARCADE RETRO (Estilo Clássico 90s)
+========================================== */
+body.tema-retro {
+  --fundo: #0d0221;
+  --fundo-body: #0d0221;
+  --card: #240046;
+  --card2: #3c096c;
+  --amarelo: #ff9e00;
+  --amarelo-glow: rgba(255, 158, 0, 0.4);
+  --verde: #38b000;
+  --vermelho: #d90429;
+  --azul: #7209b7;
+  --texto: #ffffff;
+  --cinza: #e0aaff;
+  --borda-raio: 0px;
+  --fonte-principal: 'VT323', monospace;
+  --botao-bg: #3c096c;
+  --botao-borda: #ff9e00;
 }
 
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Rajdhani', Arial, sans-serif;
+  font-family: var(--fonte-principal);
 }
 
 body{
-  background: radial-gradient(circle at top, #1a1a24, #080808 70%);
-  color: white;
+  background: var(--fundo-body);
+  background-color: var(--fundo);
+  color: var(--texto);
   min-height: 100vh;
   padding-bottom: 80px;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* =========================
@@ -44,67 +116,65 @@ body{
 }
 
 /* ==========================================
-   TOPO / LOGO PREMIUM G2 GARAGE
+   TOPO / LOGO 
 ========================================== */
 
 #topo{
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(8, 8, 10, 0.96);
-  backdrop-filter: blur(12px);
+  background: var(--card);
   border-bottom: 2px solid var(--amarelo);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 196, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
 .topbar{
-  padding: 10px 12px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* LOGO DESTACADA E GRANDE */
 .empresa{
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .logo{
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 800;
-  background: linear-gradient(135deg, #1f1f1f 0%, #0a0a0a 100%);
+  background: var(--card2);
   border: 2px solid var(--amarelo);
-  border-radius: 12px;
-  padding: 6px 14px;
-  box-shadow: 0 0 15px var(--amarelo-glow), inset 0 0 8px rgba(255, 196, 0, 0.2);
-  text-shadow: 0 0 8px var(--amarelo);
+  border-radius: var(--borda-raio);
+  padding: 4px 12px;
+  box-shadow: 0 0 10px var(--amarelo-glow);
+  text-shadow: 0 0 6px var(--amarelo);
+  color: var(--amarelo);
 }
 
 .empresa-info h1{
-  font-size: 26px; /* Nome bem maior e imponente */
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: var(--amarelo);
   text-transform: uppercase;
   margin: 0;
-  text-shadow: 0 0 10px rgba(255, 196, 0, 0.4);
   line-height: 1;
 }
 
 .empresa-info small{
   font-size: 11px;
-  color: #bbb;
+  color: var(--cinza);
   letter-spacing: 1px;
   font-weight: 600;
   text-transform: uppercase;
 }
 
 /* ==========================================
-   HUD ESPORTIVO (ESTILO PAINEL DIGITAL)
+   HUD ESPORTIVO
 ========================================== */
 
 .hud-mini{
@@ -114,100 +184,45 @@ body{
 }
 
 .box{
-  background: linear-gradient(180deg, #1f1f24 0%, #0d0d10 100%);
-  border: 1px solid #333;
-  border-top: 2px solid #555;
-  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--card2);
+  border-top: 2px solid var(--cinza);
+  border-radius: var(--borda-raio);
   padding: 6px 4px;
   text-align: center;
-  min-height: 52px;
+  min-height: 50px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-}
-
-/* Linha Neon na parte inferior de cada card do HUD */
-.box::after{
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #333;
 }
 
 .box span{
   display: block;
   font-size: 10px;
-  color: #aaa;
+  color: var(--cinza);
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.5px;
 }
 
 .box strong{
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: white;
+  color: var(--texto);
   margin-top: 2px;
 }
 
-/* Destaque para Dinheiro no HUD */
 .dinheiro{
-  border-top-color: var(--verde);
-}
-.dinheiro::after{
-  background: var(--verde);
-  box-shadow: 0 0 6px var(--verde);
+  border-top-color: var(--verde) !important;
 }
 .dinheiro strong{
   color: var(--verde);
-  text-shadow: 0 0 6px rgba(0, 210, 106, 0.4);
 }
 
 /* =========================
- SHOWROOM INICIAL
-========================= */
-
-#showroom{
-  margin: 10px;
-  padding: 10px 14px;
-  background: var(--card);
-  border: 1px solid #333;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-#fotoPrincipal{
-  width: 85px;
-  height: 62px;
-  object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid var(--amarelo);
-  box-shadow: 0 0 8px rgba(255, 196, 0, 0.2);
-}
-
-#tituloShowroom{
-  font-size: 18px;
-  color: var(--amarelo);
-  font-weight: 700;
-}
-
-#descricaoShowroom{
-  font-size: 12px;
-  color: #aaa;
-  line-height: 1.3;
-}
-
-/* =========================
- CONTEÚDO & CARDS
+   CONTEÚDO & CARDS
 ========================= */
 
 #conteudo{
@@ -215,9 +230,9 @@ body{
 }
 
 .card{
-  background: linear-gradient(145deg, #161616, #0c0c0c);
-  border: 1px solid #292929;
-  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--card2);
+  border-radius: var(--borda-raio);
   padding: 14px;
   margin-bottom: 12px;
   text-align: center;
@@ -232,87 +247,73 @@ body{
 
 .card p{
   font-size: 14px;
-  color: #ccc;
+  color: var(--cinza);
   line-height: 1.4;
   margin-bottom: 10px;
 }
 
 /* ==========================================
-   PADRONIZAÇÃO DOS BOTÕES (AÇÕES / SALVAR)
+   PADRONIZAÇÃO DOS BOTÕES
 ========================================== */
 
 button{
   border: none;
-  border-radius: 8px;
+  border-radius: var(--borda-raio);
   padding: 10px 16px;
-  background: #222;
-  color: white;
+  background: var(--botao-bg);
+  color: var(--texto);
   font-weight: bold;
   font-size: 14px;
-  border: 1px solid #444;
+  border: 1px solid var(--botao-borda);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: transform 0.1s ease, background 0.15s ease;
 }
 
 button:active{
   transform: scale(0.96);
 }
 
-/* Força os botões das configurações e expansão a ficarem bonitões e centralizados */
 #conteudo .card button,
 #conteudo button{
   display: block;
   width: 100%;
   max-width: 350px;
-  height: 50px;
+  height: 48px;
   margin: 10px auto;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border-radius: var(--borda-raio);
 }
 
-/* Botão principal/salvar ganha o Amarelo em Destaque */
 #conteudo .card button:first-of-type{
-  background: linear-gradient(90deg, #ffc400, #ffaa00);
+  background: var(--amarelo);
   color: #000;
   border: none;
-  box-shadow: 0 0 12px rgba(255, 196, 0, 0.3);
 }
 
 /* ==========================================
-   MERCADO / CARRO (RETAQUALIBRADO)
+   CARROS / MERCADO
 ========================================== */
 
 .carro-card{
-    background:#111;
-    border:1px solid #303030;
-    border-radius:18px;
-    padding:14px;
-    overflow:hidden;
-    box-shadow:
-        0 10px 25px rgba(0,0,0,.5),
-        0 0 12px rgba(255,196,0,.08);
+    background: var(--card);
+    border: 1px solid var(--card2);
+    border-radius: var(--borda-raio);
+    padding: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,.4);
 }
 
 .carro-card img{
-    width:100%;
-    height:240px;
-    object-fit:contain;
-    background:linear-gradient(180deg,#111,#1a1a1a);
-    border-radius:16px;
-    padding:8px;
-    margin-bottom:12px;
-    border:2px solid #353535;
-    box-shadow:
-        0 0 18px rgba(255,196,0,.15),
-        inset 0 0 20px rgba(255,255,255,.04);
-    transition:.35s;
-}
-
-.carro-card img:hover{
-    transform:scale(1.02);
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    background: var(--fundo);
+    border-radius: var(--borda-raio);
+    padding: 8px;
+    margin-bottom: 12px;
+    border: 1px solid var(--card2);
 }
 
 .carro-card h2{
@@ -323,12 +324,11 @@ button:active{
 
 .carro-card h3{
   font-size: 13px;
-  color: #aaa;
+  color: var(--cinza);
   margin-top: 2px;
   margin-bottom: 8px;
 }
 
-/* INFORMAÇÕES DO CARRO */
 .info-grid{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -337,23 +337,22 @@ button:active{
 }
 
 .info-grid div{
-  background: #181818;
-  border: 1px solid #2d2d2d;
-  border-radius: 8px;
+  background: var(--card2);
+  border: 1px solid var(--card2);
+  border-radius: var(--borda-raio);
   padding: 6px 8px;
   text-align: center;
   font-size: 11px;
-  color: #aaa;
+  color: var(--cinza);
 }
 
 .info-grid strong{
   display: block;
   font-size: 14px;
-  color: white;
+  color: var(--texto);
   margin-top: 2px;
 }
 
-/* FIPE E PEDIDO (VOLTARAM A FICAR COM DESTAQUE!) */
 .precos{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -364,99 +363,52 @@ button:active{
 .fipe-box,
 .pedido-box{
   padding: 8px;
-  border-radius: 8px;
+  border-radius: var(--borda-raio);
   text-align: center;
 }
 
 .fipe-box{
-  background: rgba(0, 40, 61, 0.7);
+  background: rgba(0, 170, 255, 0.1);
   border: 1px solid var(--azul);
 }
 
 .pedido-box{
-  background: rgba(0, 53, 29, 0.7);
+  background: rgba(0, 230, 118, 0.1);
   border: 1px solid var(--verde);
 }
 
 .precos small{
   display: block;
   font-size: 11px;
-  color: #ccc;
+  color: var(--cinza);
   font-weight: 600;
 }
 
 .precos strong{
   display: block;
-  font-size: 16px; /* FIPE e Pedido bem legíveis */
-  margin-top: 2px;
-}
-
-.fipe-box strong{ color: #00aaff; }
-.pedido-box strong{ color: #00e676; }
-
-/* DEFEITOS */
-.defeito{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #240707;
-  border-left: 4px solid var(--vermelho);
-  padding: 6px 10px;
-  border-radius: 6px;
-  margin: 4px 0;
-  font-size: 12px;
-}
-
-.defeito strong{ color: #ff6060; }
-
-.defeito.ok{
-  background: #062515;
-  border-left-color: var(--verde);
-  color: var(--verde);
-}
-
-/* RESUMO COMPRA */
-.resumo-compra{
-  background: #181818;
-  border: 1px dashed #555;
-  border-radius: 8px;
-  padding: 8px;
-  margin-top: 8px;
-  text-align: center;
-}
-
-.resumo-compra small{
-  font-size: 11px;
-  color: #aaa;
-}
-
-.resumo-compra strong{
-  display: block;
-  color: var(--amarelo);
   font-size: 16px;
   margin-top: 2px;
 }
 
-/* BOTÃO COMPRAR */
+.fipe-box strong{ color: var(--azul); }
+.pedido-box strong{ color: var(--verde); }
+
 .btnComprar,
 .carro-card button.btnComprar{
   width: 100% !important;
   max-width: 100% !important;
   height: 48px !important;
-  background: linear-gradient(90deg, #00b85c, #00e676) !important;
+  background: var(--verde) !important;
   color: #000 !important;
-  font-size: 17px !important;
-  padding: 10px !important;
-  border-radius: 10px !important;
+  font-size: 16px !important;
+  border-radius: var(--borda-raio) !important;
   margin-top: 10px !important;
-  font-weight: 900 !important;
+  font-weight: 800 !important;
   text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3) !important;
 }
 
 /* ==========================================
-   MENU INFERIOR (NAVEGAÇÃO)
+   MENU INFERIOR
 ========================================== */
 
 #menu{
@@ -464,10 +416,9 @@ button:active{
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 65px;
-  background: rgba(8, 8, 8, 0.96);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid #333;
+  height: 60px;
+  background: var(--fundo);
+  border-top: 1px solid var(--card2);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -477,11 +428,11 @@ button:active{
 #menu button{
   background: none !important;
   border: none !important;
-  padding: 3px !important;
+  padding: 2px !important;
   width: auto !important;
   height: auto !important;
   font-size: 18px !important;
-  color: #aaa !important;
+  color: var(--cinza) !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -499,13 +450,46 @@ button:active{
 }
 
 /* ==========================================
- ALERTAS E AVISOS
+   NOTIFICAÇÃO DO TOPO
+========================================== */
+
+#avisoTopo{
+  position: fixed !important;
+  top: 15px !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-30px);
+  width: 90% !important;
+  max-width: 420px !important;
+  background: var(--card) !important;
+  color: var(--texto) !important;
+  border: 1px solid var(--card2) !important;
+  border-left: 5px solid var(--amarelo) !important;
+  border-radius: var(--borda-raio) !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7) !important;
+  z-index: 999999 !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+}
+
+#avisoTopo.mostrar{
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+/* ==========================================
+   POPUPS / MODAIS DE ALERTA
 ========================================== */
 
 .alerta{
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0, 0, 0, 0.82);
   display: none;
   align-items: center;
   justify-content: center;
@@ -513,17 +497,20 @@ button:active{
 }
 
 .alerta-box{
-  width: 85%;
-  max-width: 320px;
-  background: #151515;
+  width: 88%;
+  max-width: 330px;
+  background: var(--card);
   border: 2px solid var(--amarelo);
-  border-radius: 12px;
+  border-radius: var(--borda-raio);
   padding: 20px;
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 }
 
 .alerta-box h2{
   color: var(--amarelo);
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .alerta-box button{
@@ -531,763 +518,32 @@ button:active{
   width: 100%;
   background: var(--amarelo);
   color: #000;
-}
-
-#avisoTopo{
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%) scale(0.8);
-  background: rgba(10,15,25,0.95);
-  color: white;
-  border: 2px solid #00ffff;
-  padding: 20px 30px;
-  border-radius: 15px;
-  z-index: 9999;
-  opacity: 0;
-  transition: .3s;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  min-width: 280px;
-  box-shadow: 0 0 25px #00ffff;
-  backdrop-filter: blur(8px);
-}
-
-#avisoTopo.mostrar{
-  opacity: 1;
-  transform: translate(-50%,-50%) scale(1);
-}
-
-/* ===========================
-   ESTILO SUPREMO - LEILÃO AO VIVO
-   =========================== */
-
-.leilao-card-vivo {
-    background: rgba(18, 18, 24, 0.95) !important;
-    border: 1px solid rgba(0, 230, 118, 0.3) !important;
-    border-radius: 16px !important;
-    padding: 15px !important;
-    margin: 15px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
-    color: #fff !important;
-}
-
-.leilao-status-topo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding-bottom: 8px;
-}
-
-.lote-badge-id {
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #ffb700;
-}
-
-.leilao-timer-box {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: #00e676;
-}
-
-.leilao-painel-central {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    margin-bottom: 12px;
-}
-
-.label-lance {
-    font-size: 0.65rem;
-    color: #888;
-    letter-spacing: 1px;
-    display: block;
-    margin-bottom: 4px;
-}
-
-.lance-atual-bloco h2 {
-    font-size: 1.6rem !important;
-    color: #00e676 !important;
-    margin: 0 0 4px 0 !important;
-}
-
-.quem-esta-ganhando {
-    font-size: 0.7rem;
-    color: #ffb700;
-    font-style: italic;
-}
-
-.historico-lances {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
-    padding: 8px;
-    margin-bottom: 15px;
-    font-size: 0.7rem;
-    color: #aaa;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-height: 70px;
-    overflow: hidden;
-}
-
-.historico-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.btn-leilao-lance {
-    width: 100%;
-    background: linear-gradient(135deg, #00e676, #00b0ff) !important;
-    color: #000 !important;
-    padding: 14px !important;
-    border: none !important;
-    border-radius: 10px !important;
-    font-weight: 800 !important;
-    font-size: 0.85rem !important;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
-    margin-bottom: 8px;
-}
-
-.btn-leilao-sair {
-    width: 100%;
-    background: rgba(255, 82, 82, 0.1) !important;
-    color: #ff5252 !important;
-    border: 1px solid rgba(255, 82, 82, 0.2) !important;
-    padding: 10px !important;
-    border-radius: 8px !important;
-    font-weight: bold !important;
-    font-size: 0.75rem !important;
-    cursor: pointer;
-}
-/* ==========================================
-   ESTILOS DO MINI-GAME ARCADE DE PISTA
-========================================== */
-.painel-rpm-arcade {
-  background: #030712;
-  border: 2px solid #1e293b;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-}
-
-.luzes-shift {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.luz-led {
-  width: 25px;
-  height: 8px;
-  background: #1e293b;
-  border-radius: 4px;
-  transition: background 0.1s ease, box-shadow 0.1s ease;
-}
-
-.luz-led.ativa {
-  background: #facc15;
-  box-shadow: 0 0 8px #facc15;
-}
-
-.luz-led.red.ativa {
-  background: #ef4444;
-  box-shadow: 0 0 12px #ef4444;
-}
-
-.barra-tacometro {
-  width: 100%;
-  height: 18px;
-  background: #0f172a;
-  border-radius: 9px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #334155;
-}
-
-.zona-perfeita {
-  position: absolute;
-  left: 72%;
-  width: 15%;
-  height: 100%;
-  background: rgba(16, 185, 129, 0.4);
-  border-left: 2px solid #10b981;
-  border-right: 2px solid #10b981;
-}
-
-.ponteiro-fluid {
-  position: absolute;
-  top: 0;
-  left: 0%;
-  width: 6px;
-  height: 100%;
-  background: #38bdf8;
-  box-shadow: 0 0 10px #38bdf8;
-  z-index: 2;
-}
-
-.btn-arcade-acao {
-  width: 100%;
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #fff;
-  font-family: inherit;
-  font-size: 14px;
   font-weight: 800;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-  transition: transform 0.05s ease, filter 0.05s ease;
-}
-
-.btn-arcade-acao:active {
-  transform: scale(0.97);
-  filter: brightness(1.1);
 }
 
 /* ==========================================
-   ESTILOS DO MINI-GAME SHOW DE GRAVES (SPL)
+   ELEMENTOS ADICIONAIS (Oficina, Mesa, etc)
 ========================================== */
-.painel-spl-arcade {
-  background: #030712;
-  border: 2px solid #38bdf8;
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.2);
-}
-
-.onda-animada {
-  font-size: 24px;
-  margin-bottom: 10px;
-  animation: pularOnda 0.4s infinite alternate ease-in-out;
-}
-
-@keyframes pularOnda {
-  0% { transform: scale(1); filter: brightness(1); }
-  100% { transform: scale(1.15); filter: brightness(1.4); }
-}
-
-.barra-spl-container {
-  width: 100%;
-  height: 22px;
-  background: #0f172a;
-  border-radius: 11px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid #334155;
-}
-
-.zona-spl-ideal {
-  position: absolute;
-  left: 60%;
-  width: 25%;
-  height: 100%;
-  background: rgba(56, 189, 248, 0.4);
-  border-left: 2px dashed #38bdf8;
-  border-right: 2px dashed #38bdf8;
-}
-
-.ponteiro-spl-fluid {
-  position: absolute;
-  top: 0;
-  left: 0%;
-  width: 6px;
-  height: 100%;
-  background: #facc15;
-  box-shadow: 0 0 10px #facc15;
-  z-index: 2;
-  transition: left 0.05s ease-out;
-}
-
-.btn-spl-acao {
-  width: 100%;
-  background: linear-gradient(135deg, #0284c7, #0369a1);
-  color: #fff;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 800;
+.patio-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+.mesa-negociacao, .negociacao-container, .som-item, .upgrade-card {
+  background: var(--card);
+  border: 1px solid var(--card2);
+  border-radius: var(--borda-raio);
   padding: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
-  transition: transform 0.05s ease, filter 0.05s ease;
 }
-
-.btn-spl-acao:active {
-  transform: scale(0.96);
-  filter: brightness(1.2);
+.config-item, .empresa-btn {
+  background: var(--card2) !important;
+  border: 1px solid var(--card2) !important;
+  color: var(--texto) !important;
+  width: 100% !important;
+  padding: 12px 16px !important;
+  border-radius: var(--borda-raio) !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  font-weight: 700 !important;
 }
-
-
-/* EFEITO DE FOGOS DE ARTIFÍCIO */
-@keyframes explodirFogo {
-    0% { transform: scale(0.1); opacity: 1; }
-    50% { opacity: 1; }
-    100% { transform: scale(2.5); opacity: 0; }
+.config-item:hover, .empresa-btn:hover {
+  border-color: var(--amarelo) !important;
 }
-
-.container-fogos {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 99999;
-    overflow: hidden;
-}
-
-.particula-fogo {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    animation: explodirFogo 1s ease-out forwards;
-}
-
-/* ===========================================
-   ESTILO DA TELA DE INTRODUÇÃO / HISTÓRIA G2
-   =========================================== */
-#modal-intro-g2 {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(9, 9, 11, 0.94);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999;
-    animation: fadeInIntro 0.4s ease-out forwards;
-}
-
-@keyframes fadeInIntro {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.caixa-intro-g2 {
-    background: linear-gradient(135deg, #18181b 0%, #09090b 100%);
-    border: 2px solid #27272a;
-    border-top: 4px solid #ef4444;
-    border-radius: 14px;
-    padding: 35px;
-    max-width: 580px;
-    width: 90%;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px rgba(239, 68, 68, 0.2);
-    text-align: center;
-    font-family: inherit;
-    color: #f4f4f5;
-    position: relative;
-    overflow: hidden;
-}
-
-.titulo-intro-g2 {
-    font-size: 22px;
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 20px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.texto-historia-g2 {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #d4d4d8;
-    margin-bottom: 25px;
-    text-align: left;
-    background: rgba(24, 24, 27, 0.7);
-    padding: 18px;
-    border-radius: 10px;
-    border-left: 3px solid #ef4444;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.botao-partida-g2 {
-    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    width: 100%;
-}
-
-.botao-partida-g2:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6);
-    background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
-}
-
-.botao-partida-g2:active {
-    transform: translateY(1px);
-}
-
-/* Correção e compactação do Topo e HUD */
-#topo {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background: rgba(24, 24, 27, 0.95);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid #27272a;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 12px; /* Reduzido para ficar bem mais compacto */
-    max-width: 100%;
-}
-
-.empresa {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.empresa .logo {
-    font-size: 24px; /* Logotipo um pouco mais enxuto */
-}
-
-.empresa-info h1 {
-    font-size: 15px;
-    margin: 0;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-.empresa-info small {
-    font-size: 10px;
-    color: #a1a1aa;
-}
-
-/* HUD Mini Compacto na Horizontal */
-.hud-mini {
-    display: flex;
-    gap: 6px; /* Espaçamento menor entre as caixas */
-    align-items: center;
-}
-
-.hud-mini .box {
-    background: rgba(9, 9, 11, 0.6);
-    border: 1px solid #27272a;
-    padding: 4px 8px; /* Altura e largura internas reduzidas */
-    border-radius: 6px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 55px;
-}
-
-.hud-mini .box span {
-    font-size: 12px; /* Ícone menor */
-    line-height: 1;
-}
-
-.hud-mini .box small {
-    font-size: 8px; /* Texto descritivo mini */
-    color: #71717a;
-    text-transform: uppercase;
-    margin-top: 1px;
-}
-
-.hud-mini .box strong {
-    font-size: 11px; /* Valor principal compacto */
-    color: #f4f4f5;
-    margin-top: 1px;
-}
-
-
-
-
-/* ==========================================================================
-   REFORMATAÇÃO SUPREMA DA GARAGEM - G2 GARAGE
-   ========================================================================== */
-
-/* --- Variáveis de Cor para Consistência --- */
-:root {
-    --patio-bg-dark: #0a0a0e;
-    --patio-card-bg: #121218;
-    --patio-border-subtle: rgba(255, 255, 255, 0.06);
-    --patio-neon-gold: #ffb700;
-    --patio-neon-green: #00e676;
-    --patio-text-dim: #a0a0a5;
-    --patio-text-bright: #ffffff;
-    --patio-danger-red: #ff5252;
-}
-
-/* --- Fundo Geral Estilizado --- */
-body.tema-garagem, .conteudo-geral.patio-ativo {
-    background-color: var(--patio-bg-dark) !important;
-    background-image: 
-        radial-gradient(circle at 80% 10%, rgba(255, 183, 0, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 20% 90%, rgba(0, 230, 118, 0.05) 0%, transparent 40%),
-        linear-gradient(135deg, #0a0a0e 0%, #161620 100%) !important;
-    background-attachment: fixed !important;
-}
-
-/* --- Cabeçalho da Garagem --- */
-.garagem-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(18, 18, 24, 0.9);
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--patio-border-subtle);
-    backdrop-filter: blur(10px);
-}
-
-.garagem-titulo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.garagem-icone {
-    font-size: 2.5rem;
-}
-
-.garagem-texto-titulo h1 {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--patio-text-bright);
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.garagem-texto-titulo p {
-    font-size: 0.8rem;
-    color: var(--patio-text-dim);
-    margin: 0;
-}
-
-/* Barra de Vagas Visual */
-.vagas-container {
-    width: 120px;
-    text-align: right;
-}
-
-.vagas-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: var(--patio-text-dim);
-    margin-bottom: 4px;
-}
-
-.vagas-info strong {
-    color: var(--patio-text-bright);
-}
-
-.vagas-barra-fundo {
-    height: 6px;
-    background: #222;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.vagas-barra-progresso {
-    height: 100%;
-    background: linear-gradient(90deg, var(--patio-neon-gold), var(--patio-neon-green));
-    border-radius: 3px;
-    transition: width 0.5s ease-out;
-}
-
-/* --- Estado Vazio Estilizado --- */
-.card-vazio {
-    background: var(--patio-card-bg);
-    border: 1px dashed var(--patio-border-subtle);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    color: var(--patio-text-dim);
-    margin: 20px;
-}
-
-.vazio-icone {
-    font-size: 3rem;
-    opacity: 0.3;
-    margin-bottom: 15px;
-}
-
-/* --- Grade de Carros --- */
-.patio-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 15px !important;
-    padding: 0 15px 15px 15px !important;
-}
-
-/* --- Card do Veículo "Premium" --- */
-.patio-grid .card.carro-card {
-    background: var(--patio-card-bg) !important;
-    border: 1px solid var(--patio-border-subtle) !important;
-    border-radius: 16px !important;
-    padding: 10px !important;
-    color: var(--patio-text-bright) !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
-    transition: all 0.3s ease;
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-/* Efeito de hover no card */
-.patio-grid .card.carro-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important;
-    border-color: rgba(255, 183, 0, 0.3) !important;
-}
-
-/* Bordas de estado colorido */
-.carro-card.estado-perfeito { border-left: 4px solid var(--patio-neon-green) !important; }
-.carro-card.estado-atencao { border-left: 4px solid var(--patio-neon-gold) !important; }
-.carro-card.estado-critico { border-left: 4px solid var(--patio-danger-red) !important; }
-
-/* Imagem do Carro Full-width */
-.carro-imagem-container {
-    position: relative;
-    margin: -10px -10px 10px -10px; /* Expande para as bordas do card */
-    border-bottom: 1px solid var(--patio-border-subtle);
-}
-
-.patio-grid .card.carro-card img {
-    width: 100% !important;
-    height: 100px !important;
-    object-fit: cover !important;
-    display: block;
-}
-
-/* Contador de Defeitos Minimalista sobre a imagem */
-.overlay-defeitos {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.7);
-    color: var(--patio-text-dim);
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-size: 0.6rem;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-.overlay-defeitos.tem-defeito {
-    background: var(--patio-danger-red);
-    color: white;
-    font-weight: bold;
-}
-
-/* Corrige o texto dos botões de ação para caber perfeitamente */
-.card button, [onclick*="abrirModalNegociacaoAvancada"] {
-    font-size: 0.75rem !important; /* Reduz levemente para acomodar textos em duas linhas sem vazar */
-    white-space: normal !important;
-    line-height: 1.2;
-    padding: 10px 6px !important;
-}
-
-/* Corrige o alinhamento do Humor no topo direito do painel direito */
-.card .perfil-humor-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-/* Informações Básicas */
-.carro-info-basica h2 {
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    margin: 0 0 2px 0 !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.carro-info-basica h3 {
-    font-size: 0.8rem !important;
-    color: var(--patio-text-dim) !important;
-    margin: 0 !important;
-    font-weight: 400 !important;
-}
-
-.carro-info-basica .versao-texto {
-    font-size: 0.6rem !important;
-    color: #666 !important;
-    margin-top: 2px !important;
-}
-
-/* Grade de Estatísticas (Ano, KM) */
-.carro-stats-grid {
-    display: flex;
-    gap: 10px;
-    margin: 10px 0;
-    font-size: 0.75rem;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(255, 255, 255, 0.03);
-    padding: 3px 6px;
-    border-radius: 4px;
-}
-
-.stat-icone { opacity: 0.7; }
-.stat-valor { color: var(--patio-text-bright); }
-.stat-valor small { color: #666; font-size: 0.6rem; }
-
-/* Área Financeira (Compra vs FIPE) */
-.carro-financeiro {
-    border-top: 1px solid var(--patio-border-subtle);
-    padding-top: 8px;
-    margin-top: auto; /* Empurra o financeiro para baixo */
-}
-
-.fin-linha {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-}
-
-.fin-label {
-    font-size: 0.6rem;
-    color: var(--patio-text-dim);
-    text-transform: uppercase;
-}
-
-.fin-valor {
-    font-size: 0.75rem

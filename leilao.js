@@ -1,37 +1,60 @@
 // ===========================================
-// LEILÃO.JS V7.1 (COM SISTEMA DE ÁUDIO WEB API INTEGRADO) 🚀🔊
+// LEILÃO.JS V10.0 - COMPRA E VENDA SIMULTÂNEAS 🚀🚗💼
 // G2 GARAGEM
 // ===========================================
 
 const carrosLeilaoLote = [
-    { marca: "Chevrolet", modelo: "Opala Diplomata", ano: 1988, fipeBase: 25000 },
-    { marca: "Volkswagen", modelo: "Gol Quadrado GTS", ano: 1992, fipeBase: 22000 },
-    { marca: "Fiat", modelo: "Tempra Turbo", ano: 1994, fipeBase: 18000 },
-    { marca: "Chevrolet", modelo: "Chevette DL", ano: 1991, fipeBase: 12000 },
-    { marca: "Ford", modelo: "Escort XR3", ano: 1990, fipeBase: 16000 },
-    { marca: "Volkswagen", modelo: "Santana Quantum", ano: 1989, fipeBase: 15000 },
-    { marca: "Fiat", modelo: "Uno 1.5R", ano: 1993, fipeBase: 14000 }
+    { marca: "Chevrolet", modelo: "Opala Diplomata SE", ano: 1992, fipeBase: 38000, categoria: "Clássico" },
+    { marca: "Volkswagen", modelo: "Gol Quadrado GTS 1.8", ano: 1994, fipeBase: 32000, categoria: "Esportivo" },
+    { marca: "Fiat", modelo: "Tempra 16V Turbo", ano: 1995, fipeBase: 24000, categoria: "Sedã" },
+    { marca: "Chevrolet", modelo: "Chevette DL", ano: 1993, fipeBase: 16000, categoria: "Popular" },
+    { marca: "Ford", modelo: "Escort XR3 Convertible", ano: 1991, fipeBase: 28000, categoria: "Conversível" },
+    { marca: "Volkswagen", modelo: "Santana Quantum GLS", ano: 1992, fipeBase: 22000, categoria: "Wagon" },
+    { marca: "Fiat", modelo: "Uno Turbo i.e.", ano: 1995, fipeBase: 42000, categoria: "Hot Hatch" },
+    { marca: "Chevrolet", modelo: "Caravan Comodoro", ano: 1988, fipeBase: 35000, categoria: "Clássico" },
+    { marca: "Volkswagen", modelo: "Fusca Itamar 1600", ano: 1996, fipeBase: 26000, categoria: "Clássico" },
+    { marca: "Ford", modelo: "Maverick Super Luxo", ano: 1976, fipeBase: 85000, categoria: "Muscle" },
+    { marca: "BMW", modelo: "325i E36 Coupé", ano: 1994, fipeBase: 65000, categoria: "Importado" },
+    { marca: "Mercedes-Benz", modelo: "C180 Elegance W202", ano: 1996, fipeBase: 45000, categoria: "Luxo" },
+    { marca: "Toyota", modelo: "Supra A70 Turbo", ano: 1991, fipeBase: 120000, categoria: "JDM Legend" },
+    { marca: "Mitsubishi", modelo: "Eclipse GSX AWD", ano: 1995, fipeBase: 95000, categoria: "JDM Legend" },
+    { marca: "Audi", modelo: "A4 Avant 2.8 Quattro", ano: 1998, fipeBase: 50000, categoria: "Importado" }
+];
+
+const pacotesLeilaoEspeciais = [
+    {
+        nome: "📦 Lote Frota Abandonada de Empresa",
+        descricao: "Pacote contendo 2 veículos utilitários de frota com histórico corporativo.",
+        quantidadeCarros: 2,
+        fipeBaseTotal: 45000,
+        categoria: "Lote Múltiplo"
+    },
+    {
+        nome: "📦 Celeiro do Vô Tonho (Dupla Clássica)",
+        descricao: "Dois clássicos nacionais encontrados no mesmo celeiro no interior.",
+        quantidadeCarros: 2,
+        fipeBaseTotal: 58000,
+        categoria: "Lote Múltiplo"
+    }
 ];
 
 const descricoesMisteriosas = [
-    "Veículo de garagem fechada há anos. Bateria arriada, não liga.",
-    "Apreendido em pátio municipal. Histórico duvidoso e cheiro de mofo.",
-    "Repasses de financeira. Sem chave de ignição e motor batendo seco.",
-    "Deixado por herança de tio avô. Tem muita poeira, mas o assoalho parece firme.",
-    "Carro de leilão de seguradora. Pequena batida na traseira, mecânica incerta.",
-    "Achado em celeiro no interior. Pneus muchos e vazamento misterioso."
+    "Veículo de garagem fechada há anos. Bateria arriada, estofamento com mofo.",
+    "Apreendido em pátio municipal por abandono. Histórico duvidoso.",
+    "Repasses de financeira de grande porte. Sem chave e motor batendo.",
+    "Deixado por herança de tio avô. Muita poeira acumulada, longarinas firmes.",
+    "Carro de seguradora (Recuperado). Pequena batida na traseira, mecânica incerta."
 ];
 
-const nomesConcorrentes = [
-    "Dr. Silveira (Colecionador)", 
-    "Garagista João (Re VENDA)", 
-    "Fião Tubarão (Desmanche)", 
-    "Investidor Anônimo", 
-    "Caçador de Relíquias SP",
-    "Felipe 'Turbo' RS"
+const concorrentesLeilao = [
+    { nome: "Dr. Silveira", tipo: "Colecionador", agressividade: 0.6, orcamentoMaxFator: 0.85 },
+    { nome: "Garagista João", tipo: "Revendedor", agressividade: 0.8, orcamentoMaxFator: 0.75 },
+    { nome: "Felipe 'Turbo' RS", tipo: "Preparador", agressividade: 0.9, orcamentoMaxFator: 0.90 },
+    { nome: "Auto Desmanche Tubarão LTDA", tipo: "Empresa", agressividade: 0.95, orcamentoMaxFator: 0.95 },
+    { nome: "Locadora Rápida S.A.", tipo: "Empresa", agressividade: 0.4, orcamentoMaxFator: 0.60 }
 ];
 
-let leilaoTimer = null;
+let leiloesIntervalos = {};
 
 function obterDataJogoFormatada() {
     if (typeof jogo === 'undefined') return "2026-1-1";
@@ -46,210 +69,329 @@ function verificarLeilaoDiario() {
     const dataJogoAtual = obterDataJogoFormatada();
     
     if (!jogo.controleLeilaoDiario) {
-        jogo.controleLeilaoDiario = { dataUltimoLeilao: "", participouHoje: false };
+        jogo.controleLeilaoDiario = { dataUltimoLeilao: "", participouHojeCompra: false };
     }
 
     if (jogo.controleLeilaoDiario.dataUltimoLeilao !== dataJogoAtual) {
-        jogo.controleLeilaoDiario.participouHoje = false;
+        jogo.controleLeilaoDiario.participouHojeCompra = false;
         jogo.controleLeilaoDiario.dataUltimoLeilao = dataJogoAtual;
-        jogo.loteLeilaoAtual = null;
-        jogo.carroNoLeilao = null;
         if (typeof salvarJogo === 'function') salvarJogo();
     }
 }
 
-function irParaPatio() {
-    if (leilaoTimer) clearInterval(leilaoTimer);
-    if (typeof mudarAba === 'function') {
-        mudarAba('patio');
-    } else if (typeof mostrarPatio === 'function') {
-        mostrarPatio();
-    } else {
-        window.location.reload();
-    }
-}
-
-function mostrarLeilao(){
+// ===========================================
+// RENDERIZAÇÃO PRINCIPAL (EXIBE COMPRA E VENDAS SIMULTÂNEAS)
+// ===========================================
+function mostrarLeilao() {
     if (typeof jogo === 'undefined') return;
     verificarLeilaoDiario();
+    injetarEstilosLeilao();
 
-    if (jogo.controleLeilaoDiario.participouHoje && !jogo.loteLeilaoAtual && !jogo.carroNoLeilao) {
-        conteudo.innerHTML = `
-        <div class="garagem-header" style="margin-bottom: 15px;">
-            <div class="garagem-titulo">
-                <span class="garagem-icone">🏆</span>
-                <div class="garagem-texto-titulo">
-                    <h1>AUDITÓRIO DE LEILÕES VIP</h1>
-                    <p>Portões fechados por hoje</p>
-                </div>
-            </div>
-        </div>
-        <div class="card leilao-card-vivo" style="text-align: center; padding: 40px;">
-            <span style="font-size: 3rem; display: block; margin-bottom: 15px;">⏳</span>
-            <h2>O Leilão de Hoje Já Ocorreu!</h2>
-            <p style="color: #aaa; margin-top: 10px; margin-bottom: 25px;">
-                Acontece apenas <strong>um leilão por dia</strong>. Avance o dia no jogo para participar de um novo leilão!
-            </p>
-            <button onclick="irParaPatio()" class="btn-leilao-lance" style="max-width: 250px; margin: 0 auto; cursor: pointer;">
-                🚗 Voltar ao Pátio
-            </button>
-        </div>
-        `;
-        return;
-    }
-
-    if (jogo.carroNoLeilao) {
-        mostrarLeilaoDoJogador();
-        return;
-    }
-
-    if(!jogo.loteLeilaoAtual){
+    // Garante que o lote de compra exista se o jogador ainda não concluiu o do dia
+    if (!jogo.controleLeilaoDiario.participouHojeCompra && !jogo.loteLeilaoAtual) {
         gerarLoteLeilao();
     }
 
-    let lote = jogo.loteLeilaoAtual;
-    let corLider = lote.ultimoLicitante === 'Você' ? '#00e676' : '#ffb700';
+    if (!jogo.listaCarrosNoLeilao) jogo.listaCarrosNoLeilao = [];
 
     let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🏆</span>
-            <div class="garagem-texto-titulo">
-                <h1>AUDITÓRIO DE LEILÕES VIP</h1>
-                <p>Disputa com ${lote.concorrentesNaSala.length} colecionadores na sala</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card leilao-card-vivo">
-        <div class="leilao-status-topo">
-            <span class="lote-badge-id">📦 LOTE MISTERIOSO #${lote.id}</span>
-            <span class="leilao-timer-box" id="timer-leilao">⏱️ ${lote.tempoRestante}s</span>
-        </div>
-
-        <div class="lote-caixa-descricao">
-            <p>"${lote.descricao}"</p>
-        </div>
-
-        <div class="leilao-painel-central">
-            <div class="lance-atual-bloco">
-                <span class="label-lance">MAIOR LANCE NA MESA</span>
-                <h2 id="valor-lance-atual">R$ ${lote.lanceAtual.toLocaleString("pt-BR")}</h2>
-                <small class="quem-esta-ganhando" style="color: ${corLider}">
-                    👑 Líder do leilão: <strong>${lote.ultimoLicitante}</strong>
-                </small>
+    <div class="leilao-wrapper-container">
+        <div class="garagem-header">
+            <div class="garagem-titulo">
+                <span class="garagem-icone">🏆</span>
+                <div class="garagem-texto-titulo">
+                    <h1>AUDITÓRIO DE LEILÕES - G2</h1>
+                    <p>Compre novos veículos na praça e monitore os leilões dos seus carros ao mesmo tempo</p>
+                </div>
             </div>
         </div>
 
-        <div class="historico-lances-container">
-            <span style="font-size: 0.65rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 4px;">📡 Registro do Pregão (Ao Vivo)</span>
-            <div class="historico-lances" id="historico-lances-box">
-                ${gerarHtmlHistorico(lote.historicoLances)}
+        <!-- SEÇÃO 1: LOTE DE COMPRA (PARA VOCÊ ARREMATAR) -->
+        <div style="margin-bottom: 25px;">
+            <div class="garagem-header" style="margin-bottom: 10px;">
+                <div class="garagem-titulo">
+                    <span class="garagem-icone">🛒</span>
+                    <div class="garagem-texto-titulo">
+                        <h2 style="font-size: 1.2rem; margin:0;">LEILÃO DE COMPRA (DISPUTE O LOTE)</h2>
+                        <p style="margin:0; font-size:0.8rem;">Dê lances para adicionar novos carros ao seu pátio</p>
+                    </div>
+                </div>
+            </div>
+            <div id="secao-lote-compra">
+                ${gerarHtmlLoteCompra()}
             </div>
         </div>
 
-        <div class="lote-botoes-acao" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="darLanceLeilao()" class="btn-leilao-lance" style="flex: 1; cursor: pointer;">
-                🔨 COBRIR LANCE (+ R$ ${lote.incremento.toLocaleString("pt-BR")})
-            </button>
-            <button onclick="abandonarLeilao()" class="btn-leilao-sair" style="flex: 1; cursor: pointer;">
-                🚪 Abandonar Auditório
-            </button>
+        <!-- SEÇÃO 2: SEUS CARROS NA PRAÇA (PARA OS BOTS COMPRAREM) -->
+        <div style="margin-top: 25px;">
+            <div class="garagem-header" style="margin-bottom: 10px;">
+                <div class="garagem-titulo">
+                    <span class="garagem-icone">📢</span>
+                    <div class="garagem-texto-titulo">
+                        <h2 style="font-size: 1.2rem; margin:0;">SEUS VEÍCULOS SENDO LEILOADOS</h2>
+                        <p style="margin:0; font-size:0.8rem;">Acompanhe as ofertas dos colecionadores pelo seu carro</p>
+                    </div>
+                </div>
+            </div>
+            <div id="lista-meus-leiloes-container">
+                ${gerarHtmlMeusCarrosLeilao()}
+            </div>
         </div>
 
-        <div style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; text-align: center;">
-            <button onclick="abrirModalColocarCarroLeilao()" class="btn-secundario" style="background: #2196F3; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                🏷️ Quero colocar um carro MEU no leilão de hoje
+        <div class="leilao-footer-botoes" style="margin-top: 25px;">
+            <button onclick="abrirModalColocarCarroLeilao()" class="btn-leilao-secundario">
+                🏷️ Enviar outro veículo do pátio para o leilão
             </button>
         </div>
     </div>
     `;
 
     conteudo.innerHTML = html;
-    iniciarCronometroLeilao();
+    iniciarTodosOsCronometros();
 }
 
-function gerarLoteLeilao(){
-    let carroBase = carrosLeilaoLote[aleatorio(0, carrosLeilaoLote.length - 1)];
-    let descricao = descricoesMisteriosas[aleatorio(0, descricoesMisteriosas.length - 1)];
-    let lanceInicial = Math.floor(carroBase.fipeBase * aleatorio(35, 50) / 100);
-
-    let qtdRivais = aleatorio(3, 4);
-    let disponiveis = [...nomesConcorrentes];
-    let ativosNaSala = [];
-    for(let i=0; i<qtdRivais; i++){
-        let idx = aleatorio(0, disponiveis.length - 1);
-        ativosNaSala.push(disponiveis[idx]);
-        disponiveis.splice(idx, 1);
+// ===========================================
+// HTML DO LOTE DE COMPRA
+// ===========================================
+function gerarHtmlLoteCompra() {
+    if (jogo.controleLeilaoDiario.participouHojeCompra && !jogo.loteLeilaoAtual) {
+        return `
+        <div class="leilao-card-vivo leilao-text-center">
+            <span class="leilao-emoji-gigante">⏳</span>
+            <h3>Lote de Compra Diário Concluído</h3>
+            <p class="leilao-subtext">Você já participou do leilão de aquisição de hoje. Avance o dia para o próximo pregão ou gerencie seus carros na praça abaixo!</p>
+            <button onclick="gerarLoteLeilao(); mostrarLeilao();" class="btn-leilao-lance" style="margin-top: 15px; max-width: 250px;">Solicitar Novo Lote Extra</button>
+        </div>`;
     }
 
-    jogo.loteLeilaoAtual = {
-        id: aleatorio(1000, 9999),
-        carroBase: carroBase,
-        descricao: descricao,
-        lanceAtual: lanceInicial,
-        incremento: Math.max(500, Math.floor(carroBase.fipeBase * 0.04)),
-        tetoMaximoBot: Math.floor(carroBase.fipeBase * aleatorio(75, 95) / 100),
-        tempoRestante: 12, 
-        ultimoLicitante: "Pregoeiro (Lance Inicial)",
-        concorrentesNaSala: ativosNaSala,
-        historicoLances: [`Lote aberto na mesa por R$ ${lanceInicial.toLocaleString("pt-BR")}`]
-    };
+    if (!jogo.loteLeilaoAtual) return '';
+
+    let lote = jogo.loteLeilaoAtual;
+    let corLider = lote.ultimoLicitante === 'Você' ? '#00e676' : '#ffb700';
+
+    return `
+    <div class="leilao-card-vivo" id="card-lote-compra">
+        <div class="leilao-status-topo">
+            <span class="lote-badge-id">📦 ${lote.isPacote ? lote.nomePacote : `LOTE DE COMPRA #${lote.id} (${lote.carroBase.categoria})`}</span>
+            <span class="leilao-timer-box" id="timer-leilao">⏱️ ${lote.tempoRestante}s</span>
+        </div>
+
+        <div class="lote-caixa-descricao">
+            ${lote.isPacote ? `<p><strong>Composição:</strong> Lote com <strong>${lote.quantidadeCarros} veículos</strong>.</p>` : `<p><strong>Veículo:</strong> ${lote.carroBase.marca} ${lote.carroBase.modelo} (${lote.carroBase.ano})</p>`}
+            <p class="leilao-citacao-insp">"${lote.descricao}"</p>
+        </div>
+
+        <div class="leilao-painel-central">
+            <div class="lance-atual-bloco">
+                <span class="label-lance">MAIOR LANCE NA MESA DE COMPRA</span>
+                <h2 id="valor-lance-atual">R$ ${lote.lanceAtual.toLocaleString("pt-BR")}</h2>
+                <small class="quem-esta-ganhando" style="color: ${corLider}" id="lider-compra-txt">
+                    👑 Líder do leilão: <strong>${lote.ultimoLicitante}</strong>
+                </small>
+            </div>
+        </div>
+
+        <div class="historico-lances-container">
+            <span class="leilao-sec-title">📡 Registro de Lances (Compra)</span>
+            <div class="historico-lances" id="historico-lances-box">
+                ${gerarHtmlHistorico(lote.historicoLances)}
+            </div>
+        </div>
+
+        <div class="lote-botoes-acao">
+            <button onclick="darLanceLeilao()" class="btn-leilao-lance">
+                🔨 COBRIR LANCE (+ R$ ${lote.incremento.toLocaleString("pt-BR")})
+            </button>
+            <button onclick="abandonarLeilaoCompra()" class="btn-leilao-sair">
+                🚪 Abandonar Lote
+            </button>
+        </div>
+    </div>`;
+}
+
+// ===========================================
+// HTML DOS CARROS DO JOGADOR NA PRAÇA
+// ===========================================
+function gerarHtmlMeusCarrosLeilao() {
+    if (!jogo.listaCarrosNoLeilao || jogo.listaCarrosNoLeilao.length === 0) {
+        return `<div class="card" style="background:#18181b; border:1px solid #27272a; text-align:center; padding:15px; color:#a1a1aa; border-radius:8px;">Nenhum veículo seu na praça de leilões no momento.</div>`;
+    }
+
+    return jogo.listaCarrosNoLeilao.map((dadosLeilao, index) => `
+    <div class="leilao-card-vivo" style="margin-bottom: 15px;" id="card-meu-carro-${index}">
+        <div class="leilao-status-topo">
+            <span class="lote-badge-id">🚗 ${dadosLeilao.carro.marca} ${dadosLeilao.carro.modelo} (${dadosLeilao.carro.ano})</span>
+            <span class="leilao-timer-box" id="timer-meu-carro-${index}">⏱️ ${dadosLeilao.tempoRestante}s</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #121215; padding: 12px; border-radius: 8px; border: 1px solid #27272a;">
+            <div>
+                <span class="label-lance">MAIOR OFERTA DA MESA</span>
+                <h3 style="margin:0; color:#4ade80; font-size: 1.5rem;" id="lance-meu-carro-${index}">R$ ${dadosLeilao.lanceAtual.toLocaleString("pt-BR")}</h3>
+                <small style="color:#ffb700;" id="lider-meu-carro-${index}">Interessado: <strong>${dadosLeilao.ultimoLicitante}</strong></small>
+            </div>
+            <button onclick="retirarCarroLeilao(${index})" class="btn-leilao-sair" style="padding: 8px 12px; font-size: 0.75rem;">Retirar da Praça</button>
+        </div>
+    </div>
+    `).join('');
+}
+
+// ===========================================
+// GERAÇÃO DOS LOTES DE COMPRA
+// ===========================================
+function gerarLoteLeilao() {
+    let ehPacote = Math.random() < 0.25;
+
+    if (ehPacote) {
+        let pacoteBase = pacotesLeilaoEspeciais[aleatorio(0, pacotesLeilaoEspeciais.length - 1)];
+        let descricao = descricoesMisteriosas[aleatorio(0, descricoesMisteriosas.length - 1)];
+        let lanceInicial = Math.floor(pacoteBase.fipeBaseTotal * aleatorio(30, 45) / 100);
+
+        let qtdRivais = aleatorio(3, 4);
+        let disponiveis = [...concorrentesLeilao];
+        let ativosNaSala = [];
+        for(let i=0; i<qtdRivais; i++){
+            let idx = aleatorio(0, disponiveis.length - 1);
+            ativosNaSala.push(disponiveis[idx].nome);
+            disponiveis.splice(idx, 1);
+        }
+
+        jogo.loteLeilaoAtual = {
+            id: aleatorio(1000, 9999),
+            isPacote: true,
+            nomePacote: pacoteBase.nome,
+            quantidadeCarros: pacoteBase.quantidadeCarros,
+            fipeTotal: pacoteBase.fipeBaseTotal,
+            descricao: descricao,
+            lanceAtual: lanceInicial,
+            incremento: Math.max(1000, Math.floor(pacoteBase.fipeBaseTotal * 0.05)),
+            tetoMaximoBot: Math.floor(pacoteBase.fipeBaseTotal * aleatorio(70, 90) / 100),
+            tempoRestante: 12,
+            ultimoLicitante: "Pregoeiro Oficial (Abertura)",
+            concorrentesNaSala: ativosNaSala,
+            historicoLances: [`Lote múltiplo aberto por R$ ${lanceInicial.toLocaleString("pt-BR")}`]
+        };
+    } else {
+        let carroBase = carrosLeilaoLote[aleatorio(0, carrosLeilaoLote.length - 1)];
+        let descricao = descricoesMisteriosas[aleatorio(0, descricoesMisteriosas.length - 1)];
+        let lanceInicial = Math.floor(carroBase.fipeBase * aleatorio(35, 50) / 100);
+
+        let qtdRivais = aleatorio(3, 4);
+        let disponiveis = [...concorrentesLeilao];
+        let ativosNaSala = [];
+        for(let i=0; i<qtdRivais; i++){
+            let idx = aleatorio(0, disponiveis.length - 1);
+            ativosNaSala.push(disponiveis[idx].nome);
+            disponiveis.splice(idx, 1);
+        }
+
+        jogo.loteLeilaoAtual = {
+            id: aleatorio(1000, 9999),
+            isPacote: false,
+            carroBase: carroBase,
+            descricao: descricao,
+            lanceAtual: lanceInicial,
+            incremento: Math.max(500, Math.floor(carroBase.fipeBase * 0.04)),
+            tetoMaximoBot: Math.floor(carroBase.fipeBase * aleatorio(75, 95) / 100),
+            tempoRestante: 12, 
+            ultimoLicitante: "Pregoeiro Oficial (Abertura)",
+            concorrentesNaSala: ativosNaSala,
+            historicoLances: [`Lote unitário aberto por R$ ${lanceInicial.toLocaleString("pt-BR")}`]
+        };
+    }
 
     if (typeof salvarJogo === 'function') salvarJogo();
 }
 
-function iniciarCronometroLeilao(){
-    if(leilaoTimer) clearInterval(leilaoTimer);
+// ===========================================
+// CRONÔMETROS ASSÍNCRONOS (ATUALIZAÇÃO DOM SEM PERDER FOCO)
+// ===========================================
+function iniciarTodosOsCronometros() {
+    Object.keys(leiloesIntervalos).forEach(k => clearInterval(leiloesIntervalos[k]));
+    leiloesIntervalos = {};
 
-    leilaoTimer = setInterval(() => {
-        let lote = jogo.loteLeilaoAtual;
-        if(!lote) {
-            clearInterval(leilaoTimer);
-            return;
-        }
-
-        lote.tempoRestante--;
-        
-        let elementoTimer = document.getElementById("timer-leilao");
-        if(elementoTimer) {
-            elementoTimer.innerHTML = `⏱️ ${lote.tempoRestante}s`;
-            if(lote.tempoRestante <= 4) {
-                elementoTimer.style.color = "#ff5252";
+    // 1. Cronômetro do Lote de Compra
+    if (jogo.loteLeilaoAtual) {
+        leiloesIntervalos['compra'] = setInterval(() => {
+            let lote = jogo.loteLeilaoAtual;
+            if (!lote) {
+                clearInterval(leiloesIntervalos['compra']);
+                return;
             }
-        }
 
-        if(lote.tempoRestante > 0 && lote.tempoRestante <= 3 && lote.ultimoLicitante === "Você") {
-            if(lote.lanceAtual < lote.tetoMaximoBot && Math.random() < 0.25) {
-                fazerLanceConcorrenteBot();
-            } else if (lote.lanceAtual >= lote.tetoMaximoBot && Math.random() < 0.50) {
-                lote.historicoLances.unshift(`🛑 O preço chegou próximo ao limite de mercado. Os colecionadores pararam.`);
-                if(lote.historicoLances.length > 4) lote.historicoLances.pop();
+            lote.tempoRestante--;
+            let elTimer = document.getElementById("timer-leilao");
+            if (elTimer) {
+                elTimer.innerHTML = `⏱️ ${lote.tempoRestante}s`;
+                if (lote.tempoRestante <= 4) elTimer.style.color = "#ff5252";
             }
-        }
 
-        if(lote.tempoRestante <= 0){
-            clearInterval(leilaoTimer);
-            
-            if(lote.ultimoLicitante === "Você") {
-                finalizarArremateLeilao();
-            } else {
-                if(typeof tocarSomErro === "function") tocarSomErro();
-                mostrarAlerta("🔨 MARTELO BATIDO!", `O lote foi arrematado por ${lote.ultimoLicitante} por R$ ${lote.lanceAtual.toLocaleString("pt-BR")}!`);
-                jogo.controleLeilaoDiario.participouHoje = true;
-                jogo.loteLeilaoAtual = null;
-                if (typeof salvarJogo === 'function') salvarJogo();
-                mostrarLeilao();
+            if (lote.tempoRestante > 0 && lote.tempoRestante <= 3 && lote.ultimoLicitante === "Você") {
+                if (lote.lanceAtual < lote.tetoMaximoBot && Math.random() < 0.35) {
+                    fazerLanceConcorrenteBot();
+                }
             }
-        }
-    }, 1000);
+
+            if (lote.tempoRestante <= 0) {
+                clearInterval(leiloesIntervalos['compra']);
+                if (lote.ultimoLicitante === "Você") {
+                    finalizarArremateLeilao();
+                } else {
+                    if(typeof tocarSomErro === "function") tocarSomErro();
+                    mostrarAlerta("🔨 MARTELO BATIDO!", `O lote foi arrematado por ${lote.ultimoLicitante} por R$ ${lote.lanceAtual.toLocaleString("pt-BR")}!`);
+                    jogo.controleLeilaoDiario.participouHojeCompra = true;
+                    jogo.loteLeilaoAtual = null;
+                    if (typeof salvarJogo === 'function') salvarJogo();
+                    if (document.getElementById("card-lote-compra")) mostrarLeilao();
+                }
+            }
+        }, 1000);
+    }
+
+    // 2. Cronômetros dos Carros do Jogador na Praça
+    if (jogo.listaCarrosNoLeilao && jogo.listaCarrosNoLeilao.length > 0) {
+        jogo.listaCarrosNoLeilao.forEach((dadosLeilao, index) => {
+            leiloesIntervalos[`meu_carro_${index}`] = setInterval(() => {
+                if (!jogo.listaCarrosNoLeilao[index]) {
+                    clearInterval(leiloesIntervalos[`meu_carro_${index}`]);
+                    return;
+                }
+
+                dadosLeilao.tempoRestante--;
+                let elTimerCarro = document.getElementById(`timer-meu-carro-${index}`);
+                if (elTimerCarro) elTimerCarro.innerHTML = `⏱️ ${dadosLeilao.tempoRestante}s`;
+
+                if (dadosLeilao.tempoRestante > 0 && dadosLeilao.lanceAtual < dadosLeilao.tetoCompraBot && Math.random() < 0.40) {
+                    let rivalSorteado = dadosLeilao.concorrentesNaSala[aleatorio(0, dadosLeilao.concorrentesNaSala.length - 1)];
+                    dadosLeilao.lanceAtual += dadosLeilao.incremento;
+                    dadosLeilao.ultimoLicitante = rivalSorteado;
+                    dadosLeilao.tempoRestante = 8;
+
+                    dadosLeilao.historicoLances.unshift(`🔥 ${rivalSorteado} elevou para R$ ${dadosLeilao.lanceAtual.toLocaleString("pt-BR")}`);
+                    if(dadosLeilao.historicoLances.length > 5) dadosLeilao.historicoLances.pop();
+
+                    let elLance = document.getElementById(`lance-meu-carro-${index}`);
+                    let elLider = document.getElementById(`lider-meu-carro-${index}`);
+                    if (elLance) elLance.innerText = `R$ ${dadosLeilao.lanceAtual.toLocaleString("pt-BR")}`;
+                    if (elLider) elLider.innerHTML = `Interessado: <strong>${rivalSorteado}</strong>`;
+                    
+                    if (typeof salvarJogo === 'function') salvarJogo();
+                }
+
+                if (dadosLeilao.tempoRestante <= 0) {
+                    clearInterval(leiloesIntervalos[`meu_carro_${index}`]);
+                    finalizarVendaCarroLeilao(index);
+                }
+            }, 1000);
+        });
+    }
 }
 
-function fazerLanceConcorrenteBot(){
+// ===========================================
+// AÇÕES DE COMPRA
+// ===========================================
+function fazerLanceConcorrenteBot() {
     let lote = jogo.loteLeilaoAtual;
-    if(!lote) return;
-
-    if (lote.lanceAtual >= lote.tetoMaximoBot) return;
+    if(!lote || lote.lanceAtual >= lote.tetoMaximoBot) return;
 
     let rivalSorteado = lote.concorrentesNaSala[aleatorio(0, lote.concorrentesNaSala.length - 1)];
     lote.lanceAtual += lote.incremento;
@@ -257,13 +399,13 @@ function fazerLanceConcorrenteBot(){
     lote.tempoRestante = 8; 
 
     lote.historicoLances.unshift(`⚡ ${rivalSorteado} cobriu para R$ ${lote.lanceAtual.toLocaleString("pt-BR")}!`);
-    if(lote.historicoLances.length > 4) lote.historicoLances.pop();
+    if(lote.historicoLances.length > 5) lote.historicoLances.pop();
 
+    atualizarDomLoteCompra();
     if (typeof salvarJogo === 'function') salvarJogo();
-    mostrarLeilao();
 }
 
-function darLanceLeilao(){
+function darLanceLeilao() {
     let lote = jogo.loteLeilaoAtual;
     if(!lote) return;
 
@@ -271,182 +413,190 @@ function darLanceLeilao(){
 
     if(jogo.dinheiro < valorTotalLance){
         if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("💸 Saldo Insuficiente", "Você não tem dinheiro suficiente para cobrir este lance!");
+        mostrarAlerta("💸 Saldo Insuficiente", "Você não tem fundos líquidos para cobrir este lance!");
         return;
     }
 
-    // Toca som curto de batida de martelo / lance
     tocarSomLanceLeilao();
 
     lote.lanceAtual = valorTotalLance;
     lote.ultimoLicitante = "Você";
     lote.tempoRestante = 10; 
 
-    lote.historicoLances.unshift(`✅ Você encobriu para R$ ${valorTotalLance.toLocaleString("pt-BR")}`);
-    if(lote.historicoLances.length > 4) lote.historicoLances.pop();
+    lote.historicoLances.unshift(`✅ Você encobriu a mesa ofertando R$ ${valorTotalLance.toLocaleString("pt-BR")}`);
+    if(lote.historicoLances.length > 5) lote.historicoLances.pop();
 
+    atualizarDomLoteCompra();
     if (typeof salvarJogo === 'function') salvarJogo();
-    mostrarLeilao();
+}
+
+function atualizarDomLoteCompra() {
+    let lote = jogo.loteLeilaoAtual;
+    if (!lote) return;
+    
+    let elValor = document.getElementById("valor-lance-atual");
+    let elLider = document.getElementById("lider-compra-txt");
+    let elHistorico = document.getElementById("historico-lances-box");
+
+    if (elValor) elValor.innerText = `R$ ${lote.lanceAtual.toLocaleString("pt-BR")}`;
+    if (elLider) {
+        let corLider = lote.ultimoLicitante === 'Você' ? '#00e676' : '#ffb700';
+        elLider.style.color = corLider;
+        elLider.innerHTML = `👑 Líder do leilão: <strong>${lote.ultimoLicitante}</strong>`;
+    }
+    if (elHistorico) {
+        elHistorico.innerHTML = gerarHtmlHistorico(lote.historicoLances);
+    }
 }
 
 function gerarHtmlHistorico(historico){
     return historico.map(h => `<div class="historico-item">${h}</div>`).join('');
 }
 
-function finalizarArremateLeilao(){
+// ===========================================
+// FINALIZAÇÕES E ENVIO DE CARROS
+// ===========================================
+function finalizarArremateLeilao() {
     let lote = jogo.loteLeilaoAtual;
     if(!lote) return;
 
-    // --- TRAVA DE VAGAS DO PÁTIO ---
     if(!jogo.empresa) jogo.empresa = { nivel: 1, vagas: 4 };
     if(!jogo.empresa.vagas) jogo.empresa.vagas = 4;
     if(!jogo.carros) jogo.carros = [];
 
-    if (jogo.carros.length >= jogo.empresa.vagas) {
+    let carrosCount = lote.isPacote ? lote.quantidadeCarros : 1;
+
+    if ((jogo.carros.length + carrosCount) > jogo.empresa.vagas) {
         if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta(
-            "🅿️ Pátio Lotado!", 
-            `Seu pátio atingiu o limite de ${jogo.empresa.vagas} vagas.\n\nVenda um veículo ou expanda sua garagem para poder arrematar novos lotes!`
-        );
+        mostrarAlerta("🅿️ Pátio Lotado!", `Seu pátio suporta no máximo ${jogo.empresa.vagas} veículos. Venda carros ou expanda a oficina.`);
         return;
     }
-    // -------------------------------
 
     if(jogo.dinheiro < lote.lanceAtual){
         if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("💸 Erro", "Você não possui saldo para liquidar este arremate!");
+        mostrarAlerta("💸 Erro", "Saldo insuficiente para liquidar a arrematação!");
         return;
     }
 
     jogo.dinheiro -= lote.lanceAtual;
+    if(typeof tocarSomCompra === "function") tocarSomCompra(); else tocarSomLanceLeilao();
 
-    // Toca som de compra com sucesso
-    if(typeof tocarSomCompra === "function") {
-        tocarSomCompra();
-    } else {
-        tocarSomLanceLeilao();
-    }
-
-    let listaDefeitosPossiveis = [
+    let listaDefeitos = [
         { nome: "Motor fundido", valor: 3500 },
-        { nome: "Suspensão totalmente estourada", valor: 2000 },
+        { nome: "Suspensão estourada", valor: 2000 },
         { nome: "Câmbio travado", valor: 2500 },
-        { nome: "Sistema elétrico em curto", valor: 1500 },
-        { nome: "Freios inoperantes", valor: 1200 },
-        { nome: "Vazamento crônico de óleo", valor: 900 }
+        { nome: "Sistema elétrico em curto", valor: 1500 }
     ];
 
-    let quantidadeDefeitos = aleatorio(1, 3);
-    let defeitosCarro = [];
-    let copiaDefeitos = [...listaDefeitosPossiveis];
+    let carrosNomes = [];
+    let qtdAdd = lote.isPacote ? lote.quantidadeCarros : 1;
 
-    for(let i = 0; i < quantidadeDefeitos; i++){
-        if(copiaDefeitos.length === 0) break;
-        let indexDef = aleatorio(0, copiaDefeitos.length - 1);
-        defeitosCarro.push(copiaDefeitos[indexDef]);
-        copiaDefeitos.splice(indexDef, 1);
+    for(let p = 0; p < qtdAdd; p++) {
+        let b = lote.isPacote ? carrosLeilaoLote[aleatorio(0, carrosLeilaoLote.length - 1)] : lote.carroBase;
+        let defs = [];
+        let copiaD = [...listaDefeitos];
+        for(let i=0; i<aleatorio(1, 2); i++){
+            if(copiaD.length === 0) break;
+            let idxx = aleatorio(0, copiaD.length - 1);
+            defs.push(copiaD[idxx]);
+            copiaD.splice(idxx, 1);
+        }
+
+        let novoC = {
+            marca: b.marca,
+            modelo: b.modelo,
+            ano: b.ano,
+            km: aleatorio(80000, 200000),
+            fipe: b.fipeBase,
+            precoCompra: Math.floor(lote.lanceAtual / qtdAdd),
+            cor: "Original de Leilão",
+            defeitos: defs,
+            reparos: []
+        };
+        jogo.carros.push(novoC);
+        carrosNomes.push(`${novoC.marca} ${novoC.modelo} (${novoC.ano})`);
     }
 
-    let novoCarro = {
-        marca: lote.carroBase.marca,
-        modelo: lote.carroBase.modelo,
-        ano: lote.carroBase.ano,
-        km: aleatorio(80000, 200000),
-        fipe: lote.carroBase.fipeBase,
-        precoCompra: lote.lanceAtual,
-        cor: "Original de Leilão",
-        defeitos: defeitosCarro,
-        reparos: []
-    };
-
-    if(!jogo.carros) jogo.carros = [];
-    jogo.carros.push(novoCarro);
-
     if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0 };
-    jogo.estatisticas.comprados++;
+    jogo.estatisticas.comprados += carrosNomes.length;
 
     jogo.loteLeilaoAtual = null;
-    jogo.controleLeilaoDiario.participouHoje = true;
-    if(leilaoTimer) clearInterval(leilaoTimer);
-
-    if (typeof atualizarPainel === 'function') atualizarPainel();
+    jogo.controleLeilaoDiario.participouHojeCompra = true;
     if (typeof salvarJogo === 'function') salvarJogo();
 
-    mostrarAlerta(
-        "🎉 LOTE ARREMATADO NO PREGÃO!",
-        `Parabéns! Você venceu a disputa e levou o ${novoCarro.marca} ${novoCarro.modelo} (${novoCarro.ano}) por R$ ${lote.lanceAtual.toLocaleString("pt-BR")}!\n\nO veículo foi descarregado no seu pátio.`
-    );
-
-    irParaPatio();
+    mostrarAlerta("🎉 LOTE ARREMATADO!", `Você arrematou com sucesso:\n• ${carrosNomes.join("\n• ")}`);
+    mostrarLeilao();
 }
 
-function abandonarLeilao(){
-    if(leilaoTimer) clearInterval(leilaoTimer);
+function abandonarLeilaoCompra(){
+    if(leiloesIntervalos['compra']) clearInterval(leiloesIntervalos['compra']);
     jogo.loteLeilaoAtual = null;
-    jogo.controleLeilaoDiario.participouHoje = true;
+    jogo.controleLeilaoDiario.participouHojeCompra = true;
     if (typeof salvarJogo === 'function') salvarJogo();
-    mostrarAlerta("🚪 Desistência", "Você se retirou do auditório de leilões por hoje.");
+    mostrarAlerta("🚪 Desistência", "Você abandonou o leilão de compra de hoje.");
     mostrarLeilao();
 }
 
 function abrirModalColocarCarroLeilao() {
     if (!jogo.carros || jogo.carros.length === 0) {
-        mostrarAlerta("Garagem Vazia", "Você não tem nenhum carro no pátio para enviar ao leilão!");
+        mostrarAlerta("Pátio Vazio", "Você não tem veículos no pátio para enviar ao leilão!");
         return;
     }
 
     let listaOpcoesHtml = jogo.carros.map((carro, index) => {
         let valorFipe = carro.fipe || carro.f || 15000;
-        let kmCarro = carro.km || 0;
         return `
-        <div style="background: #1e1e1e; padding: 12px; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="leilao-item-patio-card">
             <div>
                 <strong>${carro.marca} ${carro.modelo} (${carro.ano})</strong><br>
-                <small style="color: #888;">FIPE: R$ ${valorFipe.toLocaleString("pt-BR")} | KM: ${kmCarro}</small>
+                <small class="leilao-sub-info">FIPE: R$ ${valorFipe.toLocaleString("pt-BR")} | KM: ${carro.km || 0} km</small>
             </div>
-            <button onclick="selecionarCarroParaLeilao(${index})" class="btn-leilao-lance" style="padding: 6px 12px; font-size: 0.8rem; cursor: pointer;">
-                Enviar ao Leilão 🏷️
+            <button onclick="enviarCarroParaLeilaoPraça(${index})" class="btn-leilao-lance" style="padding: 6px 12px; font-size: 0.8rem;">
+                Enviar para Praça 🏷️
             </button>
         </div>
     `;}).join('');
 
     conteudo.innerHTML = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">🏷️</span>
-            <div class="garagem-texto-titulo">
-                <h1>SELECIONAR VEÍCULO PARA O LEILÃO</h1>
-                <p>Escolha qual carro do seu pátio irá para o pregão de hoje</p>
+    <div class="leilao-wrapper-container">
+        <div class="garagem-header">
+            <div class="garagem-titulo">
+                <span class="garagem-icone">🏷️</span>
+                <div class="garagem-texto-titulo">
+                    <h1>CADASTRAR VEÍCULO PARA LEILÃO NA PRAÇA</h1>
+                    <p>Envie um carro do pátio para leiloar enquanto participa do leilão de compra</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="card" style="max-height: 400px; overflow-y: auto;">
-        ${listaOpcoesHtml}
-        <div style="margin-top: 15px; text-align: center;">
-            <button onclick="mostrarLeilao()" class="btn-leilao-sair" style="padding: 8px 16px; cursor: pointer;">Voltar</button>
+        <div class="card" style="max-height: 400px; overflow-y: auto; background: #18181b; border: 1px solid #27272a;">
+            ${listaOpcoesHtml}
+            <div style="margin-top: 15px; text-align: center;">
+                <button onclick="mostrarLeilao()" class="btn-leilao-sair" style="padding: 8px 16px;">Voltar ao Auditório</button>
+            </div>
         </div>
     </div>
     `;
 }
 
-function selecionarCarroParaLeilao(indexCarro) {
+function enviarCarroParaLeilaoPraça(indexCarro) {
     if (!jogo.carros || !jogo.carros[indexCarro]) return;
     
     let carroEscolhido = jogo.carros.splice(indexCarro, 1)[0]; 
-    
     let valorFipe = carroEscolhido.fipe || carroEscolhido.f || 15000;
     let lanceInicialSorteado = Math.floor(valorFipe * aleatorio(45, 65) / 100);
 
     let qtdRivais = aleatorio(3, 4);
-    let disponiveis = [...nomesConcorrentes];
+    let disponiveis = [...concorrentesLeilao];
     let ativosNaSala = [];
     for(let i=0; i<qtdRivais; i++){
         let idx = aleatorio(0, disponiveis.length - 1);
-        ativosNaSala.push(disponiveis[idx]);
+        ativosNaSala.push(disponiveis[idx].nome);
         disponiveis.splice(idx, 1);
     }
 
-    jogo.carroNoLeilao = {
+    if (!jogo.listaCarrosNoLeilao) jogo.listaCarrosNoLeilao = [];
+
+    jogo.listaCarrosNoLeilao.push({
         carro: carroEscolhido,
         lanceAtual: lanceInicialSorteado,
         incremento: Math.max(500, Math.floor(valorFipe * 0.04)),
@@ -454,149 +604,66 @@ function selecionarCarroParaLeilao(indexCarro) {
         tempoRestante: 12,
         ultimoLicitante: "Nenhum lance ainda",
         concorrentesNaSala: ativosNaSala,
-        historicoLances: [`Seu ${carroEscolhido.marca} ${carroEscolhido.modelo} foi anunciado na mesa por R$ ${lanceInicialSorteado.toLocaleString("pt-BR")}`]
-    };
+        historicoLances: [`Anunciado na praça por R$ ${lanceInicialSorteado.toLocaleString("pt-BR")}`]
+    });
 
-    jogo.loteLeilaoAtual = null;
     if (typeof salvarJogo === 'function') salvarJogo();
-    mostrarLeilaoDoJogador();
+    mostrarLeilao();
 }
 
-function mostrarLeilaoDoJogador() {
-    let dadosLeilao = jogo.carroNoLeilao;
-    if (!dadosLeilao) return;
+function finalizarVendaCarroLeilao(indexLeilao) {
+    if (!jogo.listaCarrosNoLeilao || !jogo.listaCarrosNoLeilao[indexLeilao]) return;
 
-    let html = `
-    <div class="garagem-header" style="margin-bottom: 15px;">
-        <div class="garagem-titulo">
-            <span class="garagem-icone">📢</span>
-            <div class="garagem-texto-titulo">
-                <h1>SEU VEÍCULO EM LEILÃO</h1>
-                <p>Acompanhe os colecionadores disputando o seu ${dadosLeilao.carro.marca} ${dadosLeilao.carro.modelo}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="card leilao-card-vivo">
-        <div class="leilao-status-topo">
-            <span class="lote-badge-id">🚗 SEU CARRO À VENDA</span>
-            <span class="leilao-timer-box" id="timer-leilao-jogador">⏱️ ${dadosLeilao.tempoRestante}s</span>
-        </div>
-
-        <div class="leilao-painel-central">
-            <div class="lance-atual-bloco">
-                <span class="label-lance">MAIOR OFERTA DA MESA</span>
-                <h2>R$ ${dadosLeilao.lanceAtual.toLocaleString("pt-BR")}</h2>
-                <small class="quem-esta-ganhando" style="color: #ffb700;">
-                    🤝 Comprador interessado: <strong>${dadosLeilao.ultimoLicitante}</strong>
-                </small>
-            </div>
-        </div>
-
-        <div class="historico-lances-container">
-            <span style="font-size: 0.65rem; color: #888; text-transform: uppercase; display: block; margin-bottom: 4px;">📡 Pregão do seu carro ao vivo</span>
-            <div class="historico-lances">
-                ${gerarHtmlHistorico(dadosLeilao.historicoLances)}
-            </div>
-        </div>
-
-        <div style="margin-top: 15px; text-align: center;">
-            <p style="color: #888; font-size: 0.8rem;">O leilão do seu veículo rola automaticamente até o martelo bater!</p>
-        </div>
-    </div>
-    `;
-
-    conteudo.innerHTML = html;
-    iniciarCronometroLeilaoDoJogador();
-}
-
-function iniciarCronometroLeilaoDoJogador() {
-    if(leilaoTimer) clearInterval(leilaoTimer);
-
-    leilaoTimer = setInterval(() => {
-        let dadosLeilao = jogo.carroNoLeilao;
-        if(!dadosLeilao) {
-            clearInterval(leilaoTimer);
-            return;
-        }
-
-        dadosLeilao.tempoRestante--;
-
-        let elementoTimer = document.getElementById("timer-leilao-jogador");
-        if(elementoTimer) {
-            elementoTimer.innerHTML = `⏱️ ${dadosLeilao.tempoRestante}s`;
-        }
-
-        if(dadosLeilao.tempoRestante > 0 && dadosLeilao.lanceAtual < dadosLeilao.tetoCompraBot && Math.random() < 0.40) {
-            let rivalSorteado = dadosLeilao.concorrentesNaSala[aleatorio(0, dadosLeilao.concorrentesNaSala.length - 1)];
-            dadosLeilao.lanceAtual += dadosLeilao.incremento;
-            dadosLeilao.ultimoLicitante = rivalSorteado;
-            dadosLeilao.tempoRestante = 8; 
-
-            dadosLeilao.historicoLances.unshift(`🔥 ${rivalSorteado} ofereceu R$ ${dadosLeilao.lanceAtual.toLocaleString("pt-BR")}`);
-            if(dadosLeilao.historicoLances.length > 4) dadosLeilao.historicoLances.pop();
-            
-            if (typeof salvarJogo === 'function') salvarJogo();
-            mostrarLeilaoDoJogador();
-        }
-
-        if(dadosLeilao.tempoRestante <= 0) {
-            clearInterval(leilaoTimer);
-            finalizarVendaCarroLeilao();
-        }
-    }, 1000);
-}
-
-function finalizarVendaCarroLeilao() {
-    let dadosLeilao = jogo.carroNoLeilao;
-    if(!dadosLeilao) return;
-
+    let dadosLeilao = jogo.listaCarrosNoLeilao[indexLeilao];
     let valorVenda = dadosLeilao.lanceAtual;
-    let comprador = dadosLeilao.ultimoLicitante === "Nenhum lance ainda" ? "Ninguém quis comprar" : dadosLeilao.ultimoLicitante;
+    let comprador = dadosLeilao.ultimoLicitante;
 
-    if(dadosLeilao.ultimoLicitante === "Nenhum lance ainda") {
+    if(comprador === "Nenhum lance ainda") {
         if(!jogo.carros) jogo.carros = [];
         jogo.carros.push(dadosLeilao.carro);
         if(typeof tocarSomErro === "function") tocarSomErro();
-        mostrarAlerta("❌ Lote Deserto", "Nenhum colecionador se interessou pelo seu carro. Ele retornou ao seu pátio.");
+        mostrarAlerta("❌ Lote Deserto", `Nenhum licitante quis o seu ${dadosLeilao.carro.marca} ${dadosLeilao.carro.modelo}. Ele retornou ao pátio.`);
     } else {
         jogo.dinheiro += valorVenda;
         if(!jogo.estatisticas) jogo.estatisticas = { comprados: 0, vendidos: 0, consertados: 0 };
         jogo.estatisticas.vendidos++;
 
-        if(typeof tocarSomCompra === "function") {
-            tocarSomCompra();
-        } else {
-            tocarSomLanceLeilao();
-        }
+        if(typeof tocarSomCompra === "function") tocarSomCompra(); else tocarSomLanceLeilao();
 
-        mostrarAlerta(
-            "💰 CARRO VENDIDO NO LEILÃO!",
-            `Seu ${dadosLeilao.carro.marca} ${dadosLeilao.carro.modelo} foi arrematado por ${comprador} por R$ ${valorVenda.toLocaleString("pt-BR")}!`
-        );
+        mostrarAlerta("💰 CARRO VENDIDO NA PRAÇA!", `Seu ${dadosLeilao.carro.marca} ${dadosLeilao.carro.modelo} foi arrematado por ${comprador} por R$ ${valorVenda.toLocaleString("pt-BR")}!`);
     }
 
-    jogo.carroNoLeilao = null;
-    jogo.controleLeilaoDiario.participouHoje = true;
+    jogo.listaCarrosNoLeilao.splice(indexLeilao, 1);
     if (typeof atualizarPainel === 'function') atualizarPainel();
     if (typeof salvarJogo === 'function') salvarJogo();
-    irParaPatio();
+    mostrarLeilao();
+}
+
+function retirarCarroLeilao(indexLeilao) {
+    if (!jogo.listaCarrosNoLeilao || !jogo.listaCarrosNoLeilao[indexLeilao]) return;
+    if(leiloesIntervalos[`meu_carro_${indexLeilao}`]) clearInterval(leiloesIntervalos[`meu_carro_${indexLeilao}`]);
+
+    let carroRetirado = jogo.listaCarrosNoLeilao.splice(indexLeilao, 1)[0].carro;
+    if(!jogo.carros) jogo.carros = [];
+    jogo.carros.push(carroRetirado);
+
+    if (typeof salvarJogo === 'function') salvarJogo();
+    mostrarAlerta("🚗 Retirado", "Você retirou o veículo da praça de leilões com sucesso.");
+    mostrarLeilao();
 }
 
 // ===========================
-// EFEITOS SONOROS ESPECÍFICOS PARA O LEILÃO (WEB AUDIO API)
+// ÁUDIO & ESTILOS CSS
 // ===========================
 function tocarSomLanceLeilao() {
     if (typeof audioCtx !== "undefined" && audioCtx) {
         try {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
 
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Nota D5 (clique agudo de batida de martelo)
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(880.00, audioCtx.currentTime + 0.08);
 
             gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
@@ -611,7 +678,39 @@ function tocarSomLanceLeilao() {
     }
 }
 
+function injetarEstilosLeilao() {
+    if (document.getElementById("estilos-leilao-g2")) return;
+    let style = document.createElement('style');
+    style.id = "estilos-leilao-g2";
+    style.innerHTML = `
+        .leilao-wrapper-container { max-width: 850px; margin: 0 auto; }
+        .leilao-card-vivo { background: linear-gradient(135deg, #18181b 0%, #09090b 100%); border: 1px solid #27272a; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); color: #f4f4f5; }
+        .leilao-status-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .lote-badge-id { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .leilao-timer-box { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .lote-caixa-descricao { background: #202024; border-left: 4px solid #3b82f6; padding: 10px 14px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+        .lote-caixa-descricao p { margin: 0; color: #d4d4d8; font-style: italic; font-size: 0.9rem; }
+        .leilao-painel-central { text-align: center; background: #121215; border: 1px solid #27272a; border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        .label-lance { font-size: 0.65rem; color: #a1a1aa; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .lance-atual-bloco h2 { margin: 0 0 6px 0; font-size: 2rem; color: #4ade80; font-weight: 800; }
+        .historico-lances-container { background: #121215; border: 1px solid #27272a; border-radius: 8px; padding: 10px; margin-bottom: 15px; }
+        .leilao-sec-title { font-size: 0.65rem; color: #a1a1aa; text-transform: uppercase; display: block; margin-bottom: 4px; font-weight: 600; }
+        .historico-lances { max-height: 90px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .historico-item { font-size: 0.8rem; color: #d4d4d8; background: #18181b; padding: 5px 8px; border-radius: 4px; border-left: 3px solid #3f3f46; }
+        .lote-botoes-acao { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-leilao-lance { flex: 1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-leilao-sair { flex: 1; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .btn-leilao-secundario { background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .leilao-item-patio-card { background: #121215; padding: 10px; margin-bottom: 6px; border-radius: 8px; border: 1px solid #27272a; display: flex; justify-content: space-between; align-items: center; }
+        .leilao-sub-info { color: #a1a1aa; font-size: 0.75rem; }
+        .leilao-text-center { text-align: center; padding: 30px; }
+        .leilao-emoji-gigante { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+        .leilao-subtext { color: #a1a1aa; margin-top: 5px; font-size: 0.9rem; }
+    `;
+    document.head.appendChild(style);
+}
+
 if(typeof jogo !== 'undefined') {
     if(jogo.loteLeilaoAtual === undefined) jogo.loteLeilaoAtual = null;
-    if(jogo.carroNoLeilao === undefined) jogo.carroNoLeilao = null;
+    if(jogo.listaCarrosNoLeilao === undefined) jogo.listaCarrosNoLeilao = [];
 }

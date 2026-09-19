@@ -36,7 +36,6 @@ function registrarEstatisticaVenda(carroModelo, lucro) {
 }
 
 function mostrarEmpresa(){
-    // Garante estrutura e tenta estimar/puxar caso venha de vendas passadas
     if (!jogo.estatisticas) {
         jogo.estatisticas = {
             comprados: 0,
@@ -51,7 +50,6 @@ function mostrarEmpresa(){
 
     let est = jogo.estatisticas;
 
-    // Fallback de segurança: Se já houve vendas mas o recorde está zerado, garante um valor base para teste
     if (est.vendidos > 0 && est.melhorVendaValor === 0) {
         est.melhorVendaValor = Math.max(2500, Math.floor((jogo.lucro || 10000) / Math.max(1, est.vendidos)));
         est.melhorVendaCarro = "Veículo do Pátio";
@@ -138,7 +136,7 @@ function mostrarEmpresa(){
 
             <!-- BOTÕES DE NAVEGAÇÃO -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-                <button onclick="mostrarGerenciamentoFuncionarios()" style="padding: 12px; background: #27272a; color: #fff; font-weight: bold; border: 1px solid #3f3f46; border-radius: 8px; cursor: pointer;">👨‍🔧 Gerenciar Equipe</button>
+                <button onclick="mostrarGerenciamentoFuncionarios()" style="padding: 12px; background: #059669; color: #fff; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">👨‍🔧 Gerenciar Equipe</button>
                 <button onclick="mostrarConfiguracoes()" style="padding: 12px; background: #27272a; color: #fff; font-weight: bold; border: 1px solid #3f3f46; border-radius: 8px; cursor: pointer;">⚙️ Configurações</button>
             </div>
         </div>
@@ -220,7 +218,7 @@ function contratarFuncionario(){
 }
 
 // ===========================
-// CONFIGURAÇÕES
+// CONFIGURAÇÕES (REORGANIZADO POR PRIORIDADE)
 // ===========================
 
 function mostrarConfiguracoes(){
@@ -232,8 +230,9 @@ function mostrarConfiguracoes(){
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                <button onclick="mostrarSaves()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 Gerenciar Saves & Backup</button>
+                <button onclick="alternarTema()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">🎨 Alternar Tema do Jogo</button>
                 <button onclick="mostrarEstatisticas()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">📊 Estatísticas do Jogador</button>
+                <button onclick="mostrarSaves()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 Gerenciar Saves & Backup</button>
                 <button onclick="mostrarSobre()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">📖 Sobre o Jogo</button>
                 <button onclick="mostrarCreditos()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">👨‍💻 Créditos</button>
                 <button onclick="mostrarBug()" style="padding: 12px; background: #18181b; color: #fff; text-align: left; border: 1px solid #27272a; border-radius: 8px; cursor: pointer; font-weight: bold;">🐞 Reportar Bug / Suporte</button>
@@ -242,8 +241,49 @@ function mostrarConfiguracoes(){
     `;
 }
 
+// ==========================================
+// SISTEMA DE TROCA DE TEMA PELO USUÁRIO (COM O TEMA ORIGINAL INCLUÍDO)
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", () => {
+  const temaSalvo = localStorage.getItem("g2_garage_tema") || "";
+  document.body.className = temaSalvo;
+});
+
+function alternarTema() {
+  const body = document.body;
+  let novoTema = "";
+
+  // Ciclo atualizado: Tema Original ➔ Racing ➔ Retro ➔ Clean ➔ Retorna ao Original
+  if (body.className === "" || !body.classList.contains("tema-racing") && !body.classList.contains("tema-retro") && !body.classList.contains("tema-clean")) {
+    novoTema = "tema-racing";
+    if (typeof mostrarAvisoTopo === 'function') {
+      mostrarAvisoTopo("Tema alterado para: Racing Pro 🏎️");
+    }
+  } else if (body.classList.contains("tema-racing")) {
+    novoTema = "tema-retro";
+    if (typeof mostrarAvisoTopo === 'function') {
+      mostrarAvisoTopo("Tema alterado para: Arcade Retro 🕹️");
+    }
+  } else if (body.classList.contains("tema-retro")) {
+    novoTema = "tema-clean";
+    if (typeof mostrarAvisoTopo === 'function') {
+      mostrarAvisoTopo("Tema alterado para: Dark Clean 🖥️");
+    }
+  } else {
+    // Volta para o Tema Original do seu jogo
+    novoTema = "";
+    if (typeof mostrarAvisoTopo === 'function') {
+      mostrarAvisoTopo("Tema alterado para: Original do Jogo 🌟");
+    }
+  }
+
+  body.className = novoTema;
+  localStorage.setItem("g2_garage_tema", novoTema);
+}
+
 // ===========================
-// SAVES & BACKUP (NOVO JOGO EM 1º, CARREGAR EM 2º)
+// SAVES & BACKUP (ORDEM MAIS SEGURA)
 // ===========================
 
 function mostrarSaves(){
@@ -257,18 +297,23 @@ function mostrarSaves(){
             <p style="font-size: 13px; color: #a1a1aa; margin-bottom: 15px;">Gerencie seus dados de progresso e faça backups por código.</p>
 
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- 1º LUGAR: NOVO JOGO / APAGAR SAVE -->
-                <button onclick="apagarSave()" style="padding: 12px; background: #dc2626; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span>🆕</span> Novo Jogo (Apagar Progresso Atual)
-                </button>
+                <!-- 1º LUGAR: SALVAR JOGO (SEGURANÇA EM PRIMEIRO) -->
+                <button onclick="salvarJogo(); mostrarAlerta('Sucesso', 'Jogo salvo com sucesso!');" style="padding: 12px; background: #059669; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 Salvar Jogo Agora</button>
+                
+                <!-- 2º LUGAR: EXPORTAR SAVE -->
+                <button onclick="exportarSave()" style="padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📤 Exportar Código de Save</button>
 
-                <!-- 2º LUGAR: CARREGAR / SALVAR JOGO -->
+                <!-- 3º LUGAR: IMPORTAR / CARREGAR SAVE -->
                 <button onclick="importarSavePrompt()" style="padding: 12px; background: #d97706; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <span>💾</span> Carregar / Importar Código de Save
                 </button>
 
-                <button onclick="salvarJogo(); mostrarAlerta('Sucesso', 'Jogo salvo com sucesso!');" style="padding: 12px; background: #059669; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">💾 Salvar Jogo Agora</button>
-                <button onclick="exportarSave()" style="padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">📤 Exportar Código de Save</button>
+                <hr style="border: 0; border-top: 1px solid #27272a; margin: 5px 0;">
+
+                <!-- ÚLTIMO LUGAR: NOVO JOGO / APAGAR (DESTRUTIVO) -->
+                <button onclick="apagarSave()" style="padding: 12px; background: #dc2626; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>🆕</span> Novo Jogo (Apagar Progresso Atual)
+                </button>
             </div>
         </div>
     `;
@@ -365,7 +410,7 @@ function mostrarCreditos(){
 }
 
 // ===========================
-// BUG / SUPORTE (COM DJ_AlexÁvila)
+// BUG / SUPORTE
 // ===========================
 
 function mostrarBug(){
